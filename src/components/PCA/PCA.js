@@ -32,6 +32,24 @@ type Props = {
 };
 
 type State = {
+  dataset: Array<number[]>,
+  normalizedDataset: Array<number[]>,
+  covariance: Array<number[]>,
+  eigens: {
+    // eigenvectors
+    lambda: {
+      x: Array<number[]>,
+      y: Array<number[]>,
+    },
+    // eigenvalues
+    E: {
+      x: Array<number>,
+      y: Array<number>,
+    },
+  },
+  linearCombinations: any, // TODO: create type
+  analyzes: any, // TODO: create type
+  points: Array<{ x: number, y: number }>,
   calculating: boolean,
   calculated: boolean,
   plotting: boolean,
@@ -40,6 +58,14 @@ type State = {
 
 class PCA extends Component<Props, State> {
   state = {
+    // FIXME: It's a fake dataset
+    dataset: [[8, 18, 16, 20], [1.79, 4.0, 6.11, 8.42]],
+    normalizedDataset: [],
+    covariance: [],
+    eigens: {},
+    linearCombinations: undefined,
+    analyzes: undefined,
+    points: [],
     calculating: false,
     calculated: false,
     plotting: false,
@@ -47,58 +73,53 @@ class PCA extends Component<Props, State> {
   };
 
   calculate = (): void => {
+    const { dataset } = this.state;
+
     this.setState({
       calculating: true,
       calculated: false,
     });
 
-    // FIXME: IT'S A FAKE DATA
-    const initialDataset: Array<number[]> = [[8, 18, 16, 20], [1.79, 4.0, 6.11, 8.42]];
-
-    console.log('initial dataset', initialDataset);
-
     // 1) normalize the dataset
-    const normalized: Array<number[]> = this.normalize(initialDataset);
-
-    console.log('normalized dataset', normalized);
+    const normalizedDataset: Array<number[]> = this.normalize(dataset);
 
     // 2) compute matrix covariance
-    const covariance: Array<number[]> = cov(normalized);
-
-    console.log('matrix covariance', covariance);
+    const covariance: Array<number[]> = cov(normalizedDataset);
 
     // 3-4) compute eigenvalues and eigenvectors
     const eigens: {
-      // eigenvectors
       lambda: {
         x: Array<number[]>,
         y: Array<number[]>,
       },
-      // eigenvalues
       E: {
         x: Array<number>,
         y: Array<number>,
       },
     } = this.eig(covariance);
 
-    console.log('eigenvalues and eigenvectors', eigens);
-
     // 5) compute Linear Combinations
+    const linearCombinations = undefined;
 
     // 6) analyse (calc percentage, etc...)
     const analyzes = this.analyse(eigens);
 
-    console.log('analyzes of PCA', analyzes);
-
     // 7) plot graphics
-    const points: Array<{ x: number, y: number }> = transformDatasetToPoints(normalized);
+    const points: Array<{ x: number, y: number }> = transformDatasetToPoints(normalizedDataset);
 
-    // FIXME: PASS POINTS TO PLOT FUNCTION
-    this.setState({
-      points,
-      calculating: false,
-      calculated: true,
-    });
+    this.setState(
+      {
+        normalizedDataset,
+        covariance,
+        linearCombinations,
+        eigens,
+        analyzes,
+        points,
+        calculating: false,
+        calculated: true,
+      },
+      () => console.log(this.state),
+    );
   };
 
   normalize = (dataset: Array<number[]>): Array<number[]> => dataset.map((data: Array<number>) => {
@@ -111,12 +132,10 @@ class PCA extends Component<Props, State> {
   eig = (
     covariance: Array<number[]>,
   ): {
-    // eigenvectors
     lambda: {
       x: Array<number[]>,
       y: Array<number[]>,
     },
-    // eigenvalues
     E: {
       x: Array<number>,
       y: Array<number>,
@@ -132,18 +151,16 @@ class PCA extends Component<Props, State> {
   };
 
   analyse = (eigens: {
-    // eigenvectors
     lambda: {
       x: Array<number[]>,
       y: Array<number[]>,
     },
-    // eigenvalues
     E: {
       x: Array<number>,
       y: Array<number>,
     },
   }) => {
-    console.log('analysing...', eigens);
+    return undefined;
   };
 
   download = () => null;
