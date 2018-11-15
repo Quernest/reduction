@@ -9,9 +9,6 @@ import {
   Grid, Button, Typography, withStyles, LinearProgress, Tooltip,
 } from '@material-ui/core';
 
-// D3.js is a JavaScript library for manipulating documents based on data.
-import * as d3 from 'd3';
-
 // Math.js is an extensive math library for JavaScript and Node.js.
 import * as math from 'mathjs';
 
@@ -23,6 +20,8 @@ import numeric from 'numeric';
 
 // utilities
 import { transformDatasetToPoints } from '../../helpers/utils';
+
+import { Chart } from '.';
 
 try {
   // import the numeric.js library into math.js
@@ -164,124 +163,26 @@ class PCA extends Component<Props, State> {
     const { points } = this.state;
 
     this.setState({
-      plotting: true,
-      plotted: false,
+      plotted: true,
     });
 
-    setTimeout(() => {
-      this.plotGraphs(points);
-      this.setState({
-        plotting: false,
-        plotted: true,
-      });
-    }, 300);
-  };
+    // this.setState({
+    //   plotting: true,
+    //   plotted: false,
+    // });
 
-  plotGraphs = (points: Array<{ x: number, y: number }>): void => {
-    if (!points || points.length === 0) {
-      throw new Error('There are no points to plot');
-    }
-
-    // remove existed svgs
-    d3.select('#chart svg').remove();
-
-    const margin: {
-      top: number,
-      right: number,
-      bottom: number,
-      left: number,
-    } = {
-      top: 20,
-      right: 30,
-      bottom: 20,
-      left: 30,
-    };
-
-    const width: number = 800 - margin.left - margin.right;
-
-    const height: number = 600 - margin.top - margin.bottom;
-
-    // create svg element
-    const svg = d3
-      .select('#chart')
-      .append('svg')
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-      .append('g') // add group to leave margin for axis
-      .attr('transform', `translate(${margin.left}, ${margin.top})`);
-
-    const x = d3
-      .scaleLinear()
-      .rangeRound([0, width])
-      .domain([-d3.max(points, d => math.abs(d.x)), d3.max(points, d => math.abs(d.x))]);
-
-    const y = d3
-      .scaleLinear()
-      .rangeRound([0, height])
-      .domain([d3.max(points, d => math.abs(d.y)), -d3.max(points, d => math.abs(d.y))]);
-
-    const xAxis = d3.axisBottom(x);
-    const yAxis = d3.axisLeft(y);
-
-    svg
-      .append('g')
-      .attr('transform', `translate(${width / 2}, 0)`)
-      .call(yAxis);
-
-    svg
-      .append('g')
-      .attr('transform', `translate(0, ${height / 2})`)
-      .call(xAxis);
-
-    svg
-      .append('text')
-      .text('X')
-      .attr('x', 0 - height / 2)
-      .attr('y', 0 - margin.left)
-      .attr('dy', '1em')
-      .style('text-anchor', 'middle')
-      .attr('transform', 'rotate(-90)');
-
-    svg
-      .append('text')
-      .text('Y')
-      .attr('x', width / 2)
-      .attr('y', height + margin.bottom)
-      .style('text-anchor', 'middle');
-
-    svg
-      .selectAll('.tick')
-      .filter(d => d === 0)
-      .remove();
-
-    svg
-      .selectAll('circle')
-      .data(points)
-      .enter()
-      .append('circle')
-      .attr('cx', d => x(d.x))
-      .attr('cy', d => y(d.y))
-      .attr('r', 3)
-      .attr('fill', 'red');
-
-    // WARN: it's just template for svg line
-    svg
-      .append('line')
-      .style('stroke', 'blue')
-      .style('stroke-width', 2)
-      .attr('x1', x(0))
-      .attr('y1', y(0))
-      .attr('x2', x(1))
-      .attr('y2', y(1));
+    // setTimeout(() => {
+    //   this.setState({
+    //     plotting: false,
+    //     plotted: true,
+    //   });
+    // }, 300);
   };
 
   render() {
     const { classes } = this.props;
     const {
-      calculated,
-      calculating,
-      plotted,
-      plotting,
+      calculated, calculating, plotted, plotting, points,
     } = this.state;
 
     return (
@@ -333,7 +234,7 @@ class PCA extends Component<Props, State> {
               </Button>
             )}
             {(calculating || plotting) && <LinearProgress className={classes.linearProgress} />}
-            <div id="chart" className={classes.chart} />
+            {plotted && <Chart points={points} />}
           </Grid>
         </Grid>
       </div>
@@ -369,9 +270,6 @@ const styles = theme => ({
   },
   btnDownload: {
     marginLeft: 16,
-  },
-  chart: {
-    width: '100%',
   },
 });
 
