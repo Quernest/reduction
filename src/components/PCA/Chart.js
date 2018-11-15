@@ -9,23 +9,6 @@ import {
 // Math.js is an extensive math library for JavaScript and Node.js.
 import { abs } from 'mathjs';
 
-const margin: {
-  top: number,
-  right: number,
-  bottom: number,
-  left: number,
-} = {
-  top: 20,
-  right: 20,
-  bottom: 20,
-  left: 35,
-};
-
-const fullWidth: number = 800;
-const fullHeight: number = 600;
-const width: number = fullWidth - margin.left - margin.right;
-const height: number = fullHeight - margin.top - margin.bottom;
-
 type Props = {
   points: Array<{
     x: number,
@@ -34,17 +17,49 @@ type Props = {
   }>,
 };
 
-export default class Chart extends Component<Props> {
+type State = {
+  fullWidth: number,
+  fullHeight: number,
+  width: number,
+  height: number,
+  margin: {
+    top: number,
+    right: number,
+    bottom: number,
+    left: number,
+  },
+};
+
+export default class Chart extends Component<Props, State> {
+  state = {
+    margin: {
+      top: 20,
+      right: 20,
+      bottom: 20,
+      left: 35,
+    },
+    fullWidth: 825,
+    fullHeight: 625,
+    get width() {
+      return this.fullWidth - this.margin.left - this.margin.right;
+    },
+    get height() {
+      return this.fullHeight - this.margin.top - this.margin.bottom;
+    },
+  };
+
   componentDidMount() {
     const { points } = this.props;
 
     this.selectSVGElement();
     this.drawAxes(points);
     this.drawPoints(points);
-    this.drawLines();
+    this.drawVectors();
   }
 
   selectSVGElement() {
+    const { fullWidth, fullHeight, margin } = this.state;
+
     this.svg = select('#chart')
       .attr('width', '100%')
       .attr('height', '100%')
@@ -55,6 +70,8 @@ export default class Chart extends Component<Props> {
   }
 
   drawAxes(points) {
+    const { width, height, margin } = this.state;
+
     const x = scaleLinear()
       .rangeRound([0, width])
       .domain([-max(points, d => abs(d.x)), max(points, d => abs(d.x))]);
@@ -98,8 +115,8 @@ export default class Chart extends Component<Props> {
       .filter(d => d === 0)
       .remove();
 
-    this.x = x;
-    this.y = y;
+    this.xScale = x;
+    this.yScale = y;
   }
 
   drawPoints(points) {
@@ -108,23 +125,23 @@ export default class Chart extends Component<Props> {
       .data(points)
       .enter()
       .append('circle')
-      .attr('cx', d => this.x(d.x))
-      .attr('cy', d => this.y(d.y))
+      .attr('cx', d => this.xScale(d.x))
+      .attr('cy', d => this.yScale(d.y))
       .attr('r', 3)
       .attr('fill', 'red');
   }
 
-  drawLines(vectors) {
+  drawVectors(vectors) {
     console.log(vectors);
 
     this.svg
       .append('line')
       .style('stroke', 'blue')
       .style('stroke-width', 2)
-      .attr('x1', this.x(0))
-      .attr('y1', this.y(0))
-      .attr('x2', this.x(1))
-      .attr('y2', this.y(1));
+      .attr('x1', this.xScale(0))
+      .attr('y1', this.yScale(0))
+      .attr('x2', this.xScale(1))
+      .attr('y2', this.yScale(1));
   }
 
   render() {

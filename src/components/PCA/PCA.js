@@ -1,10 +1,6 @@
 // @flow
 // Principal component analysis page
-
-// core
 import React, { Component } from 'react';
-
-// user interface elements
 import {
   Grid, Button, Typography, withStyles, LinearProgress, Tooltip,
 } from '@material-ui/core';
@@ -20,7 +16,6 @@ import numeric from 'numeric';
 
 // utilities
 import { transformDatasetToPoints } from '../../helpers/utils';
-
 import { Chart } from '.';
 
 try {
@@ -98,18 +93,12 @@ class PCA extends Component<Props, State> {
     // 7) plot graphics
     const points: Array<{ x: number, y: number }> = transformDatasetToPoints(normalized);
 
-    // console.log('plotting graphs by points:', points);
-
-    // this.plotGraphs(points);
-
     // FIXME: PASS POINTS TO PLOT FUNCTION
-    setTimeout(() => {
-      this.setState({
-        points,
-        calculating: false,
-        calculated: true,
-      });
-    }, 300);
+    this.setState({
+      points,
+      calculating: false,
+      calculated: true,
+    });
   };
 
   normalize = (dataset: Array<number[]>): Array<number[]> => dataset.map((data: Array<number>) => {
@@ -157,26 +146,12 @@ class PCA extends Component<Props, State> {
     console.log('analysing...', eigens);
   };
 
-  download = () => console.log('downloading...');
+  download = () => null;
 
   plot = () => {
-    const { points } = this.state;
-
     this.setState({
       plotted: true,
     });
-
-    // this.setState({
-    //   plotting: true,
-    //   plotted: false,
-    // });
-
-    // setTimeout(() => {
-    //   this.setState({
-    //     plotting: false,
-    //     plotted: true,
-    //   });
-    // }, 300);
   };
 
   render() {
@@ -200,17 +175,15 @@ class PCA extends Component<Props, State> {
             </Typography>
             {calculated ? (
               <div>
-                <Tooltip title="Plot the graphic">
-                  <Button
-                    className={classes.btnPlot}
-                    color="primary"
-                    variant="contained"
-                    onClick={this.plot}
-                    disabled={plotted || plotting}
-                  >
-                    Plot
-                  </Button>
-                </Tooltip>
+                <Button
+                  className={classes.btnPlot}
+                  color="primary"
+                  variant="contained"
+                  onClick={this.plot}
+                  disabled={plotted || plotting}
+                >
+                  Plot
+                </Button>
                 <Tooltip title="Download results in Microsoft Word .docx format">
                   <Button
                     className={classes.btnDownload}
