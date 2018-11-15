@@ -49,7 +49,7 @@ type State = {
   },
   linearCombinations: any, // TODO: create type
   analyzes: any, // TODO: create type
-  points: Array<{ x: number, y: number }>,
+  normalizedDatasetPoints: Array<{ x: number, y: number }>,
   calculating: boolean,
   calculated: boolean,
   plotting: boolean,
@@ -65,7 +65,7 @@ class PCA extends Component<Props, State> {
     eigens: {},
     linearCombinations: undefined,
     analyzes: undefined,
-    points: [],
+    normalizedDatasetPoints: [],
     calculating: false,
     calculated: false,
     plotting: false,
@@ -105,7 +105,7 @@ class PCA extends Component<Props, State> {
     const analyzes = this.analyse(eigens);
 
     // 7) plot graphics
-    const points: Array<{ x: number, y: number }> = transformDatasetToPoints(normalizedDataset);
+    const normalizedDatasetPoints: Array<{ x: number, y: number }> = transformDatasetToPoints(normalizedDataset);
 
     this.setState(
       {
@@ -114,7 +114,7 @@ class PCA extends Component<Props, State> {
         linearCombinations,
         eigens,
         analyzes,
-        points,
+        normalizedDatasetPoints,
         calculating: false,
         calculated: true,
       },
@@ -174,7 +174,7 @@ class PCA extends Component<Props, State> {
   render() {
     const { classes } = this.props;
     const {
-      calculated, calculating, plotted, plotting, points,
+      calculated, calculating, plotted, plotting, normalizedDatasetPoints,
     } = this.state;
 
     return (
@@ -224,7 +224,7 @@ class PCA extends Component<Props, State> {
               </Button>
             )}
             {(calculating || plotting) && <LinearProgress className={classes.linearProgress} />}
-            {plotted && <Chart points={points} />}
+            {plotted && <Chart points={normalizedDatasetPoints} />}
           </Grid>
         </Grid>
       </div>
