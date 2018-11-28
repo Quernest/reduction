@@ -57,7 +57,7 @@ export default class Chart extends Component<Props, State> {
     this.drawVectors();
   }
 
-  selectSVGElement() {
+  selectSVGElement = () => {
     const { fullWidth, fullHeight, margin } = this.state;
 
     this.svg = select('#chart')
@@ -69,7 +69,7 @@ export default class Chart extends Component<Props, State> {
       .attr('transform', `translate(${margin.left},${margin.top})`);
   }
 
-  drawAxes(points) {
+  drawAxes = (points) => {
     const { width, height, margin } = this.state;
 
     const x = scaleLinear()
@@ -119,7 +119,7 @@ export default class Chart extends Component<Props, State> {
     this.yScale = y;
   }
 
-  drawPoints(points) {
+  drawPoints = (points) => {
     this.svg
       .selectAll('circle')
       .data(points)
@@ -131,9 +131,7 @@ export default class Chart extends Component<Props, State> {
       .attr('fill', 'red');
   }
 
-  drawVectors(vectors) {
-    console.log(vectors);
-
+  drawVectors = (vectors) => {
     this.svg
       .append('line')
       .style('stroke', 'blue')

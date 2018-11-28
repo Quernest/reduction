@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import {
   Grid, Button, Typography, withStyles,
 } from '@material-ui/core';
+import styles from './styles';
 
 type Props = {
   classes: Object,
@@ -29,21 +30,5 @@ const Home = ({ classes }: Props) => (
     </Grid>
   </div>
 );
-
-const styles = theme => ({
-  wrap: {
-    padding: 20,
-  },
-  headline: {
-    marginBottom: 16,
-  },
-  grid: {
-    [theme.breakpoints.up('lg')]: {
-      width: 1170,
-      marginLeft: 'auto',
-      marginRight: 'auto',
-    },
-  },
-});
 
 export default withStyles(styles)(Home);

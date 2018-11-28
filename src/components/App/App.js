@@ -12,6 +12,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import { NotFound } from '../Errors';
 import { Home } from '../Home';
 import { PCA } from '../PCA';
+import styles from './styles';
 
 type Props = {
   classes: Object,
@@ -43,15 +44,5 @@ const App = ({ classes }: Props) => (
     </Router>
   </div>
 );
-
-const styles = {
-  menuButton: {
-    marginLeft: -12,
-    marginRight: 20,
-  },
-  grow: {
-    flexGrow: 1,
-  },
-};
 
 export default withStyles(styles)(App);
