@@ -17,6 +17,7 @@ import PCA from './PCA';
  * 4) promise-based algorithm
  * 5) pass vecotrs coordinates to Chart component
  * 6) comments
+ * 7) add alerts and info 'how to use' PCA
  */
 
 type Props = {
