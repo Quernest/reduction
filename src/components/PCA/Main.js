@@ -26,6 +26,10 @@ type Props = {
 
 type State = {
   dataset: Array<number[]>,
+  scatterPoints: Array<{
+    x: number,
+    y: number,
+  }>,
   plotting: boolean,
   plotted: boolean,
   calculating: boolean,
