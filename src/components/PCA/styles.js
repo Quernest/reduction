@@ -20,10 +20,7 @@ export default theme => ({
     marginTop: 16,
     marginBottom: 16,
   },
-  btnPlot: {
-    marginTop: 16,
-    marginBottom: 16,
-  },
+  btnPlot: {},
   btnDownload: {
     marginLeft: 16,
   },

@@ -131,6 +131,7 @@ class Main extends Component<Props, State> {
     console.log('covariance', pca.covariance);
     console.log('points', pca.points);
     console.log('eigens', pca.eigens);
+    console.log('analysis', pca.analysis);
 
     this.setState({
       calculating: false,
@@ -147,11 +148,11 @@ class Main extends Component<Props, State> {
     console.log('plotting ...');
 
     this.setState({
-      plotting: true,
-      plotted: false,
+      plotting: false,
+      plotted: true,
     });
 
-    setTimeout(() => this.setState({ plotted: true, plotting: false }), 1000);
+    // setTimeout(() => this.setState({ plotted: true, plotting: false }), 1000);
 
     console.log('==========================================');
   };
@@ -194,7 +195,13 @@ class Main extends Component<Props, State> {
   render() {
     const { classes } = this.props;
     const {
-      uploading, uploaded, calculating, calculated, plotting, plotted, scatterPoints,
+      uploading,
+      uploaded,
+      calculating,
+      calculated,
+      plotting,
+      plotted,
+      scatterPoints,
     } = this.state;
 
     const isVisibleProgressBar: boolean = uploading || calculating || plotting;
@@ -214,18 +221,22 @@ class Main extends Component<Props, State> {
               linearly uncorrelated variables called principal components.
             </Typography>
             <div className={classes.dropZoneWrap}>
-              <Dropzone
-                className={classes.dropZone}
-                activeClassName={classes.activeDropZone}
-                rejectClassName={classes.rejectedDropZone}
-                multiple={false}
-                accept="text/x-csv, text/plain, application/vnd.ms-excel"
-                onDrop={this.onUpload}
-                onFileDialogCancel={this.onFileDialogCancel}
-              >
-                {props => this.checkFileTypes(props)}
-              </Dropzone>
-              {isVisibleCalculateButton && (
+              {!calculated && (
+                <Dropzone
+                  className={classes.dropZone}
+                  activeClassName={classes.activeDropZone}
+                  rejectClassName={classes.rejectedDropZone}
+                  multiple={false}
+                  accept="text/x-csv, text/plain, application/vnd.ms-excel"
+                  onDrop={this.onUpload}
+                  onFileDialogCancel={this.onFileDialogCancel}
+                >
+                  {props => this.checkFileTypes(props)}
+                </Dropzone>
+              )}
+            </div>
+            <div>
+            {isVisibleCalculateButton && (
                 <Button
                   className={classes.btnCalculate}
                   color="primary"
@@ -270,4 +281,3 @@ class Main extends Component<Props, State> {
 }
 
 export default withStyles(styles)(Main);
-

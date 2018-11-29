@@ -55,8 +55,8 @@ class PCA {
     // it is said to be a linear combination of the other vectors.
     this.linearCombinations = undefined;
 
-    // analysis of influence {PC1 on PC2 ... PCn}
-    this.analysis = undefined;
+    // analysis. How {PC1, PC2 ... PCn} accounts of the total variation around the PCs.
+    this.analysis = this.analyze(this.eigens.lambda.x);
   }
 
   // step 1
@@ -100,7 +100,11 @@ class PCA {
   getLinearCombinations = (): void => undefined;
 
   // step 6
-  analyze = (): void => undefined;
+  analyze = (eigenvalues) => {
+    const total = math.sum(eigenvalues);
+
+    return eigenvalues.map(l => parseFloat(((l / total) * 100).toFixed(2)));
+  };
 
   // optional you can add 'z' axis
   getPoints = (dataset, axes = ['x', 'y']): Array<{ x: number, y: number }> => {

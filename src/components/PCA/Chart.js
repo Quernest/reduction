@@ -67,7 +67,7 @@ export default class Chart extends Component<Props, State> {
       .attr('preserveAspectRatio', 'xMinYMin meet')
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
-  }
+  };
 
   drawAxes = (points) => {
     const { width, height, margin } = this.state;
@@ -117,7 +117,7 @@ export default class Chart extends Component<Props, State> {
 
     this.xScale = x;
     this.yScale = y;
-  }
+  };
 
   drawPoints = (points) => {
     this.svg
@@ -129,18 +129,18 @@ export default class Chart extends Component<Props, State> {
       .attr('cy', d => this.yScale(d.y))
       .attr('r', 3)
       .attr('fill', 'red');
-  }
+  };
 
   drawVectors = (vectors) => {
-    this.svg
-      .append('line')
-      .style('stroke', 'blue')
-      .style('stroke-width', 2)
-      .attr('x1', this.xScale(0))
-      .attr('y1', this.yScale(0))
-      .attr('x2', this.xScale(1))
-      .attr('y2', this.yScale(1));
-  }
+    // this.svg
+    //   .append('line')
+    //   .style('stroke', 'blue')
+    //   .style('stroke-width', 2)
+    //   .attr('x1', this.xScale(0))
+    //   .attr('y1', this.yScale(0))
+    //   .attr('x2', this.xScale(1))
+    //   .attr('y2', this.yScale(1));
+  };
 
   render() {
     return <svg id="chart" />;
