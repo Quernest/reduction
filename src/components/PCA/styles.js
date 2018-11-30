@@ -12,14 +12,15 @@ export default theme => ({
   title: {
     marginBottom: 16,
   },
+  content: {
+    marginTop: 16,
+    marginBottom: 16,
+  },
   linearProgress: {
     marginTop: 16,
     marginBottom: 16,
   },
-  btnCalculate: {
-    marginTop: 16,
-    marginBottom: 16,
-  },
+  btnCalculate: {},
   btnPlot: {},
   btnDownload: {
     marginLeft: 16,
@@ -28,8 +29,8 @@ export default theme => ({
     margin: 16,
   },
   dropZoneWrap: {
-    marginTop: 16,
-    marginBottom: 16,
+    marginTop: 8,
+    marginBottom: 8,
   },
   dropZone: {
     display: 'flex',

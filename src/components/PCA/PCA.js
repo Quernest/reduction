@@ -35,31 +35,36 @@ class PCA {
       this.dataset = this.transformTo2DArray(dataset);
     }
 
+    // step 1
     // If some variables have a large variance and some small,
     // PCA (maximizing variance) will load on the large variances.
     this.normalizedDataset = this.normalize(this.dataset);
 
-    // points of dataset to plot scatter
-    this.points = this.getPoints(this.normalizedDataset);
-
+    // step 2
     // a covariance matrix (also known as dispersion matrix or variance–covariance matrix)
     // is a matrix whose element in the i, j position is the covariance
     // between the i-th and j-th elements of a random vector.
     this.covariance = this.computeCovariance(this.normalizedDataset);
 
+    // step 3-4
     // a linear transformation is a non-zero vector that changes
     // by only a scalar factor when that linear transformation is applied to it.
     this.eigens = this.getEigens(this.covariance);
 
+    // step 5
     // If one vector is equal to the sum of scalar multiples of other vectors,
     // it is said to be a linear combination of the other vectors.
     this.linearCombinations = undefined;
 
+    // step 6
     // analysis. How {PC1, PC2 ... PCn} accounts of the total variation around the PCs.
     this.analysis = this.analyze(this.eigens.lambda.x);
+
+    // additional calculations
+    // get points of dataset to plot scatter
+    this.points = this.getPoints(this.normalizedDataset);
   }
 
-  // step 1
   normalize = (dataset: Array<number[]>): Array<number[]> => dataset.map((data: Array<number>) => {
     const mean: number = math.mean(data);
     const variance: number = math.var(data);
@@ -67,10 +72,8 @@ class PCA {
     return data.map((value: number): number => (value - mean) / math.sqrt(variance));
   });
 
-  // step 2
   computeCovariance = (dataset: Array<number[]>): Array<number[]> => cov(dataset);
 
-  // step 3-4
   getEigens = (
     covariance: Array<number[]>,
   ): {
@@ -96,10 +99,8 @@ class PCA {
     return math.eval(`eig(${matrix})`);
   };
 
-  // step 5
   getLinearCombinations = (): void => undefined;
 
-  // step 6
   analyze = (eigenvalues) => {
     const total = math.sum(eigenvalues);
 
@@ -107,7 +108,7 @@ class PCA {
   };
 
   // optional you can add 'z' axis
-  getPoints = (dataset, axes = ['x', 'y']): Array<{ x: number, y: number }> => {
+  getPoints = (dataset: Array<number[]>, axes = ['x', 'y']): Array<{ x: number, y: number }> => {
     const points: Array<{ x: number, y: number }> = [];
 
     for (let i = 0; i < dataset.length; i += 1) {

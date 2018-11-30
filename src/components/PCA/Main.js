@@ -236,7 +236,7 @@ class Main extends Component<Props, State> {
               )}
             </div>
             <div>
-            {isVisibleCalculateButton && (
+              {isVisibleCalculateButton && (
                 <Button
                   className={classes.btnCalculate}
                   color="primary"
