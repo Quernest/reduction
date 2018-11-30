@@ -14,10 +14,9 @@ import PCA from './PCA';
  * 1) better optimized validation
  * 2) dynamic form for adding factors
  * 3) logic for plotting scatterplot
- * 4) promise-based algorithm
- * 5) pass vecotrs coordinates to Chart component
- * 6) comments
- * 7) add alerts and info 'how to use' PCA
+ * 4) pass vecotrs coordinates to Chart component
+ * 5) comments
+ * 6) add alerts and info 'how to use' PCA
  */
 
 type Props = {
