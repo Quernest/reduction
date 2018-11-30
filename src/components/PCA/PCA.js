@@ -62,7 +62,7 @@ class PCA {
 
     // additional calculations
     // get points of dataset to plot scatter
-    this.points = this.getPoints(this.normalizedDataset);
+    this.points = this.getPoints(this.dataset);
   }
 
   normalize = (dataset: Array<number[]>): Array<number[]> => dataset.map((data: Array<number>) => {
@@ -101,28 +101,24 @@ class PCA {
 
   getLinearCombinations = (): void => undefined;
 
-  analyze = (eigenvalues) => {
-    const total = math.sum(eigenvalues);
+  analyze = eigenvalues => eigenvalues.map(l => parseFloat(((l / math.sum(eigenvalues)) * 100).toFixed(2)));
 
-    return eigenvalues.map(l => parseFloat(((l / total) * 100).toFixed(2)));
-  };
-
-  // optional you can add 'z' axis
-  getPoints = (dataset: Array<number[]>, axes = ['x', 'y']): Array<{ x: number, y: number }> => {
-    const points: Array<{ x: number, y: number }> = [];
-
-    for (let i = 0; i < dataset.length; i += 1) {
-      for (let j = 0; j < dataset[i].length; j += 1) {
-        if (typeof points[j] === 'undefined') {
-          points[j] = {};
-        }
-
-        points[j][axes[i]] = dataset[i][j];
+  getPoints = (
+    dataset: Array<number[]>,
+    axes: Array<string> = ['x', 'y', 'z'],
+  ): Array<{ x: number, y: number }> => dataset.reduce((acc, curr, i) => {
+    curr.forEach((_, j) => {
+      if (typeof acc[j] === 'undefined') {
+        acc[j] = {};
       }
-    }
 
-    return points;
-  };
+      if (typeof axes[i] !== 'undefined') {
+        acc[j][axes[i]] = curr[j];
+      }
+    });
+
+    return acc;
+  }, []);
 
   transformTo2DArray = (data): Array<number[]> => data.reduce((acc, curr) => {
     Object.values(curr).forEach((value, i) => {
