@@ -127,9 +127,8 @@ class PCA {
   getScatterPoints = (
     dataset: Array<number[]>,
     axes: Array<string> = ['x', 'y', 'z'],
-  ): Array<{ x: number, y: number }> => reduce(
-    dataset,
-    (acc: Array<number>, curr: number, i: number) => {
+  ): Array<{ x: number, y: number, z?: number }> => {
+    const reducer = (acc: Array<number>, curr: number, i: number) => {
       forEach(curr, (_, j: number) => {
         if (isUndefined(acc[j])) {
           acc[j] = {};
@@ -141,17 +140,20 @@ class PCA {
       });
 
       return acc;
-    },
-    [],
-  );
+    };
 
-  transformTo2DArray = (data: Object): Array<number[]> => transform(
-    data,
-    (acc: Array<number[]>, curr: Object) => values(curr).forEach((value: number, i: number) => {
-      (acc[i] || (acc[i] = [])).push(value);
-    }),
-    [],
-  );
+    return reduce(dataset, reducer, []);
+  };
+
+  transformTo2DArray = (data: Object): Array<number[]> => {
+    const transformer = (acc: Array<number[]>, curr: Object) => {
+      values(curr).forEach((value: number, i: number) => {
+        (acc[i] || (acc[i] = [])).push(value);
+      });
+    };
+
+    return transform(data, transformer, []);
+  };
 }
 
 export default PCA;
