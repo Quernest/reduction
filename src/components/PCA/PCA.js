@@ -101,7 +101,13 @@ class PCA {
 
   getLinearCombinations = (): void => undefined;
 
-  analyze = eigenvalues => eigenvalues.map(l => parseFloat(((l / math.sum(eigenvalues)) * 100).toFixed(2)));
+  analyze = (eigenvalues: Array<number>): Array<number> => {
+    const summary: number = math.sum(eigenvalues);
+
+    return eigenvalues.map(
+      (lambda: number): number => parseFloat((lambda / summary) * 100).toFixed(2),
+    );
+  };
 
   getPoints = (
     dataset: Array<number[]>,
