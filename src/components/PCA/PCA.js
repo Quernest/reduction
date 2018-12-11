@@ -62,7 +62,7 @@ class PCA {
 
     // additional calculations
     // get points of dataset to plot scatter
-    this.points = this.getPoints(this.dataset);
+    this.points = this.getPoints(this.normalizedDataset);
   }
 
   normalize = (dataset: Array<number[]>): Array<number[]> => dataset.map((data: Array<number>) => {
@@ -105,7 +105,7 @@ class PCA {
     const summary: number = math.sum(eigenvalues);
 
     return eigenvalues.map(
-      (lambda: number): number => parseFloat((lambda / summary) * 100).toFixed(2),
+      (lambda: number): number => parseFloat(((lambda / summary) * 100).toFixed(2)),
     );
   };
 
