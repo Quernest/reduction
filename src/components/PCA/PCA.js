@@ -2,6 +2,19 @@
 // Math.js is an extensive math library for JavaScript and Node.js.
 import * as math from 'mathjs';
 
+// A modern JavaScript utility library delivering modularity, performance & extras.
+import {
+  map,
+  reduce,
+  transform,
+  values,
+  forEach,
+  round,
+  isArray,
+  isEmpty,
+  isUndefined,
+} from 'lodash';
+
 // lib computes the covariance between one or more numeric arrays.
 import cov from 'compute-covariance';
 
@@ -20,7 +33,7 @@ try {
 class PCA {
   constructor(dataset: Array<number[]> | Array<Object>) {
     // handle empty dataset
-    if (!dataset || (dataset && dataset.length) === 0) {
+    if (isEmpty(dataset)) {
       throw new Error('No dataset found!');
     }
 
@@ -31,7 +44,7 @@ class PCA {
 
     // check whether the transferred data to the required type Array<number[]>
     // if not, transform into a two-dimensional array.
-    if (!Array.isArray(element)) {
+    if (!isArray(element)) {
       this.dataset = this.transformTo2DArray(dataset);
     }
 
@@ -61,16 +74,20 @@ class PCA {
     this.analysis = this.analyze(this.eigens.lambda.x);
 
     // additional calculations
-    // get points of dataset to plot scatter
-    this.points = this.getPoints(this.normalizedDataset);
+    // get scatter points of the dataset for plotting the scatter
+    this.scatterPoints = this.getScatterPoints(this.normalizedDataset);
   }
 
-  normalize = (dataset: Array<number[]>): Array<number[]> => dataset.map((data: Array<number>) => {
-    const mean: number = math.mean(data);
-    const variance: number = math.var(data);
+  normalize = (dataset: Array<number[]>): Array<number[]> => map(
+    dataset,
+    (data: Array<number>): Array<number> => {
+      const mean: number = math.mean(data);
+      const variance: number = math.var(data);
+      const std: number = math.sqrt(variance);
 
-    return data.map((value: number): number => (value - mean) / math.sqrt(variance));
-  });
+      return map(data, (value: number): number => round((value - mean) / std, 3));
+    },
+  );
 
   computeCovariance = (dataset: Array<number[]>): Array<number[]> => cov(dataset);
 
@@ -104,39 +121,37 @@ class PCA {
   analyze = (eigenvalues: Array<number>): Array<number> => {
     const summary: number = math.sum(eigenvalues);
 
-    return eigenvalues.map(
-      (lambda: number): number => parseFloat(((lambda / summary) * 100).toFixed(2)),
-    );
+    return map(eigenvalues, (lambda: number): number => round((lambda / summary) * 100, 2));
   };
 
-  getPoints = (
+  getScatterPoints = (
     dataset: Array<number[]>,
     axes: Array<string> = ['x', 'y', 'z'],
-  ): Array<{ x: number, y: number }> => dataset.reduce((acc, curr, i) => {
-    curr.forEach((_, j) => {
-      if (typeof acc[j] === 'undefined') {
-        acc[j] = {};
-      }
+  ): Array<{ x: number, y: number }> => reduce(
+    dataset,
+    (acc: Array<number>, curr: number, i: number) => {
+      forEach(curr, (_, j: number) => {
+        if (isUndefined(acc[j])) {
+          acc[j] = {};
+        }
 
-      if (typeof axes[i] !== 'undefined') {
-        acc[j][axes[i]] = curr[j];
-      }
-    });
+        if (!isUndefined(axes[i])) {
+          acc[j][axes[i]] = curr[j];
+        }
+      });
 
-    return acc;
-  }, []);
+      return acc;
+    },
+    [],
+  );
 
-  transformTo2DArray = (data): Array<number[]> => data.reduce((acc, curr) => {
-    Object.values(curr).forEach((value, i) => {
-      if (typeof acc[i] === 'undefined') {
-        acc[i] = [];
-      }
-
-      acc[i].push(value);
-    });
-
-    return acc;
-  }, []);
+  transformTo2DArray = (data: Object): Array<number[]> => transform(
+    data,
+    (acc: Array<number[]>, curr: Object) => values(curr).forEach((value: number, i: number) => {
+      (acc[i] || (acc[i] = [])).push(value);
+    }),
+    [],
+  );
 }
 
 export default PCA;

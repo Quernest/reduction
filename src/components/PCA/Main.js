@@ -128,14 +128,14 @@ class Main extends Component<Props, State> {
 
     console.log('normalized dataset', pca.normalizedDataset);
     console.log('covariance', pca.covariance);
-    console.log('points', pca.points);
+    console.log('points', pca.scatterPoints);
     console.log('eigens', pca.eigens);
     console.log('analysis', pca.analysis);
 
     this.setState({
       calculating: false,
       calculated: true,
-      scatterPoints: pca.points,
+      scatterPoints: pca.scatterPoints,
     });
 
     console.log('==========================================');
