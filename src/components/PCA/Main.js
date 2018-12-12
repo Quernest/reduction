@@ -3,6 +3,9 @@ import React, { Component } from 'react';
 import {
   Grid, Button, Typography, withStyles, LinearProgress, Tooltip,
 } from '@material-ui/core';
+import {
+  some, filter, isEmpty, isNumber, isNull, has,
+} from 'lodash';
 import Dropzone from 'react-dropzone';
 import Papa from 'papaparse';
 import styles from './styles';
@@ -11,12 +14,11 @@ import PCA from './PCA';
 
 /**
  * TODO:
- * 1) better optimized validation
- * 2) dynamic form for adding factors
- * 3) logic for plotting scatterplot
- * 4) pass vecotrs coordinates to Chart component
- * 5) comments
- * 6) add alerts and info 'how to use' PCA
+ * 1) dynamic form for adding factors
+ * 2) logic for plotting scatterplot
+ * 3) pass vecotrs coordinates to Chart component
+ * 4) comments
+ * 5) add alerts and info 'how to use' PCA
  */
 
 type Props = {
@@ -29,10 +31,13 @@ type State = {
     x: number,
     y: number,
   }>,
+  // chart plotting process
   plotting: boolean,
   plotted: boolean,
+  // calculating process
   calculating: boolean,
   calculated: boolean,
+  // file uploading process
   uploading: boolean,
   uploaded: boolean,
 };
@@ -49,13 +54,13 @@ class Main extends Component<Props, State> {
     uploaded: false,
   };
 
-  onUpload = (acceptedFiles, rejectedFiles) => {
+  onUpload = (acceptedFiles: Array<File>, rejectedFiles: Array<File>) => {
     if (rejectedFiles.length) {
-      throw new Error('This file rejected');
+      throw new Error('this file rejected');
     }
 
-    if (!acceptedFiles || acceptedFiles.length === 0) {
-      throw new Error('No files found!');
+    if (isEmpty(acceptedFiles)) {
+      throw new Error('no files found!');
     }
 
     this.setState({
@@ -77,40 +82,33 @@ class Main extends Component<Props, State> {
     });
   };
 
-  validate = (results) => {
-    if (!results || results.length === 0) {
-      throw new Error('Results not found!');
+  validate = (results: Object): boolean => {
+    if (isEmpty(results)) {
+      throw new Error('results not found!');
     }
 
-    if (results && !results.data) {
-      throw new Error('Passed results have not data array');
+    if (results && !has(results, 'data')) {
+      throw new Error('passed results have not data array');
     }
 
     const { data } = results;
 
-    function hasNull(obj) {
-      return Object.values(obj).some(x => x == null);
+    const wrongValues: Array<Object> = filter(
+      data,
+      (obj: any): boolean => some(obj, (value: any): boolean => !isNumber(value) || isNull(value)),
+    );
+
+    if (!isEmpty(wrongValues)) {
+      // TODO: set error code to the state
+      // console.error('Validation error. The dataset has some wrong values');
+      return false;
     }
-
-    function isNotNumber(obj) {
-      return Object.values(obj).some(x => typeof x !== 'number');
-    }
-
-    data.forEach((o, i) => {
-      if (hasNull(o)) {
-        console.log(`Error. ${i + 2} row has null value`);
-      } else if (isNotNumber(o)) {
-        console.log(`Error. ${i + 2} row has wrong type of value. Must be number.`);
-      } else {
-        return o;
-      }
-    });
-
-    const dataset = data;
 
     this.setState({
-      dataset,
+      dataset: data,
     });
+
+    return true;
   };
 
   calculate = (): void => {
@@ -152,19 +150,21 @@ class Main extends Component<Props, State> {
     });
 
     // setTimeout(() => this.setState({ plotted: true, plotting: false }), 1000);
-
     console.log('==========================================');
   };
 
   download = (): void => null;
 
-  onParseComplete = (results) => {
-    this.validate(results);
+  onParseComplete = (results: Object) => {
+    const isValid: boolean = this.validate(results);
 
-    this.setState({
-      uploading: false,
-      uploaded: true,
-    });
+    // TODO: handle else statement
+    if (isValid) {
+      this.setState({
+        uploading: false,
+        uploaded: true,
+      });
+    }
   };
 
   onFileDialogCancel = (e) => {};
@@ -172,11 +172,11 @@ class Main extends Component<Props, State> {
   checkFileTypes = ({
     isDragAccept, isDragReject, acceptedFiles, rejectedFiles,
   }): string => {
-    if (acceptedFiles.length) {
+    if (!isEmpty(acceptedFiles)) {
       return `Accepted ${acceptedFiles.length} files`;
     }
 
-    if (rejectedFiles.length) {
+    if (!isEmpty(rejectedFiles)) {
       return `Rejected ${rejectedFiles.length} files`;
     }
 
