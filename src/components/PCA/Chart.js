@@ -131,15 +131,25 @@ export default class Chart extends Component<Props, State> {
       .attr('fill', 'red');
   };
 
-  drawVectors = (vectors) => {
-    // this.svg
-    //   .append('line')
-    //   .style('stroke', 'blue')
-    //   .style('stroke-width', 2)
-    //   .attr('x1', this.xScale(0))
-    //   .attr('y1', this.yScale(0))
-    //   .attr('x2', this.xScale(1))
-    //   .attr('y2', this.yScale(1));
+  drawVectors = (vectors: Array<number[]>) => {
+    // PC1
+    this.svg
+      .append('line')
+      .style('stroke', 'red')
+      .style('stroke-width', 2)
+      .attr('x1', this.xScale(0))
+      .attr('y1', this.yScale(0))
+      .attr('x2', this.xScale(0.707))
+      .attr('y2', this.yScale(0.707));
+    // PC2
+    this.svg
+      .append('line')
+      .style('stroke', 'blue')
+      .style('stroke-width', 2)
+      .attr('x1', this.xScale(0))
+      .attr('y1', this.yScale(0))
+      .attr('x2', this.xScale(-0.707))
+      .attr('y2', this.yScale(0.707));
   };
 
   render() {

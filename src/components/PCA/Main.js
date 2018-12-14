@@ -1,16 +1,24 @@
 // @flow
 import React, { Component } from 'react';
 import {
-  Grid, Button, Typography, withStyles, LinearProgress, Tooltip,
+  Grid,
+  Button,
+  IconButton,
+  Typography,
+  withStyles,
+  LinearProgress,
+  Tooltip,
 } from '@material-ui/core';
 import {
-  some, filter, isEmpty, isNumber, isNull, has,
+  some, filter, size, forEach, isEmpty, isNumber, isNull, isArray, has,
 } from 'lodash';
-import Dropzone from 'react-dropzone';
-import Papa from 'papaparse';
-import styles from './styles';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import DeleteIcon from '@material-ui/icons/Delete';
 import { Chart } from '.';
+import Worker from './Worker';
+import WebWorker from '../../utils/WebWorker';
 import PCA from './PCA';
+import styles from './styles';
 
 /**
  * TODO:
@@ -26,6 +34,7 @@ type Props = {
 };
 
 type State = {
+  selectedFile: File,
   dataset: Array<number[]>,
   scatterPoints: Array<{
     x: number,
@@ -44,6 +53,7 @@ type State = {
 
 class Main extends Component<Props, State> {
   state = {
+    selectedFile: null,
     dataset: [],
     scatterPoints: [],
     plotting: false,
@@ -54,33 +64,11 @@ class Main extends Component<Props, State> {
     uploaded: false,
   };
 
-  onUpload = (acceptedFiles: Array<File>, rejectedFiles: Array<File>) => {
-    if (rejectedFiles.length) {
-      throw new Error('this file rejected');
-    }
+  fileInput: ?HTMLInputElement = React.createRef();
 
-    if (isEmpty(acceptedFiles)) {
-      throw new Error('no files found!');
-    }
-
-    this.setState({
-      uploading: true,
-      uploaded: false,
-    });
-
-    const [file] = acceptedFiles;
-
-    if (!file) {
-      throw new Error('Uploading error');
-    }
-
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      dynamicTyping: true,
-      complete: this.onParseComplete,
-    });
-  };
+  componentDidMount() {
+    this.worker = new WebWorker(Worker);
+  }
 
   validate = (results: Object): boolean => {
     if (isEmpty(results)) {
@@ -91,12 +79,17 @@ class Main extends Component<Props, State> {
       throw new Error('passed results have not data array');
     }
 
-    const { data } = results;
+    const { data }: Array<{ value: ?number }> = results;
 
-    const wrongValues: Array<Object> = filter(
-      data,
-      (obj: any): boolean => some(obj, (value: any): boolean => !isNumber(value) || isNull(value)),
-    );
+    // check dataset object size
+    forEach(data, (object: Object) => {
+      if (size(object) < 2) {
+        throw new Error('The object of dataset must contain more than 2 factors.');
+      }
+    });
+
+    // check if valid dataset object values
+    const wrongValues: Array<Object> = filter(data, (object: Object) => some(object, (value: number | string) => isNull(value) || !isNumber(value)));
 
     if (!isEmpty(wrongValues)) {
       // TODO: set error code to the state
@@ -112,83 +105,71 @@ class Main extends Component<Props, State> {
   };
 
   calculate = (): void => {
-    const { dataset } = this.state;
-
-    console.time('PCA performance');
-    console.log('==========================================');
+    const { dataset }: Array<number[]> = this.state;
 
     this.setState({
       calculating: true,
       calculated: false,
     });
 
+    // maybe calculate it in the worker?
     const pca = new PCA(dataset);
 
-    console.log('normalized dataset', pca.normalizedDataset);
-    console.log('covariance', pca.covariance);
-    console.log('points', pca.scatterPoints);
-    console.log('eigens', pca.eigens);
-    console.log('analysis', pca.analysis);
+    const { scatterPoints } = pca;
 
     this.setState({
       calculating: false,
       calculated: true,
-      scatterPoints: pca.scatterPoints,
+      scatterPoints,
     });
-
-    console.log('==========================================');
-    console.timeEnd('PCA performance');
   };
 
   plot = (): void => {
-    console.log('==========================================');
-    console.log('plotting ...');
-
     this.setState({
       plotting: false,
       plotted: true,
     });
-
-    // setTimeout(() => this.setState({ plotted: true, plotting: false }), 1000);
-    console.log('==========================================');
   };
 
-  download = (): void => null;
+  fileSelectedHandler = (event: Event) => {
+    const { files }: FileList = event.target;
+    const [file]: File = files;
 
-  onParseComplete = (results: Object) => {
-    const isValid: boolean = this.validate(results);
-
-    // TODO: handle else statement
-    if (isValid) {
-      this.setState({
-        uploading: false,
-        uploaded: true,
-      });
-    }
+    this.setState({
+      selectedFile: file,
+    });
   };
 
-  onFileDialogCancel = (e) => {};
+  fileUploadHandler = () => {
+    this.setState({
+      uploaded: false,
+      uploading: true,
+    });
 
-  checkFileTypes = ({
-    isDragAccept, isDragReject, acceptedFiles, rejectedFiles,
-  }): string => {
-    if (!isEmpty(acceptedFiles)) {
-      return `Accepted ${acceptedFiles.length} files`;
-    }
+    const { selectedFile } = this.state;
 
-    if (!isEmpty(rejectedFiles)) {
-      return `Rejected ${rejectedFiles.length} files`;
-    }
+    // communication with worker
+    this.worker.addEventListener('message', (event: MessageEvent) => {
+      if (isArray(event.data)) {
+        const dataset: Array<number[]> = event.data;
 
-    if (isDragAccept) {
-      return 'This file is authorized';
-    }
+        this.setState({
+          uploaded: true,
+          uploading: false,
+          dataset,
+        });
+      }
+    }, false);
 
-    if (isDragReject) {
-      return 'This file is not authorized';
-    }
+    // send selected file to the worker
+    this.worker.postMessage(selectedFile);
+  };
 
-    return 'Drop .txt or .csv file here';
+  fileCancelHandler = () => {
+    this.setState({
+      selectedFile: null,
+      uploaded: false,
+    });
   };
 
   render() {
@@ -201,6 +182,7 @@ class Main extends Component<Props, State> {
       plotting,
       plotted,
       scatterPoints,
+      selectedFile,
     } = this.state;
 
     const isVisibleProgressBar: boolean = uploading || calculating || plotting;
@@ -219,25 +201,58 @@ class Main extends Component<Props, State> {
               (entities each of which takes on various numerical values) into a set of values of
               linearly uncorrelated variables called principal components.
             </Typography>
-            <div className={classes.dropZoneWrap}>
-              {!calculated && (
-                <Dropzone
-                  className={classes.dropZone}
-                  activeClassName={classes.activeDropZone}
-                  rejectClassName={classes.rejectedDropZone}
-                  multiple={false}
-                  accept="text/x-csv, text/plain, application/vnd.ms-excel"
-                  onDrop={this.onUpload}
-                  onFileDialogCancel={this.onFileDialogCancel}
+
+            {!uploaded && (
+              <>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  className={classes.button}
+                  onClick={() => this.fileInput.current.click()}
+                  disabled={uploading || !isNull(selectedFile)}
                 >
-                  {props => this.checkFileTypes(props)}
-                </Dropzone>
-              )}
-            </div>
+                  Pick csv file
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  className={classes.button}
+                  onClick={this.fileUploadHandler}
+                  disabled={uploading || isNull(selectedFile)}
+                >
+                  Upload
+                  <CloudUploadIcon className={classes.rightIcon} />
+                </Button>
+                <input
+                  style={{ display: 'none' }}
+                  ref={this.fileInput}
+                  type="file"
+                  onChange={this.fileSelectedHandler}
+                  multiple={false}
+                  hidden
+                />
+                {!isNull(selectedFile) && !uploading && (
+                  <div className={classes.file}>
+                    <Typography variant="body2">
+                      {selectedFile.name}
+                      <IconButton
+                        aria-label="delete"
+                        className={classes.margin}
+                        onClick={this.fileCancelHandler}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Typography>
+                  </div>
+                )}
+              </>
+            )}
+
             <div>
               {isVisibleCalculateButton && (
                 <Button
-                  className={classes.btnCalculate}
+                  className={classes.button}
                   color="primary"
                   variant="contained"
                   onClick={this.calculate}
@@ -248,7 +263,7 @@ class Main extends Component<Props, State> {
               )}
               {calculated && (
                 <Button
-                  className={classes.btnCalculate}
+                  className={classes.button}
                   color="primary"
                   variant="contained"
                   onClick={this.plot}
@@ -260,7 +275,7 @@ class Main extends Component<Props, State> {
               {calculated && (
                 <Tooltip title="Download results in Microsoft Word .docx format">
                   <Button
-                    className={classes.btnDownload}
+                    className={classes.button}
                     color="primary"
                     variant="contained"
                     onClick={this.download}

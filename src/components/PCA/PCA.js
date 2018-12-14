@@ -65,9 +65,10 @@ class PCA {
     this.eigens = this.getEigens(this.covariance);
 
     // step 5
+    // https://www.dsprelated.com/freebooks/mdft/Linear_Combination_Vectors.html
     // If one vector is equal to the sum of scalar multiples of other vectors,
     // it is said to be a linear combination of the other vectors.
-    this.linearCombinations = undefined;
+    this.linearCombinations = this.getLinearCombinations(this.normalizedDataset, this.eigens.E.x);
 
     // step 6
     // analysis. How {PC1, PC2 ... PCn} accounts of the total variation around the PCs.
@@ -94,12 +95,12 @@ class PCA {
   getEigens = (
     covariance: Array<number[]>,
   ): {
-    // eigenvectors
+    // eigenvalues
     lambda: {
       x: Array<number[]>,
       y: Array<number[]>,
     },
-    // eigenvalues
+    // eigenvectors
     E: {
       x: Array<number>,
       y: Array<number>,
@@ -116,7 +117,9 @@ class PCA {
     return math.eval(`eig(${matrix})`);
   };
 
-  getLinearCombinations = (): void => undefined;
+  getLinearCombinations = (dataset: Array<number[]>, eigenvectors): any => {
+    forEach(eigenvectors, (vector: Array<number>, i: number) => {});
+  };
 
   analyze = (eigenvalues: Array<number>): Array<number> => {
     const summary: number = math.sum(eigenvalues);
