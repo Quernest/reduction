@@ -134,7 +134,6 @@ export default class Chart extends Component<Props, State> {
 
   drawVectors = (vectors: Array<number[]>) => {
     // const arrayColumn = (arr, n) => arr.map(x => abs(x[n]) * -1);
-
     // // PC1
     // this.svg
     //   .append('line')

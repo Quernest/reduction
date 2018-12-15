@@ -1,17 +1,12 @@
 // @flow
 import React, { Component } from 'react';
-import {
-  Grid,
-  Button,
-  withStyles,
-  LinearProgress,
-  Tooltip,
-} from '@material-ui/core';
+import { withStyles, Grid } from '@material-ui/core';
 import {
   some, filter, size, forEach, isEmpty, isNumber, isNull, has,
 } from 'lodash';
 import { Header, Chart } from '.';
 import { Controls, UploadControls, AlgorithmControls } from './Controls';
+import ProgressBar from '../ProgressBar';
 import UploadWorker from './upload.worker';
 import CalculateWorker from './calculate.worker';
 import styles from './styles';
@@ -45,7 +40,7 @@ type State = {
   // file uploading process
   uploading: boolean,
   uploaded: boolean,
-  errors: Array<string>,
+  error: string,
 };
 
 class Main extends Component<Props, State> {
@@ -59,7 +54,7 @@ class Main extends Component<Props, State> {
     calculated: false,
     uploading: false,
     uploaded: false,
-    errors: [],
+    error: '',
   };
 
   fileInput: ?HTMLInputElement = React.createRef();
@@ -149,6 +144,10 @@ class Main extends Component<Props, State> {
     const { files }: FileList = event.target;
     const [file]: File = files;
 
+    // reset input
+    // to be able to upload the same file again if it was canceled
+    event.target.value = '';
+
     this.setState({
       selectedFile: file,
     });
@@ -156,6 +155,7 @@ class Main extends Component<Props, State> {
 
   onFileUpload = () => {
     this.setState({
+      error: '',
       uploaded: false,
       uploading: true,
     });
@@ -166,33 +166,22 @@ class Main extends Component<Props, State> {
     this.uploadWorker.addEventListener(
       'message',
       (event: MessageEvent) => {
-        if (event.data.error) {
-          const { errors } = this.state;
-
-          this.setState({
-            uploaded: false,
-            uploading: false,
-            errors: [...errors, event.data.error],
-          });
-        }
+        this.setState({
+          uploaded: true,
+          uploading: false,
+          dataset: event.data,
+        });
       },
       false,
     );
 
     // error handler
     this.uploadWorker.addEventListener('error', (event: ErrorEvent) => {
-      if (event && has(event, 'message')) {
-        const { errors } = this.state;
-
-        // add one
-        errors.push(event.message);
-
-        this.setState({
-          uploaded: false,
-          uploading: false,
-          errors,
-        });
-      }
+      this.setState({
+        uploaded: false,
+        uploading: false,
+        error: event.message,
+      });
     });
 
     // send selected file to the worker
@@ -203,6 +192,7 @@ class Main extends Component<Props, State> {
     this.setState({
       selectedFile: null,
       uploaded: false,
+      error: '',
     });
   };
 
@@ -215,143 +205,40 @@ class Main extends Component<Props, State> {
       calculated,
       plotting,
       plotted,
-      scatterPoints,
       selectedFile,
+      scatterPoints,
       vectors,
-      errors,
+      error, // TODO: display error in modal or smth else
     } = this.state;
-    // const isVisibleProgressBar: boolean = uploading || calculating || plotting;
-    // const isVisibleCalculateButton: boolean = uploaded && !calculated;
-    // const hasErrors: boolean = !isEmpty(errors);
 
     return (
       <div className={classes.root}>
-        <Header />
-        <Controls>
-          <UploadControls
-            onFileUpload={this.onFileUpload}
-            onFileSelectInputChange={this.onFileSelectInputChange}
-            onFileCancel={this.onFileCancel}
-            multiple={false}
-            file={selectedFile}
-            uploading={uploading}
-            uploaded={uploaded}
-          />
-          <AlgorithmControls
-            onCalculate={this.onCalculate}
-            onChartPlot={this.onChartPlot}
-            onDocumentDownload={this.onDocumentDownload}
-            calculated={calculated}
-            calculating={calculating}
-            plotting={plotting}
-            plotted={plotted}
-          />
-        </Controls>
-
-        {/* <Controls
-          onFileUpload={this.onFileUpload}
-          onFileSelectInputChange={this.onFileSelectInputChange}
-          onFileCancel={this.onFileCancel}
-          onCalculate={this.onCalculate}
-          onPlotChart={this.onChartPlot}
-          onDownloadDocument={this.onDocumentDownload}
-          multiple={false}
-          file={selectedFile}
-        /> */}
-
         <Grid className={classes.grid} container>
           <Grid item>
-            {/* {!uploaded && (
-              <>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  className={classes.button}
-                  onClick={() => this.fileInput.current.click()}
-                  disabled={uploading || !isNull(selectedFile)}
-                >
-                  Pick csv file
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  className={classes.button}
-                  onClick={this.fileUploadHandler}
-                  disabled={uploading || isNull(selectedFile)}
-                >
-                  Upload
-                  <CloudUploadIcon className={classes.rightIcon} />
-                </Button>
-                <input
-                  style={{ display: 'none' }}
-                  ref={this.fileInput}
-                  type="file"
-                  onChange={this.fileSelectedHandler}
-                  multiple={false}
-                  hidden
-                />
-                {!isNull(selectedFile) && !uploading && (
-                  <div className={classes.file}>
-                    <Typography variant="body2">
-                      {selectedFile.name}
-                      <IconButton
-                        aria-label="delete"
-                        className={classes.margin}
-                        onClick={this.fileCancelHandler}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Typography>
-                  </div>
-                )}
-              </>
-            )} */}
-            {/* <div>
-              {isVisibleCalculateButton && (
-                <Button
-                  className={classes.button}
-                  color="primary"
-                  variant="contained"
-                  onClick={this.calculate}
-                  disabled={calculating}
-                >
-                  Calculate
-                </Button>
-              )}
-              {calculated && (
-                <Button
-                  className={classes.button}
-                  color="primary"
-                  variant="contained"
-                  onClick={this.plot}
-                  disabled={plotting || plotted}
-                >
-                  Plot
-                </Button>
-              )}
-              {calculated && (
-                <Tooltip title="Download results in Microsoft Word .docx format">
-                  <Button
-                    className={classes.button}
-                    color="primary"
-                    variant="contained"
-                    onClick={this.download}
-                  >
-                    Word
-                  </Button>
-                </Tooltip>
-              )}
-              {plotted && <Chart points={scatterPoints} vectors={vectors} />}
-            </div> */}
-            {/* {isVisibleProgressBar && <LinearProgress className={classes.linearProgress} />} */}
-            {/* {hasErrors && (
-              <div>
-                {forEach(errors, error => (
-                  <p>{error}</p>
-                ))}
-              </div>
-            )} */}
+            <Header />
+            <Controls>
+              <UploadControls
+                onFileUpload={this.onFileUpload}
+                onFileSelectInputChange={this.onFileSelectInputChange}
+                onFileCancel={this.onFileCancel}
+                multiple={false}
+                file={selectedFile}
+                uploading={uploading}
+                uploaded={uploaded}
+              />
+              <AlgorithmControls
+                onCalculate={this.onCalculate}
+                onChartPlot={this.onChartPlot}
+                onDocumentDownload={this.onDocumentDownload}
+                uploaded={uploaded}
+                calculated={calculated}
+                calculating={calculating}
+                plotting={plotting}
+                plotted={plotted}
+              />
+            </Controls>
+            <ProgressBar active={uploading || calculating} />
+            {plotted && <Chart points={scatterPoints} vectors={vectors} />}
           </Grid>
         </Grid>
       </div>

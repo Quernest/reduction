@@ -8,8 +8,11 @@ type Props = {
   onCalculate: () => void,
   onChartPlot: () => void,
   onDocumentDownload: () => void,
+  uploaded: boolean,
   calculating: boolean,
   calculated: boolean,
+  plotting: boolean,
+  plotted: boolean,
 };
 
 const AlgorithmControls = ({
@@ -17,25 +20,50 @@ const AlgorithmControls = ({
   onCalculate,
   onChartPlot,
   onDocumentDownload,
+  uploaded,
   calculating,
   calculated,
-}: Props) => (
-  <div className={classes.algorithmControls}>
-    <Button className={classes.button} color="primary" variant="contained" onClick={onCalculate}>
-      Calculate
-    </Button>
-    <Button className={classes.button} color="primary" variant="contained" onClick={onChartPlot}>
-      Plot
-    </Button>
-    <Button
-      className={classes.button}
-      color="primary"
-      variant="contained"
-      onClick={onDocumentDownload}
-    >
-      Document
-    </Button>
-  </div>
-);
+  plotted,
+}: Props) => {
+  if (calculated) {
+    return (
+      <div className={classes.algorithmControls}>
+        <Button
+          className={classes.button}
+          color="primary"
+          variant="contained"
+          onClick={onChartPlot}
+          disabled={plotted}
+        >
+          Plot
+        </Button>
+        <Button
+          className={classes.button}
+          color="primary"
+          variant="contained"
+          onClick={onDocumentDownload}
+        >
+          Document
+        </Button>
+      </div>
+    );
+  }
+
+  if (uploaded && !calculated) {
+    return (
+      <Button
+        className={classes.button}
+        color="primary"
+        variant="contained"
+        onClick={onCalculate}
+        disabled={calculating}
+      >
+        Calculate
+      </Button>
+    );
+  }
+
+  return null;
+};
 
 export default withStyles(styles)(AlgorithmControls);
