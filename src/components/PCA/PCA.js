@@ -8,6 +8,7 @@ import {
   reduce,
   transform,
   values,
+  size,
   forEach,
   round,
   isArray,

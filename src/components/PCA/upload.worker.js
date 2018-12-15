@@ -12,7 +12,7 @@ self.addEventListener('message', async (ev) => {
 
     const parsedCSV = CSV.parse(result);
 
-    self.postMessage(parsedCSV);
+    postMessage(parsedCSV);
   };
 
   fr.onerror = error => postMessage(error);

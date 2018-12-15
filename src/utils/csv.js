@@ -5,6 +5,7 @@
 // Each line of the file is a data record.
 // Each record consists of one or more fields, separated by commas.
 // The use of the comma as a field separator is the source of the name for this file format.
+import { isString } from 'lodash';
 
 export default class CSV {
   static parse(csv: string): Array<{ value: number }> {
@@ -19,12 +20,12 @@ export default class CSV {
       const currentline: Array<string> = line.split(',');
 
       headers.map((header: string, indexHeader: number) => {
-        // convert to number
-        if (typeof currentline[indexHeader] === 'string') {
+        // convert to the number
+        if (isString(currentline[indexHeader])) {
           currentline[indexHeader] = parseFloat(currentline[indexHeader]);
         }
 
-        // remove quotes from the object key
+        // remove double quotes from the object key
         obj[header.trim()] = currentline[indexHeader];
 
         return obj[header];

@@ -3,18 +3,15 @@ import React, { Component } from 'react';
 import {
   Grid,
   Button,
-  IconButton,
-  Typography,
   withStyles,
   LinearProgress,
   Tooltip,
 } from '@material-ui/core';
 import {
-  some, filter, size, forEach, isEmpty, isNumber, isNull, isArray, has,
+  some, filter, size, forEach, isEmpty, isNumber, isNull, has,
 } from 'lodash';
-import CloudUploadIcon from '@material-ui/icons/CloudUpload';
-import DeleteIcon from '@material-ui/icons/Delete';
-import { Chart } from '.';
+import { Header, Chart } from '.';
+import { Controls, UploadControls, AlgorithmControls } from './Controls';
 import UploadWorker from './upload.worker';
 import CalculateWorker from './calculate.worker';
 import styles from './styles';
@@ -48,6 +45,7 @@ type State = {
   // file uploading process
   uploading: boolean,
   uploaded: boolean,
+  errors: Array<string>,
 };
 
 class Main extends Component<Props, State> {
@@ -61,6 +59,7 @@ class Main extends Component<Props, State> {
     calculated: false,
     uploading: false,
     uploaded: false,
+    errors: [],
   };
 
   fileInput: ?HTMLInputElement = React.createRef();
@@ -105,7 +104,7 @@ class Main extends Component<Props, State> {
     return true;
   };
 
-  calculate = (): void => {
+  onCalculate = (): void => {
     const { dataset }: Array<number[]> = this.state;
 
     this.setState({
@@ -137,14 +136,16 @@ class Main extends Component<Props, State> {
     this.calculateWorker.postMessage(dataset);
   };
 
-  plot = (): void => {
+  onChartPlot = (): void => {
     this.setState({
       plotting: false,
       plotted: true,
     });
   };
 
-  fileSelectedHandler = (event: Event) => {
+  onDocumentDownload = (): void => null;
+
+  onFileSelectInputChange = (event: Event) => {
     const { files }: FileList = event.target;
     const [file]: File = files;
 
@@ -153,7 +154,7 @@ class Main extends Component<Props, State> {
     });
   };
 
-  fileUploadHandler = () => {
+  onFileUpload = () => {
     this.setState({
       uploaded: false,
       uploading: true,
@@ -165,24 +166,40 @@ class Main extends Component<Props, State> {
     this.uploadWorker.addEventListener(
       'message',
       (event: MessageEvent) => {
-        if (isArray(event.data)) {
-          const dataset: Array<number[]> = event.data;
+        if (event.data.error) {
+          const { errors } = this.state;
 
           this.setState({
-            uploaded: true,
+            uploaded: false,
             uploading: false,
-            dataset,
+            errors: [...errors, event.data.error],
           });
         }
       },
       false,
     );
 
+    // error handler
+    this.uploadWorker.addEventListener('error', (event: ErrorEvent) => {
+      if (event && has(event, 'message')) {
+        const { errors } = this.state;
+
+        // add one
+        errors.push(event.message);
+
+        this.setState({
+          uploaded: false,
+          uploading: false,
+          errors,
+        });
+      }
+    });
+
     // send selected file to the worker
     this.uploadWorker.postMessage(selectedFile);
   };
 
-  fileCancelHandler = () => {
+  onFileCancel = () => {
     this.setState({
       selectedFile: null,
       uploaded: false,
@@ -201,26 +218,50 @@ class Main extends Component<Props, State> {
       scatterPoints,
       selectedFile,
       vectors,
+      errors,
     } = this.state;
-
-    const isVisibleProgressBar: boolean = uploading || calculating || plotting;
-    const isVisibleCalculateButton: boolean = uploaded && !calculated;
+    // const isVisibleProgressBar: boolean = uploading || calculating || plotting;
+    // const isVisibleCalculateButton: boolean = uploaded && !calculated;
+    // const hasErrors: boolean = !isEmpty(errors);
 
     return (
       <div className={classes.root}>
+        <Header />
+        <Controls>
+          <UploadControls
+            onFileUpload={this.onFileUpload}
+            onFileSelectInputChange={this.onFileSelectInputChange}
+            onFileCancel={this.onFileCancel}
+            multiple={false}
+            file={selectedFile}
+            uploading={uploading}
+            uploaded={uploaded}
+          />
+          <AlgorithmControls
+            onCalculate={this.onCalculate}
+            onChartPlot={this.onChartPlot}
+            onDocumentDownload={this.onDocumentDownload}
+            calculated={calculated}
+            calculating={calculating}
+            plotting={plotting}
+            plotted={plotted}
+          />
+        </Controls>
+
+        {/* <Controls
+          onFileUpload={this.onFileUpload}
+          onFileSelectInputChange={this.onFileSelectInputChange}
+          onFileCancel={this.onFileCancel}
+          onCalculate={this.onCalculate}
+          onPlotChart={this.onChartPlot}
+          onDownloadDocument={this.onDocumentDownload}
+          multiple={false}
+          file={selectedFile}
+        /> */}
+
         <Grid className={classes.grid} container>
           <Grid item>
-            <Typography className={classes.title} variant="h5">
-              Principal component analysis
-            </Typography>
-            <Typography variant="subtitle1">
-              Principal component analysis (PCA) is a statistical procedure that uses an orthogonal
-              transformation to convert a set of observations of possibly correlated variables
-              (entities each of which takes on various numerical values) into a set of values of
-              linearly uncorrelated variables called principal components.
-            </Typography>
-
-            {!uploaded && (
+            {/* {!uploaded && (
               <>
                 <Button
                   variant="contained"
@@ -265,9 +306,8 @@ class Main extends Component<Props, State> {
                   </div>
                 )}
               </>
-            )}
-
-            <div>
+            )} */}
+            {/* <div>
               {isVisibleCalculateButton && (
                 <Button
                   className={classes.button}
@@ -303,8 +343,15 @@ class Main extends Component<Props, State> {
                 </Tooltip>
               )}
               {plotted && <Chart points={scatterPoints} vectors={vectors} />}
-            </div>
-            {isVisibleProgressBar && <LinearProgress className={classes.linearProgress} />}
+            </div> */}
+            {/* {isVisibleProgressBar && <LinearProgress className={classes.linearProgress} />} */}
+            {/* {hasErrors && (
+              <div>
+                {forEach(errors, error => (
+                  <p>{error}</p>
+                ))}
+              </div>
+            )} */}
           </Grid>
         </Grid>
       </div>

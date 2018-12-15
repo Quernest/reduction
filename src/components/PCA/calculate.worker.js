@@ -5,7 +5,6 @@ self.addEventListener(
   (ev) => {
     const { data } = ev;
 
-    // TODO: add validation
     const pca = new PCA(data);
 
     const {
