@@ -15,8 +15,8 @@ import {
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Chart } from '.';
-import Worker from './Worker';
-import WebWorker from '../../utils/WebWorker';
+import UploadWorker from './upload.worker';
+import CalculateWorker from './calculate.worker';
 import PCA from './PCA';
 import styles from './styles';
 
@@ -67,7 +67,9 @@ class Main extends Component<Props, State> {
   fileInput: ?HTMLInputElement = React.createRef();
 
   componentDidMount() {
-    this.worker = new WebWorker(Worker);
+    // initialzie workers
+    this.uploadWorker = new UploadWorker();
+    this.calculateWorker = new CalculateWorker();
   }
 
   validate = (results: Object): boolean => {
@@ -112,16 +114,24 @@ class Main extends Component<Props, State> {
       calculated: false,
     });
 
-    // maybe calculate it in the worker?
-    const pca = new PCA(dataset);
+    this.calculateWorker.addEventListener(
+      'message',
+      (ev) => {
+        const { data } = ev;
+        const { scatterPoints } = data;
 
-    const { scatterPoints } = pca;
+        this.setState({
+          calculating: false,
+          calculated: true,
+          scatterPoints,
+        });
+      },
+      false,
+    );
 
-    this.setState({
-      calculating: false,
-      calculated: true,
-      scatterPoints,
-    });
+    // TODO: add timeout function (stop calculations if too long)
+
+    this.calculateWorker.postMessage(dataset);
   };
 
   plot = (): void => {
@@ -149,20 +159,26 @@ class Main extends Component<Props, State> {
     const { selectedFile } = this.state;
 
     // communication with worker
-    this.worker.addEventListener('message', (event: MessageEvent) => {
-      if (isArray(event.data)) {
-        const dataset: Array<number[]> = event.data;
+    this.uploadWorker.addEventListener(
+      'message',
+      (event: MessageEvent) => {
+        if (isArray(event.data)) {
+          const dataset: Array<number[]> = event.data;
 
-        this.setState({
-          uploaded: true,
-          uploading: false,
-          dataset,
-        });
-      }
-    }, false);
+          console.log(dataset);
+
+          this.setState({
+            uploaded: true,
+            uploading: false,
+            dataset,
+          });
+        }
+      },
+      false,
+    );
 
     // send selected file to the worker
-    this.worker.postMessage(selectedFile);
+    this.uploadWorker.postMessage(selectedFile);
   };
 
   fileCancelHandler = () => {
