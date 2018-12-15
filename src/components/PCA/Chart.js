@@ -15,6 +15,7 @@ type Props = {
     y: number,
     z?: number,
   }>,
+  vectors: Array<number[]>,
 };
 
 type State = {
@@ -49,12 +50,12 @@ export default class Chart extends Component<Props, State> {
   };
 
   componentDidMount() {
-    const { points } = this.props;
+    const { points, vectors } = this.props;
 
     this.selectSVGElement();
     this.drawAxes(points);
     this.drawPoints(points);
-    this.drawVectors();
+    this.drawVectors(vectors);
   }
 
   selectSVGElement = () => {
@@ -132,24 +133,26 @@ export default class Chart extends Component<Props, State> {
   };
 
   drawVectors = (vectors: Array<number[]>) => {
-    // PC1
-    this.svg
-      .append('line')
-      .style('stroke', 'red')
-      .style('stroke-width', 2)
-      .attr('x1', this.xScale(0))
-      .attr('y1', this.yScale(0))
-      .attr('x2', this.xScale(0.707))
-      .attr('y2', this.yScale(0.707));
-    // PC2
-    this.svg
-      .append('line')
-      .style('stroke', 'blue')
-      .style('stroke-width', 2)
-      .attr('x1', this.xScale(0))
-      .attr('y1', this.yScale(0))
-      .attr('x2', this.xScale(-0.707))
-      .attr('y2', this.yScale(0.707));
+    // const arrayColumn = (arr, n) => arr.map(x => abs(x[n]) * -1);
+
+    // // PC1
+    // this.svg
+    //   .append('line')
+    //   .style('stroke', 'red')
+    //   .style('stroke-width', 2)
+    //   .attr('x1', this.xScale(0))
+    //   .attr('y1', this.yScale(0))
+    //   .attr('x2', this.xScale(0.707))
+    //   .attr('y2', this.yScale(0.707));
+    // // PC2
+    // this.svg
+    //   .append('line')
+    //   .style('stroke', 'blue')
+    //   .style('stroke-width', 2)
+    //   .attr('x1', this.xScale(0))
+    //   .attr('y1', this.yScale(0))
+    //   .attr('x2', this.xScale(-0.707))
+    //   .attr('y2', this.yScale(0.707));
   };
 
   render() {

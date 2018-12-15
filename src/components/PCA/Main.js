@@ -17,7 +17,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { Chart } from '.';
 import UploadWorker from './upload.worker';
 import CalculateWorker from './calculate.worker';
-import PCA from './PCA';
 import styles from './styles';
 
 /**
@@ -114,23 +113,27 @@ class Main extends Component<Props, State> {
       calculated: false,
     });
 
+    // communication with worker
     this.calculateWorker.addEventListener(
       'message',
       (ev) => {
         const { data } = ev;
-        const { scatterPoints } = data;
+        const { scatterPoints, eigens } = data;
+
+        const vectors = eigens.E.x;
 
         this.setState({
           calculating: false,
           calculated: true,
           scatterPoints,
+          vectors,
         });
       },
       false,
     );
 
     // TODO: add timeout function (stop calculations if too long)
-
+    // send the dataset to the worker
     this.calculateWorker.postMessage(dataset);
   };
 
@@ -165,8 +168,6 @@ class Main extends Component<Props, State> {
         if (isArray(event.data)) {
           const dataset: Array<number[]> = event.data;
 
-          console.log(dataset);
-
           this.setState({
             uploaded: true,
             uploading: false,
@@ -199,6 +200,7 @@ class Main extends Component<Props, State> {
       plotted,
       scatterPoints,
       selectedFile,
+      vectors,
     } = this.state;
 
     const isVisibleProgressBar: boolean = uploading || calculating || plotting;
@@ -300,7 +302,7 @@ class Main extends Component<Props, State> {
                   </Button>
                 </Tooltip>
               )}
-              {plotted && <Chart points={scatterPoints} />}
+              {plotted && <Chart points={scatterPoints} vectors={vectors} />}
             </div>
             {isVisibleProgressBar && <LinearProgress className={classes.linearProgress} />}
           </Grid>
