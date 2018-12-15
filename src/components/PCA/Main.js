@@ -5,20 +5,10 @@ import {
   some, filter, size, forEach, isEmpty, isNumber, isNull, has,
 } from 'lodash';
 import { Header, Chart } from '.';
+import { UploadWorker, CalculateWorker } from './WebWorkers'; // eslint-disable-line
 import { Controls, UploadControls, AlgorithmControls } from './Controls';
 import ProgressBar from '../ProgressBar';
-import UploadWorker from './upload.worker';
-import CalculateWorker from './calculate.worker';
 import styles from './styles';
-
-/**
- * TODO:
- * 1) dynamic form for adding factors
- * 2) logic for plotting scatterplot
- * 3) pass vecotrs coordinates to Chart component
- * 4) comments
- * 5) add alerts and info 'how to use' PCA
- */
 
 type Props = {
   classes: Object,

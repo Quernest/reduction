@@ -1,4 +1,4 @@
-import PCA from './PCA';
+import PCA from '../PCA';
 
 self.addEventListener(
   'message',

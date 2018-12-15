@@ -1,4 +1,4 @@
-import CSV from '../../utils/csv';
+import CSV from '../../../utils/csv';
 
 self.addEventListener('message', async (ev) => {
   const { data } = ev;
