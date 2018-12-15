@@ -62,10 +62,7 @@ const UploadControls = ({
         ref={fileInput}
         style={{ display: 'none' }}
         type="file"
-        onChange={(e) => {
-          console.log('works');
-          onFileSelectInputChange(e);
-        }}
+        onChange={onFileSelectInputChange}
         multiple={multiple}
         hidden
       />
