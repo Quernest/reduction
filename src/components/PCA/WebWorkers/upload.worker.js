@@ -15,6 +15,8 @@ self.addEventListener('message', (ev) => {
 
     const csv = CSV.parse(result);
 
+    console.log('csv file:', csv); // eslint-disable-line
+
     // is not permitted:
     // empty csv files
     if (isEmpty(csv)) {

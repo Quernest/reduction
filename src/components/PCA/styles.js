@@ -21,7 +21,8 @@ export default theme => ({
     marginBottom: 16,
   },
   button: {
-    margin: theme.spacing.unit,
+    marginTop: theme.spacing.unit,
+    marginBottom: theme.spacing.unit,
   },
   file: {
     marginLeft: theme.spacing.unit,
@@ -29,6 +30,9 @@ export default theme => ({
   },
   margin: {
     margin: theme.spacing.unit,
+  },
+  marginLeft: {
+    marginLeft: theme.spacing.unit,
   },
   rightIcon: {
     marginLeft: theme.spacing.unit,

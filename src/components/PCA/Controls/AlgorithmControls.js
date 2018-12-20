@@ -38,7 +38,7 @@ const AlgorithmControls = ({
           Plot
         </Button>
         <Button
-          className={classes.button}
+          className={`${classes.button} ${classes.marginLeft}`}
           color="primary"
           variant="contained"
           onClick={onDocumentDownload}

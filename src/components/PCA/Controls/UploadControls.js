@@ -51,7 +51,7 @@ const UploadControls = ({
       <Button
         variant="contained"
         color="primary"
-        className={classes.button}
+        className={`${classes.button} ${classes.marginLeft}`}
         onClick={onFileUpload}
         disabled={uploading || !hasFile}
       >
