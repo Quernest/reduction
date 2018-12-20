@@ -41,8 +41,6 @@ class Main extends Component<Props, State> {
     error: '',
   };
 
-  fileInput: ?HTMLInputElement = React.createRef();
-
   componentDidMount() {
     // initialzie workers
     this.uploadWorker = new UploadWorker();
