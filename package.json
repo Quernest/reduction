@@ -16,6 +16,8 @@
     "@material-ui/icons": "^3.0.1",
     "compute-covariance": "^1.0.1",
     "d3": "^5.7.0",
+    "docx": "^4.4.1",
+    "file-saver": "^2.0.0",
     "flow-bin": "^0.86.0",
     "js-xlsx": "^0.8.22",
     "lodash": "^4.17.11",

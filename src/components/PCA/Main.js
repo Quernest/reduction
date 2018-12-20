@@ -1,6 +1,9 @@
 // @flow
 import React, { Component } from 'react';
 import { withStyles, Grid, Typography } from '@material-ui/core';
+import { Document, Packer, Paragraph } from 'docx';
+import { round } from 'lodash';
+import saveAs from 'file-saver';
 import { Header, Chart } from '.';
 import { UploadWorker, CalculateWorker } from './WebWorkers'; // eslint-disable-line
 import { Controls, UploadControls, AlgorithmControls } from './Controls';
@@ -60,15 +63,19 @@ class Main extends Component<Props, State> {
       'message',
       (ev) => {
         const { data } = ev;
-        const { scatterPoints, eigens } = data;
+        const { scatterPoints, eigens, analysis } = data;
 
+        // todo: add calculations to state
         const vectors = eigens.E.x;
+        const eigenvalues = eigens.lambda.x;
 
         this.setState({
           calculating: false,
           calculated: true,
           scatterPoints,
           vectors,
+          eigenvalues,
+          analysis,
         });
       },
       false,
@@ -95,7 +102,59 @@ class Main extends Component<Props, State> {
     });
   };
 
-  onDocumentDownload = (): void => null;
+  onDocumentDownload = async (): void => {
+    const { eigenvalues, analysis, scatterPoints } = this.state;
+
+    const doc = new Document({
+      creator: 'Clippy',
+      title: 'Sample Document',
+      description: 'A brief example of using docx',
+    });
+
+    doc.Styles.createParagraphStyle('Heading1', 'Heading 1')
+      .basedOn('Normal')
+      .next('Normal')
+      .quickFormat()
+      .size(36)
+      .bold()
+      .center();
+
+    doc.createParagraph('Principal Component Analysis').heading1();
+
+    // create table
+    const table = doc.createTable(3, 3);
+
+    table.getCell(0, 0).addContent(new Paragraph('Component'));
+    table.getCell(0, 1).addContent(new Paragraph('Eigenvalue'));
+    table.getCell(0, 2).addContent(new Paragraph('Account, %'));
+
+    Object.keys(scatterPoints[0]).map(
+      (key: string, i: number) => table.getCell(i + 1, 0).addContent(new Paragraph(key)), // display original key name instead "x" and "y"
+    );
+
+    eigenvalues.map(
+      (value: number, i: number): void => table.getCell(i + 1, 1).addContent(new Paragraph(round(value, 4))),
+    );
+
+    analysis.map(
+      (value: number, i: number) => table.getCell(i + 1, 2).addContent(new Paragraph(round(value, 2))),
+    );
+
+    // pack to blob and save via file-saver
+    const packer = new Packer();
+
+    try {
+      const blob = await packer.toBlob(doc);
+
+      saveAs(blob, 'pca.docx');
+    } catch (error) {
+      this.setState({
+        error,
+      });
+
+      throw new Error(error); // handle it
+    }
+  };
 
   onFileSelectInputChange = (event: Event) => {
     const { files }: FileList = event.target;
