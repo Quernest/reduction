@@ -3,7 +3,7 @@ import {
 } from 'lodash';
 import CSV from '../../../utils/csv';
 
-self.addEventListener('message', async (ev) => {
+self.addEventListener('message', (ev) => {
   const { data } = ev;
 
   const fr = new FileReader();
