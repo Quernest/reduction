@@ -25,6 +25,16 @@ self.addEventListener(
       normalizedDataset,
     };
 
+    console.group('Calculations'); // eslint-disable-line
+
+    Object.keys(calculations).map((key) => {
+      console.log(key, calculations[key]); // eslint-disable-line
+
+      return key;
+    });
+
+    console.groupEnd('Calculations'); // eslint-disable-line
+
     self.postMessage(calculations);
   },
   false,

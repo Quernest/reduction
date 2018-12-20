@@ -1,9 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { withStyles, Grid } from '@material-ui/core';
-import {
-  some, filter, size, forEach, isEmpty, isNumber, isNull, has,
-} from 'lodash';
+import { withStyles, Grid, Typography } from '@material-ui/core';
 import { Header, Chart } from '.';
 import { UploadWorker, CalculateWorker } from './WebWorkers'; // eslint-disable-line
 import { Controls, UploadControls, AlgorithmControls } from './Controls';
@@ -21,13 +18,10 @@ type State = {
     x: number,
     y: number,
   }>,
-  // chart plotting process
   plotting: boolean,
   plotted: boolean,
-  // calculating process
   calculating: boolean,
   calculated: boolean,
-  // file uploading process
   uploading: boolean,
   uploaded: boolean,
   error: string,
@@ -54,40 +48,6 @@ class Main extends Component<Props, State> {
     this.uploadWorker = new UploadWorker();
     this.calculateWorker = new CalculateWorker();
   }
-
-  validate = (results: Object): boolean => {
-    if (isEmpty(results)) {
-      throw new Error('results not found!');
-    }
-
-    if (results && !has(results, 'data')) {
-      throw new Error('passed results have not data array');
-    }
-
-    const { data }: Array<{ value: ?number }> = results;
-
-    // check dataset object size
-    forEach(data, (object: Object) => {
-      if (size(object) < 2) {
-        throw new Error('The object of dataset must contain more than 2 factors.');
-      }
-    });
-
-    // check if valid dataset object values
-    const wrongValues: Array<Object> = filter(data, (object: Object) => some(object, (value: number | string) => isNull(value) || !isNumber(value)));
-
-    if (!isEmpty(wrongValues)) {
-      // TODO: set error code to the state
-      // console.error('Validation error. The dataset has some wrong values');
-      return false;
-    }
-
-    this.setState({
-      dataset: data,
-    });
-
-    return true;
-  };
 
   onCalculate = (): void => {
     const { dataset }: Array<number[]> = this.state;
@@ -116,6 +76,15 @@ class Main extends Component<Props, State> {
       false,
     );
 
+    // error handler
+    this.calculateWorker.addEventListener('error', (event: ErrorEvent) => {
+      this.setState({
+        uploaded: false,
+        uploading: false,
+        error: event.message,
+      });
+    });
+
     // TODO: add timeout function (stop calculations if too long)
     // send the dataset to the worker
     this.calculateWorker.postMessage(dataset);
@@ -136,7 +105,7 @@ class Main extends Component<Props, State> {
 
     // reset input
     // to be able to upload the same file again if it was canceled
-    event.target.value = '';
+    event.target.value = ''; // eslint-disable-line
 
     this.setState({
       selectedFile: file,
@@ -198,7 +167,7 @@ class Main extends Component<Props, State> {
       selectedFile,
       scatterPoints,
       vectors,
-      error, // TODO: display error in modal or smth else
+      error,
     } = this.state;
 
     return (
@@ -229,6 +198,12 @@ class Main extends Component<Props, State> {
             </Controls>
             <ProgressBar active={uploading || calculating} />
             {plotted && <Chart points={scatterPoints} vectors={vectors} />}
+            {/* errors should be as list */}
+            {
+              <Typography variant="body1" color="error">
+                {error.toString()}
+              </Typography>
+            }
           </Grid>
         </Grid>
       </div>

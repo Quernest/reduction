@@ -1,3 +1,6 @@
+import {
+  forEach, some, size, isEmpty, isNaN, isString,
+} from 'lodash';
 import CSV from '../../../utils/csv';
 
 self.addEventListener('message', async (ev) => {
@@ -10,9 +13,29 @@ self.addEventListener('message', async (ev) => {
   fr.onload = () => {
     const { result } = fr;
 
-    const parsedCSV = CSV.parse(result);
+    const csv = CSV.parse(result);
 
-    postMessage(parsedCSV);
+    // is not permitted:
+    // empty csv files
+    if (isEmpty(csv)) {
+      throw new Error('parsed csv is empty');
+    }
+
+    forEach(csv, (obj) => {
+      // objects that contains less than 2 factors
+      if (size(obj) < 2) {
+        throw new Error('the object of dataset must contain more than 2 factors.');
+      }
+
+      // String and NaN values
+      const hasIncorrectValue = value => isNaN(value) || isString(value);
+
+      if (some(obj, hasIncorrectValue)) {
+        throw new Error('the dataset has some wrong values');
+      }
+    });
+
+    postMessage(csv);
   };
 
   fr.onerror = error => postMessage(error);
