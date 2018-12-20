@@ -24,10 +24,7 @@ export default theme => ({
     marginTop: theme.spacing.unit,
     marginBottom: theme.spacing.unit,
   },
-  file: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
-  },
+  file: {},
   margin: {
     margin: theme.spacing.unit,
   },

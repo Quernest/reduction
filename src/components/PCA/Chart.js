@@ -128,7 +128,7 @@ export default class Chart extends Component<Props, State> {
       .append('circle')
       .attr('cx', d => this.xScale(d.x))
       .attr('cy', d => this.yScale(d.y))
-      .attr('r', 3)
+      .attr('r', 2)
       .attr('fill', 'red');
   };
 
