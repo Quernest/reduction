@@ -17,10 +17,25 @@ type Props = {
 type State = {
   selectedFile: File,
   dataset: Array<number[]>,
-  scatterPoints: Array<{
-    x: number,
-    y: number,
-  }>,
+  calculations: {
+    scatterPoints: Array<{
+      x: number,
+      y: number,
+    }>,
+    normalizedDataset: Array<number[]>,
+    covariance: Array<number[]>,
+    eigens: {
+      lambda: {
+        x: Array<number[]>,
+        y: Array<number[]>,
+      },
+      E: {
+        x: Array<number>,
+        y: Array<number>,
+      },
+    },
+    linearCombinations: any, // TODO: create type
+  },
   plotting: boolean,
   plotted: boolean,
   calculating: boolean,
@@ -34,7 +49,13 @@ class Main extends Component<Props, State> {
   state = {
     selectedFile: null,
     dataset: [],
-    scatterPoints: [],
+    calculations: {
+      scatterPoints: [],
+      normalizedDataset: [],
+      covariance: [],
+      eigens: {},
+      linearCombinations: undefined, // TODO: create empty object or array
+    },
     plotting: false,
     plotted: false,
     calculating: false,
@@ -63,19 +84,11 @@ class Main extends Component<Props, State> {
       'message',
       (ev) => {
         const { data } = ev;
-        const { scatterPoints, eigens, analysis } = data;
-
-        // todo: add calculations to state
-        const vectors = eigens.E.x;
-        const eigenvalues = eigens.lambda.x;
 
         this.setState({
           calculating: false,
           calculated: true,
-          scatterPoints,
-          vectors,
-          eigenvalues,
-          analysis,
+          calculations: data,
         });
       },
       false,
@@ -103,7 +116,8 @@ class Main extends Component<Props, State> {
   };
 
   onDocumentDownload = async (): void => {
-    const { eigenvalues, analysis, scatterPoints } = this.state;
+    const { calculations } = this.state;
+    const { eigenvalues, analysis, scatterPoints } = calculations;
 
     const doc = new Document({
       creator: 'Clippy',
@@ -222,10 +236,11 @@ class Main extends Component<Props, State> {
       plotting,
       plotted,
       selectedFile,
-      scatterPoints,
-      vectors,
+      calculations,
       error,
     } = this.state;
+
+    const { scatterPoints, eigens } = calculations;
 
     return (
       <div className={classes.root}>
@@ -254,7 +269,7 @@ class Main extends Component<Props, State> {
               />
             </Controls>
             <ProgressBar active={uploading || calculating} />
-            {plotted && <Chart points={scatterPoints} vectors={vectors} />}
+            {plotted && <Chart points={scatterPoints} vectors={[]} />}
             {/* errors should be as list */}
             {
               <Typography variant="body1" color="error">
