@@ -139,7 +139,7 @@ export default class Chart extends Component<Props, State> {
     this.svg
       .append('line')
       .style('stroke', '#000')
-      .style('stroke-width', 2)
+      .style('stroke-width', 1.5)
       .attr('x1', this.xScale(0))
       .attr('y1', this.yScale(0))
       .attr('x2', this.xScale(round(opposite(vectors[0][0]), 3)))
@@ -148,7 +148,7 @@ export default class Chart extends Component<Props, State> {
     this.svg
       .append('line')
       .style('stroke', '#000')
-      .style('stroke-width', 2)
+      .style('stroke-width', 1.5)
       .attr('x1', this.xScale(0))
       .attr('y1', this.yScale(0))
       .attr('x2', this.xScale(round(opposite(vectors[1][0]), 3)))
