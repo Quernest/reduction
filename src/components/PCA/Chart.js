@@ -8,7 +8,7 @@ import {
 
 // Math.js is an extensive math library for JavaScript and Node.js.
 import { abs } from 'mathjs';
-import { reverse, map } from 'lodash';
+import { round } from 'lodash';
 
 type Props = {
   points: Array<{
@@ -134,34 +134,26 @@ export default class Chart extends Component<Props, State> {
   };
 
   drawVectors = (vectors: Array<number[]>) => {
-    // reverse vectors for correct visualization
-    const reversedVectors: Array<number[]> = reverse(vectors)
-      .map((vector: Array<number>): Array<number> => 
-        // convert negative number to positive or positive to negative
-        map(vector, (value: number): number => (value > 0 ? -abs(value) : -value))
-      );
+    const opposite: number = (value: number): number => -value;
 
-    // PC1
     this.svg
       .append('line')
       .style('stroke', '#000')
       .style('stroke-width', 2)
       .attr('x1', this.xScale(0))
       .attr('y1', this.yScale(0))
-      .attr('x2', this.xScale(reversedVectors[0][1]))
-      .attr('y2', this.yScale(reversedVectors[0][0]))
-      .attr("marker-end","url(#arrow)");
-
-    // PC2
+      .attr('x2', this.xScale(round(opposite(vectors[0][0]), 3)))
+      .attr('y2', this.yScale(round(opposite(vectors[0][1]), 3)))
+      .attr('marker-end', 'url(#arrow)');
     this.svg
       .append('line')
       .style('stroke', '#000')
       .style('stroke-width', 2)
       .attr('x1', this.xScale(0))
       .attr('y1', this.yScale(0))
-      .attr('x2', this.xScale(reversedVectors[1][0]))
-      .attr('y2', this.yScale(reversedVectors[1][1]))
-      .attr("marker-end","url(#arrow)");
+      .attr('x2', this.xScale(round(opposite(vectors[1][0]), 3)))
+      .attr('y2', this.yScale(round(opposite(vectors[1][1]), 3)))
+      .attr('marker-end', 'url(#arrow)');
   };
 
   render() {
