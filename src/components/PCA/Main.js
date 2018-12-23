@@ -269,7 +269,7 @@ class Main extends Component<Props, State> {
               />
             </Controls>
             <ProgressBar active={uploading || calculating} />
-            {plotted && <Chart points={scatterPoints} vectors={[]} />}
+            {plotted && <Chart points={scatterPoints} vectors={eigens.E.x} />}
             {/* errors should be as list */}
             {
               <Typography variant="body1" color="error">

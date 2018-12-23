@@ -8,6 +8,7 @@ import {
 
 // Math.js is an extensive math library for JavaScript and Node.js.
 import { abs } from 'mathjs';
+import { reverse, map } from 'lodash';
 
 type Props = {
   points: Array<{
@@ -133,28 +134,54 @@ export default class Chart extends Component<Props, State> {
   };
 
   drawVectors = (vectors: Array<number[]>) => {
-    // const arrayColumn = (arr, n) => arr.map(x => abs(x[n]) * -1);
-    // // PC1
-    // this.svg
-    //   .append('line')
-    //   .style('stroke', 'red')
-    //   .style('stroke-width', 2)
-    //   .attr('x1', this.xScale(0))
-    //   .attr('y1', this.yScale(0))
-    //   .attr('x2', this.xScale(0.707))
-    //   .attr('y2', this.yScale(0.707));
-    // // PC2
-    // this.svg
-    //   .append('line')
-    //   .style('stroke', 'blue')
-    //   .style('stroke-width', 2)
-    //   .attr('x1', this.xScale(0))
-    //   .attr('y1', this.yScale(0))
-    //   .attr('x2', this.xScale(-0.707))
-    //   .attr('y2', this.yScale(0.707));
+    // reverse vectors for correct visualization
+    const reversedVectors: Array<number[]> = reverse(vectors)
+      .map((vector: Array<number>): Array<number> => 
+        // convert negative number to positive or positive to negative
+        map(vector, (value: number): number => (value > 0 ? -abs(value) : -value))
+      );
+
+    // PC1
+    this.svg
+      .append('line')
+      .style('stroke', '#000')
+      .style('stroke-width', 2)
+      .attr('x1', this.xScale(0))
+      .attr('y1', this.yScale(0))
+      .attr('x2', this.xScale(reversedVectors[0][1]))
+      .attr('y2', this.yScale(reversedVectors[0][0]))
+      .attr("marker-end","url(#arrow)");
+
+    // PC2
+    this.svg
+      .append('line')
+      .style('stroke', '#000')
+      .style('stroke-width', 2)
+      .attr('x1', this.xScale(0))
+      .attr('y1', this.yScale(0))
+      .attr('x2', this.xScale(reversedVectors[1][0]))
+      .attr('y2', this.yScale(reversedVectors[1][1]))
+      .attr("marker-end","url(#arrow)");
   };
 
   render() {
-    return <svg id="chart" />;
+    return (
+      <svg id="chart">
+        <defs>
+          <marker
+            id="arrow"
+            markerUnits="strokeWidth"
+            markerWidth="12"
+            markerHeight="12"
+            viewBox="0 0 12 12"
+            refX="6"
+            refY="6"
+            orient="auto"
+          >
+            <path d="M2,2 L10,6 L2,10 L6,6 L2,2" style={{ fill: '#000' }} />
+          </marker>
+        </defs>
+      </svg>
+    );
   }
 }
