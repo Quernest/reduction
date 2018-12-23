@@ -1,14 +1,15 @@
-// @flow
-// Math.js is an extensive math library for JavaScript and Node.js.
+/**
+ * @flow
+ * Math.js is an extensive math library for JavaScript and Node.js.
+ */
 import * as math from 'mathjs';
 
-// A modern JavaScript utility library delivering modularity, performance & extras.
+// utility library delivering modularity, performance & extras.
 import {
   map,
   reduce,
   transform,
   values,
-  size,
   forEach,
   round,
   isArray,
@@ -33,50 +34,65 @@ try {
 // Principal Component Analysis class
 class PCA {
   constructor(dataset: Array<number[]> | Array<Object>) {
-    // handle empty dataset
+    // handle if empty
     if (isEmpty(dataset)) {
-      throw new Error('No dataset found!');
+      throw new Error('no dataset found');
     }
 
-    // original dataset
+    // copy the original dataset
     this.dataset = dataset;
 
     const [element] = this.dataset;
 
-    // check whether the transferred data to the required type Array<number[]>
-    // if not, transform into a two-dimensional array.
+    /**
+     * check whether the transferred data to the required type Array<number[]>
+     * if not, transform into a two-dimensional array.
+     */
     if (!isArray(element)) {
       this.dataset = this.transformTo2DArray(dataset);
     }
 
-    // step 1
-    // If some variables have a large variance and some small,
-    // PCA (maximizing variance) will load on the large variances.
+    /**
+     * step 1
+     * If some variables have a large variance and some small,
+     * PCA (maximizing variance) will load on the large variances.
+     */
     this.normalizedDataset = this.normalize(this.dataset);
 
-    // step 2
-    // a covariance matrix (also known as dispersion matrix or variance–covariance matrix)
-    // is a matrix whose element in the i, j position is the covariance
-    // between the i-th and j-th elements of a random vector.
+    /**
+     * step 2
+     * a covariance matrix (also known as dispersion matrix or variance–covariance matrix)
+     * is a matrix whose element in the i, j position is the covariance
+     * between the i-th and j-th elements of a random vector.
+     */
     this.covariance = this.computeCovariance(this.normalizedDataset);
 
-    // step 3-4
-    // a linear transformation is a non-zero vector that changes
-    // by only a scalar factor when that linear transformation is applied to it.
+    /**
+     * step 3-4
+     * a linear transformation is a non-zero vector that changes
+     * by only a scalar factor when that linear transformation is applied to it.
+     */
     this.eigens = this.getEigens(this.covariance);
 
-    // step 5
-    // https://www.dsprelated.com/freebooks/mdft/Linear_Combination_Vectors.html
-    // If one vector is equal to the sum of scalar multiples of other vectors,
-    // it is said to be a linear combination of the other vectors.
+    /**
+     * step 5
+     * If one vector is equal to the sum of scalar multiples of other vectors,
+     * it is said to be a linear combination of the other vectors.
+     * read more: https://www.dsprelated.com/freebooks/mdft/Linear_Combination_Vectors.html
+     */
     this.linearCombinations = this.getLinearCombinations(this.normalizedDataset, this.eigens.E.x);
 
-    // step 6
-    // analysis. How {PC1, PC2 ... PCn} accounts of the total variation around the PCs.
+    /**
+     * step 6
+     * analysis. How {PC1, PC2 ... PCn} accounts of the total variation around the PCs.
+     */
     this.analysis = this.analyze(this.eigens.lambda.x);
 
-    // additional calculations
-    // get scatter points of the dataset for plotting the scatter
+    /**
+     * step 7
+     * additional calculations
+     * get scatter points of the dataset for plotting the scatter
+     */
     this.scatterPoints = this.getScatterPoints(this.normalizedDataset);
   }
 
