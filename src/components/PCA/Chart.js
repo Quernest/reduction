@@ -8,7 +8,6 @@ import {
 
 // Math.js is an extensive math library for JavaScript and Node.js.
 import { abs } from 'mathjs';
-import { round } from 'lodash';
 
 type Props = {
   points: Array<{
@@ -112,6 +111,7 @@ class Chart extends Component<Props, State> {
       .text(`${axes[1]} (${analysis[1]}%)`)
       .attr('x', width / 2)
       .attr('y', height + margin.bottom)
+      .attr('dy', '-1em')
       .style('text-anchor', 'middle');
 
     this.svg
@@ -144,8 +144,8 @@ class Chart extends Component<Props, State> {
       .style('stroke-width', 1.5)
       .attr('x1', this.xScale(0))
       .attr('y1', this.yScale(0))
-      .attr('x2', this.xScale(round(opposite(vectors[0][0]), 3)))
-      .attr('y2', this.yScale(round(opposite(vectors[0][1]), 3)))
+      .attr('x2', this.xScale(opposite(vectors[0][0])))
+      .attr('y2', this.yScale(opposite(vectors[1][0])))
       .attr('marker-end', 'url(#arrow)');
     this.svg
       .append('line')
@@ -153,8 +153,8 @@ class Chart extends Component<Props, State> {
       .style('stroke-width', 1.5)
       .attr('x1', this.xScale(0))
       .attr('y1', this.yScale(0))
-      .attr('x2', this.xScale(round(opposite(vectors[1][0]), 3)))
-      .attr('y2', this.yScale(round(opposite(vectors[1][1]), 3)))
+      .attr('x2', this.xScale(opposite(vectors[0][1])))
+      .attr('y2', this.yScale(opposite(vectors[1][1])))
       .attr('marker-end', 'url(#arrow)');
   };
 

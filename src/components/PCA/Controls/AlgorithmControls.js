@@ -42,6 +42,7 @@ const AlgorithmControls = ({
           color="primary"
           variant="contained"
           onClick={onDocumentDownload}
+          disabled
         >
           Document
         </Button>
