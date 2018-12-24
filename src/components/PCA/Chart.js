@@ -32,7 +32,7 @@ type State = {
   },
 };
 
-export default class Chart extends Component<Props, State> {
+class Chart extends Component<Props, State> {
   state = {
     margin: {
       top: 20,
@@ -177,3 +177,5 @@ export default class Chart extends Component<Props, State> {
     );
   }
 }
+
+export default Chart;

@@ -4,7 +4,7 @@ import { withStyles, Grid, Typography } from '@material-ui/core';
 import { Document, Packer, Paragraph } from 'docx';
 import { round } from 'lodash';
 import saveAs from 'file-saver';
-import { Header, Chart } from '.';
+import { Header, Chart, Bar } from '.';
 import { UploadWorker, CalculateWorker } from './WebWorkers'; // eslint-disable-line
 import { Controls, UploadControls, AlgorithmControls } from './Controls';
 import ProgressBar from '../ProgressBar';
@@ -150,9 +150,7 @@ class Main extends Component<Props, State> {
       (value: number, i: number): void => table.getCell(i + 1, 1).addContent(new Paragraph(round(value, 4))),
     );
 
-    analysis.map(
-      (value: number, i: number) => table.getCell(i + 1, 2).addContent(new Paragraph(round(value, 2))),
-    );
+    analysis.map((value: number, i: number) => table.getCell(i + 1, 2).addContent(new Paragraph(round(value, 2))));
 
     // pack to blob and save via file-saver
     const packer = new Packer();
@@ -269,7 +267,12 @@ class Main extends Component<Props, State> {
               />
             </Controls>
             <ProgressBar active={uploading || calculating} />
-            {plotted && <Chart points={scatterPoints} vectors={eigens.E.x} />}
+            {plotted && (
+              <div>
+                <Chart points={scatterPoints} vectors={eigens.E.x} />
+                <Bar values={eigens.lambda.x} />
+              </div>
+            )}
             {/* errors should be as list */}
             {
               <Typography variant="body1" color="error">
