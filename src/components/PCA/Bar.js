@@ -4,11 +4,12 @@ import React, { Component } from 'react';
 import {
   select, scaleLinear, scaleBand, axisBottom, axisLeft, max,
 } from 'd3';
-import { round } from 'lodash';
+import { round, transform } from 'lodash';
 
 type Props = {
   values: Array<number>,
   names: Array<string>,
+  analysis: Array<number>,
 };
 
 type State = {
@@ -43,33 +44,25 @@ export default class Bar extends Component<Props, State> {
   };
 
   componentDidMount() {
-    // const { values } = this.props;
+    const { values, names, analysis } = this.props;
 
-    // const formattedValues = values.map(value => round(value, 3));
+    // transform to array of objects
+    const data: Array<{ name: string, value: number }> = transform(
+      values,
+      (acc: Array<{ name: string, value: number }>, curr: number, i: number) => {
+        acc.push({
+          name: names[i],
+          value: round(curr, 3),
+        });
 
-    // fake data
-    const data: Array<{ name: string, value: number }> = [
-      {
-        name: 'PC1',
-        value: 1.95,
+        return acc;
       },
-      {
-        name: 'PC2',
-        value: 0.55,
-      },
-      {
-        name: 'PC3',
-        value: 0.25,
-      },
-      {
-        name: 'PC4',
-        value: 0.05,
-      },
-    ];
+      [],
+    );
 
     this.selectSVGElement();
-    this.drawAxes(data);
-    this.drawBars(data);
+    this.drawAxes(data, analysis);
+    this.drawBars(data, analysis);
   }
 
   selectSVGElement(): void {
@@ -84,13 +77,13 @@ export default class Bar extends Component<Props, State> {
       .attr('transform', `translate(${margin.left},${margin.top})`);
   }
 
-  drawAxes(data: Array<{ name: string, value: number }>): void {
+  drawAxes(data: Array<{ name: string, value: number }>, analysis: Array<number>): void {
     const { width, height } = this.state;
 
     this.x = scaleBand()
       .range([0, width])
-      .padding(0.5)
-      .domain(data.map(d => d.name));
+      .padding(0.25)
+      .domain(data.map((d, i) => `${d.name} (${analysis[i]}%)`));
     this.y = scaleLinear()
       .range([height, 0])
       .domain([0, max(data, d => d.value)]);
@@ -103,7 +96,7 @@ export default class Bar extends Component<Props, State> {
     this.svg.append('g').call(axisLeft(this.y));
   }
 
-  drawBars(data: Array<{ name: string, value: number }>): void {
+  drawBars(data: Array<{ name: string, value: number }>, analysis: Array<number>): void {
     const { height } = this.state;
 
     this.svg
@@ -113,7 +106,7 @@ export default class Bar extends Component<Props, State> {
       .append('rect')
       .attr('class', 'bar')
       .attr('fill', 'steelblue')
-      .attr('x', d => this.x(d.name))
+      .attr('x', (d, i) => this.x(`${d.name} (${analysis[i]}%)`))
       .attr('width', this.x.bandwidth())
       .attr('y', d => this.y(d.value))
       .attr('height', d => height - this.y(d.value));

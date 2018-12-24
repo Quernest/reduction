@@ -14,6 +14,7 @@ self.addEventListener(
       eigens,
       linearCombinations,
       normalizedDataset,
+      names,
     } = pca;
 
     const calculations = {
@@ -23,6 +24,7 @@ self.addEventListener(
       eigens,
       linearCombinations,
       normalizedDataset,
+      names,
     };
 
     console.group('Calculations'); // eslint-disable-line

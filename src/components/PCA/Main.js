@@ -35,6 +35,7 @@ type State = {
       },
     },
     linearCombinations: any, // TODO: create type
+    names: Array<string>,
   },
   plotting: boolean,
   plotted: boolean,
@@ -238,7 +239,9 @@ class Main extends Component<Props, State> {
       error,
     } = this.state;
 
-    const { scatterPoints, eigens } = calculations;
+    const {
+      scatterPoints, eigens, names, analysis,
+    } = calculations;
 
     return (
       <div className={classes.root}>
@@ -269,8 +272,8 @@ class Main extends Component<Props, State> {
             <ProgressBar active={uploading || calculating} />
             {plotted && (
               <div>
-                <Chart points={scatterPoints} vectors={eigens.E.x} />
-                <Bar values={eigens.lambda.x} />
+                <Chart points={scatterPoints} vectors={eigens.E.x} names={names} analysis={analysis} />
+                <Bar values={eigens.lambda.x} names={names} analysis={analysis} />
               </div>
             )}
             {/* errors should be as list */}

@@ -17,6 +17,8 @@ type Props = {
     z?: number,
   }>,
   vectors: Array<number[]>,
+  names: Array<string>,
+  analysis: Array<number>,
 };
 
 type State = {
@@ -37,7 +39,7 @@ class Chart extends Component<Props, State> {
     margin: {
       top: 20,
       right: 20,
-      bottom: 20,
+      bottom: 35,
       left: 35,
     },
     fullWidth: 825,
@@ -51,10 +53,10 @@ class Chart extends Component<Props, State> {
   };
 
   componentDidMount() {
-    const { points, vectors } = this.props;
+    const { points, vectors, names, analysis } = this.props;
 
     this.selectSVGElement();
-    this.drawAxes(points);
+    this.drawAxes(points, names, analysis);
     this.drawPoints(points);
     this.drawVectors(vectors);
   }
@@ -71,7 +73,7 @@ class Chart extends Component<Props, State> {
       .attr('transform', `translate(${margin.left},${margin.top})`);
   };
 
-  drawAxes = (points) => {
+  drawAxes = (points, axes, analysis) => {
     const { width, height, margin } = this.state;
 
     const x = scaleLinear()
@@ -93,7 +95,7 @@ class Chart extends Component<Props, State> {
 
     this.svg
       .append('text')
-      .text('X')
+      .text(`${axes[0]} (${analysis[0]}%)`)
       .attr('x', 0 - height / 2)
       .attr('y', 0 - margin.left)
       .attr('dy', '1em')
@@ -107,7 +109,7 @@ class Chart extends Component<Props, State> {
 
     this.svg
       .append('text')
-      .text('Y')
+      .text(`${axes[1]} (${analysis[1]}%)`)
       .attr('x', width / 2)
       .attr('y', height + margin.bottom)
       .style('text-anchor', 'middle');

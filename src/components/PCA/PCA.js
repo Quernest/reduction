@@ -10,6 +10,7 @@ import {
   reduce,
   transform,
   values,
+  keys,
   forEach,
   round,
   isArray,
@@ -49,6 +50,10 @@ class PCA {
      * if not, transform into a two-dimensional array.
      */
     if (!isArray(element)) {
+      // get keys (factor names)
+      this.names = this.getFactorNames(element);
+
+      // if it's object, transform to the two-dimensional array
       this.dataset = this.transformTo2DArray(dataset);
     }
 
@@ -164,6 +169,8 @@ class PCA {
 
     return reduce(dataset, reducer, []);
   };
+
+  getFactorNames = (element: { x: any }): Array<string> => keys(element);
 
   transformTo2DArray = (data: Object): Array<number[]> => {
     const transformer = (acc: Array<number[]>, curr: Object) => {
