@@ -9,6 +9,7 @@ import {
 // Math.js is an extensive math library for JavaScript and Node.js.
 import { abs } from 'mathjs';
 import { size } from 'lodash';
+import { opposite } from '../../../utils/num';
 
 type Props = {
   points: Array<{
@@ -34,7 +35,7 @@ type State = {
   },
 };
 
-class Chart extends Component<Props, State> {
+class Biplot extends Component<Props, State> {
   state = {
     margin: {
       top: 20,
@@ -71,7 +72,7 @@ class Chart extends Component<Props, State> {
   selectSVGElement = () => {
     const { fullWidth, fullHeight, margin } = this.state;
 
-    this.svg = select('#chart')
+    this.svg = select('#biplot')
       .attr('width', '100%')
       .attr('height', '100%')
       .attr('viewBox', `0 0 ${fullWidth} ${fullHeight}`)
@@ -144,7 +145,6 @@ class Chart extends Component<Props, State> {
   };
 
   drawVectors = (vectors: Array<number[]>) => {
-    const opposite: number = (value: number): number => -value;
     const defs = this.svg.append('defs');
     const marker = defs
       .append('marker')
@@ -191,8 +191,8 @@ class Chart extends Component<Props, State> {
       return null;
     }
 
-    return <svg id="chart" />;
+    return <svg id="biplot" />;
   }
 }
 
-export default Chart;
+export default Biplot;

@@ -4,7 +4,8 @@ import { withStyles, Grid, Typography } from '@material-ui/core';
 import { Document, Packer, Paragraph } from 'docx';
 import { round } from 'lodash';
 import saveAs from 'file-saver';
-import { Header, Chart, Bar } from '.';
+import { Biplot, Bar } from './Charts';
+import { Header } from '.';
 import { UploadWorker, CalculateWorker } from './WebWorkers'; // eslint-disable-line
 import { Controls, UploadControls, AlgorithmControls } from './Controls';
 import ProgressBar from '../ProgressBar';
@@ -272,7 +273,12 @@ class Main extends Component<Props, State> {
             <ProgressBar active={uploading || calculating} />
             {plotted && (
               <div>
-                <Chart points={scatterPoints} vectors={eigens.E.x} names={names} analysis={analysis} />
+                <Biplot
+                  points={scatterPoints}
+                  vectors={eigens.E.x}
+                  names={names}
+                  analysis={analysis}
+                />
                 <Bar values={eigens.lambda.x} names={names} analysis={analysis} />
               </div>
             )}
