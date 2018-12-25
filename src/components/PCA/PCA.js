@@ -6,6 +6,7 @@ import * as math from 'mathjs';
 
 // utility library delivering modularity, performance & extras.
 import {
+  sum,
   map,
   reduce,
   transform,
@@ -23,6 +24,9 @@ import cov from 'compute-covariance';
 
 // library for formatting and manipulating numbers.
 import numeric from 'numeric';
+
+// helpers
+import { opposite } from '../../utils/num';
 
 try {
   math.import(numeric, { wrap: true, silent: true });
@@ -139,8 +143,31 @@ class PCA {
     return math.eval(`eig(${matrix})`);
   };
 
-  getLinearCombinations = (dataset: Array<number[]>, eigenvectors): any => {
-    forEach(eigenvectors, (vector: Array<number>, i: number) => {});
+  getLinearCombinations = (
+    dataset: Array<number[]>,
+    eigenvectors: Array<number[]>,
+  ): Array<number[]> => {
+    const reducer: Array<number[]> = (acc: Array<number[]>, curr: Array<number[]>, i: number) => {
+      // get column of eigenvectors matrix
+      const vector: Array<number> = map(eigenvectors, (eigenvector: Array<number>): Array<number> => eigenvector[i]);
+
+      // scalar multiplication of factor by vector
+      const multiplication: Array<number[]> = map(dataset, (factors: Array<number>, j: number): Array<number> => {
+        return map(factors, (factor: number): number => opposite(factor * vector[j]));
+      });
+
+      // get linear combinations (sum of scalar multiples of vectors)
+      const linearCombination: Array<number> = map(math.transpose(multiplication), sum);
+
+      // push to the accamulator
+      if (!isUndefined(acc)) {
+        acc.push(linearCombination);
+      }
+
+      return acc;
+    };
+
+    return reduce(eigenvectors, reducer, []);
   };
 
   analyze = (eigenvalues: Array<number>): Array<number> => {

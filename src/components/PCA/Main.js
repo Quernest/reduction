@@ -35,7 +35,7 @@ type State = {
         y: Array<number>,
       },
     },
-    linearCombinations: any, // TODO: create type
+    linearCombinations: Array<number[]>,
     names: Array<string>,
   },
   plotting: boolean,
