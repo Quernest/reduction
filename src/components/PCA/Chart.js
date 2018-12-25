@@ -8,6 +8,7 @@ import {
 
 // Math.js is an extensive math library for JavaScript and Node.js.
 import { abs } from 'mathjs';
+import { size } from 'lodash';
 
 type Props = {
   points: Array<{
@@ -52,7 +53,14 @@ class Chart extends Component<Props, State> {
   };
 
   componentDidMount() {
-    const { points, vectors, names, analysis } = this.props;
+    const {
+      points, vectors, names, analysis,
+    } = this.props;
+
+    // 2D only
+    if (size(names) > 2) {
+      return;
+    }
 
     this.selectSVGElement();
     this.drawAxes(points, names, analysis);
@@ -137,6 +145,23 @@ class Chart extends Component<Props, State> {
 
   drawVectors = (vectors: Array<number[]>) => {
     const opposite: number = (value: number): number => -value;
+    const defs = this.svg.append('defs');
+    const marker = defs
+      .append('marker')
+      .attr('id', 'arrow')
+      .attr('markerUnits', 'strokeWidth')
+      .attr('markerWidth', 12)
+      .attr('markerHeight', 12)
+      .attr('viewBox', '0 0 12 12')
+      .attr('refX', 6)
+      .attr('refY', 6)
+      .attr('orient', 'auto');
+    marker
+      .append('path')
+      .attr('d', 'M2,2 L10,6 L2,10 L6,6 L2,2')
+      .style({
+        fill: '#000',
+      });
 
     this.svg
       .append('line')
@@ -159,24 +184,14 @@ class Chart extends Component<Props, State> {
   };
 
   render() {
-    return (
-      <svg id="chart">
-        <defs>
-          <marker
-            id="arrow"
-            markerUnits="strokeWidth"
-            markerWidth="12"
-            markerHeight="12"
-            viewBox="0 0 12 12"
-            refX="6"
-            refY="6"
-            orient="auto"
-          >
-            <path d="M2,2 L10,6 L2,10 L6,6 L2,2" style={{ fill: '#000' }} />
-          </marker>
-        </defs>
-      </svg>
-    );
+    const { names } = this.props;
+
+    // 2D only
+    if (size(names) > 2) {
+      return null;
+    }
+
+    return <svg id="chart" />;
   }
 }
 

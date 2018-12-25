@@ -13,7 +13,7 @@ self.addEventListener(
       scatterPoints,
       eigens,
       linearCombinations,
-      normalizedDataset,
+      adjustedDataset,
       names,
     } = pca;
 
@@ -23,7 +23,7 @@ self.addEventListener(
       scatterPoints,
       eigens,
       linearCombinations,
-      normalizedDataset,
+      adjustedDataset,
       names,
     };
 

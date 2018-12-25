@@ -22,7 +22,7 @@ type State = {
       x: number,
       y: number,
     }>,
-    normalizedDataset: Array<number[]>,
+    adjustedDataset: Array<number[]>,
     covariance: Array<number[]>,
     eigens: {
       lambda: {
@@ -52,7 +52,7 @@ class Main extends Component<Props, State> {
     dataset: [],
     calculations: {
       scatterPoints: [],
-      normalizedDataset: [],
+      adjustedDataset: [],
       covariance: [],
       eigens: {},
       linearCombinations: undefined, // TODO: create empty object or array

@@ -62,7 +62,7 @@ class PCA {
      * If some variables have a large variance and some small,
      * PCA (maximizing variance) will load on the large variances.
      */
-    this.normalizedDataset = this.normalize(this.dataset);
+    this.adjustedDataset = this.adjustDataset(this.dataset);
 
     /**
      * step 2
@@ -70,7 +70,7 @@ class PCA {
      * is a matrix whose element in the i, j position is the covariance
      * between the i-th and j-th elements of a random vector.
      */
-    this.covariance = this.computeCovariance(this.normalizedDataset);
+    this.covariance = this.computeCovariance(this.adjustedDataset);
 
     /**
      * step 3-4
@@ -85,7 +85,7 @@ class PCA {
      * it is said to be a linear combination of the other vectors.
      * read more: https://www.dsprelated.com/freebooks/mdft/Linear_Combination_Vectors.html
      */
-    this.linearCombinations = this.getLinearCombinations(this.normalizedDataset, this.eigens.E.x);
+    this.linearCombinations = this.getLinearCombinations(this.adjustedDataset, this.eigens.E.x);
 
     /**
      * step 6
@@ -98,10 +98,10 @@ class PCA {
      * additional calculations
      * get scatter points of the dataset for plotting the scatter
      */
-    this.scatterPoints = this.getScatterPoints(this.normalizedDataset);
+    this.scatterPoints = this.getScatterPoints(this.adjustedDataset);
   }
 
-  normalize = (dataset: Array<number[]>): Array<number[]> => map(
+  adjustDataset = (dataset: Array<number[]>): Array<number[]> => map(
     dataset,
     (data: Array<number>): Array<number> => {
       const mean: number = math.mean(data);
@@ -151,7 +151,7 @@ class PCA {
 
   getScatterPoints = (
     dataset: Array<number[]>,
-    axes: Array<string> = ['x', 'y', 'z'],
+    axes: Array<string> = ['x', 'y'],
   ): Array<{ x: number, y: number, z?: number }> => {
     const reducer = (acc: Array<number>, curr: number, i: number) => {
       forEach(curr, (_, j: number) => {

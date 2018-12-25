@@ -79,10 +79,11 @@ export default class Bar extends Component<Props, State> {
 
   drawAxes(data: Array<{ name: string, value: number }>, analysis: Array<number>): void {
     const { width, height } = this.state;
+    const padding = 0.25;
 
     this.x = scaleBand()
       .range([0, width])
-      .padding(0.25)
+      .padding(padding)
       .domain(data.map((d, i) => `${d.name} (${analysis[i]}%)`));
     this.y = scaleLinear()
       .range([height, 0])
