@@ -56,7 +56,7 @@ class Main extends Component<Props, State> {
       adjustedDataset: [],
       covariance: [],
       eigens: {},
-      linearCombinations: undefined, // TODO: create empty object or array
+      linearCombinations: [],
     },
     plotting: false,
     plotted: false,
