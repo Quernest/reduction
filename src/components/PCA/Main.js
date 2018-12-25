@@ -272,14 +272,18 @@ class Main extends Component<Props, State> {
             </Controls>
             <ProgressBar active={uploading || calculating} />
             {plotted && (
-              <div>
+              <div className={classes.charts}>
                 <Biplot
                   points={scatterPoints}
                   vectors={eigens.E.x}
                   names={names}
                   analysis={analysis}
                 />
-                <Bar values={eigens.lambda.x} names={names} analysis={analysis} />
+                <Bar
+                  values={eigens.lambda.x}
+                  names={names}
+                  analysis={analysis}
+                />
               </div>
             )}
             {/* errors should be as list */}

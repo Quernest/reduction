@@ -34,4 +34,8 @@ export default theme => ({
   rightIcon: {
     marginLeft: theme.spacing.unit,
   },
+  charts: {
+    marginTop: 20,
+    marginBottom: 20,
+  },
 });
