@@ -1,12 +1,9 @@
 // @flow
 import React, { Component } from 'react';
-
-// D3.js is a JavaScript library for manipulating documents based on data.
 import {
   select, axisBottom, axisLeft, scaleLinear, max,
 } from 'd3';
-
-// Math.js is an extensive math library for JavaScript and Node.js.
+import { Typography } from '@material-ui/core';
 import { abs } from 'mathjs';
 import { size } from 'lodash';
 import { opposite } from '../../../utils/num';
@@ -191,7 +188,12 @@ class Biplot extends Component<Props, State> {
       return null;
     }
 
-    return <svg id="biplot" />;
+    return (
+      <>
+        <Typography variant="h5">Biplot</Typography>
+        <svg id="biplot" />
+      </>
+    );
   }
 }
 

@@ -1,9 +1,9 @@
 // @flow
-
 import React, { Component } from 'react';
 import {
   select, scaleLinear, scaleBand, axisBottom, axisLeft, max,
 } from 'd3';
+import { Typography } from '@material-ui/core';
 import { round, transform } from 'lodash';
 
 type Props = {
@@ -114,6 +114,11 @@ export default class Bar extends Component<Props, State> {
   }
 
   render() {
-    return <svg id="bar" />;
+    return (
+      <>
+        <Typography variant="h5">Bar chart</Typography>
+        <svg id="bar" />
+      </>
+    );
   }
 }
