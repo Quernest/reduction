@@ -5,19 +5,16 @@
 import * as math from 'mathjs';
 
 // utility library delivering modularity, performance & extras.
-import {
-  sum,
-  map,
-  reduce,
-  transform,
-  values,
-  keys,
-  forEach,
-  round,
-  isArray,
-  isEmpty,
-  isUndefined,
-} from 'lodash';
+import sum from 'lodash/sum';
+import map from 'lodash/map';
+import reduce from 'lodash/reduce';
+import values from 'lodash/values';
+import keys from 'lodash/keys';
+import forEach from 'lodash/forEach';
+import round from 'lodash/round';
+import isArray from 'lodash/isArray';
+import isEmpty from 'lodash/isEmpty';
+import isUndefined from 'lodash/isUndefined';
 
 // lib computes the covariance between one or more numeric arrays.
 import cov from 'compute-covariance';
@@ -149,12 +146,16 @@ class PCA {
   ): Array<number[]> => {
     const reducer: Array<number[]> = (acc: Array<number[]>, curr: Array<number[]>, i: number) => {
       // get column of eigenvectors matrix
-      const vector: Array<number> = map(eigenvectors, (eigenvector: Array<number>): Array<number> => eigenvector[i]);
+      const vector: Array<number> = map(
+        eigenvectors,
+        (eigenvector: Array<number>): Array<number> => eigenvector[i],
+      );
 
       // scalar multiplication of factor by vector
-      const multiplication: Array<number[]> = map(dataset, (factors: Array<number>, j: number): Array<number> => {
-        return map(factors, (factor: number): number => opposite(factor * vector[j]));
-      });
+      const multiplication: Array<number[]> = map(
+        dataset,
+        (factors: Array<number>, j: number): Array<number> => map(factors, (factor: number): number => opposite(factor * vector[j])),
+      );
 
       // get linear combinations (sum of scalar multiples of vectors)
       const linearCombination: Array<number> = map(math.transpose(multiplication), sum);
@@ -200,13 +201,13 @@ class PCA {
   getFactorNames = (element: { x: any }): Array<string> => keys(element);
 
   transformTo2DArray = (data: Object): Array<number[]> => {
-    const transformer = (acc: Array<number[]>, curr: Object) => {
+    const reducer = (acc: Array<number[]>, curr: Object) => {
       values(curr).forEach((value: number, i: number) => {
         (acc[i] || (acc[i] = [])).push(value);
       });
     };
 
-    return transform(data, transformer, []);
+    return reduce(data, reducer, []);
   };
 }
 

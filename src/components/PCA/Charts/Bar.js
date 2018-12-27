@@ -1,10 +1,9 @@
 // @flow
-import React, { Component } from 'react';
-import {
-  select, scaleLinear, scaleBand, axisBottom, axisLeft, max,
-} from 'd3';
-import { Typography } from '@material-ui/core';
-import { round, transform } from 'lodash';
+import React from 'react';
+import * as d3 from 'd3';
+import Typography from '@material-ui/core/Typography';
+import round from 'lodash/round';
+import transform from 'lodash/transform';
 
 type Props = {
   values: Array<number>,
@@ -25,7 +24,7 @@ type State = {
   },
 };
 
-export default class Bar extends Component<Props, State> {
+export default class Bar extends React.Component<Props, State> {
   state = {
     margin: {
       top: 20,
@@ -68,7 +67,8 @@ export default class Bar extends Component<Props, State> {
   selectSVGElement(): void {
     const { margin, fullWidth, fullHeight } = this.state;
 
-    this.svg = select('#bar')
+    this.svg = d3
+      .select('#bar')
       .attr('width', '100%')
       .attr('height', '100%')
       .attr('viewBox', `0 0 ${fullWidth} ${fullHeight}`)
@@ -81,20 +81,22 @@ export default class Bar extends Component<Props, State> {
     const { width, height } = this.state;
     const padding = 0.25;
 
-    this.x = scaleBand()
+    this.x = d3
+      .scaleBand()
       .range([0, width])
       .padding(padding)
       .domain(data.map((d, i) => `${d.name} (${analysis[i]}%)`));
-    this.y = scaleLinear()
+    this.y = d3
+      .scaleLinear()
       .range([height, 0])
-      .domain([0, max(data, d => d.value)]);
+      .domain([0, d3.max(data, d => d.value)]);
 
     this.svg
       .append('g')
       .attr('transform', `translate(0, ${height})`)
-      .call(axisBottom(this.x));
+      .call(d3.axisBottom(this.x));
 
-    this.svg.append('g').call(axisLeft(this.y));
+    this.svg.append('g').call(d3.axisLeft(this.y));
   }
 
   drawBars(data: Array<{ name: string, value: number }>, analysis: Array<number>): void {

@@ -1,11 +1,16 @@
 // @flow
 import React from 'react';
 import MaterialTable from 'material-table';
-import { withStyles, Paper } from '@material-ui/core';
-import { keys, head, map } from 'lodash';
-import {
-  FirstPage, LastPage, KeyboardArrowLeft, KeyboardArrowRight,
-} from '@material-ui/icons';
+import { withStyles } from '@material-ui/core/styles';
+// lodash helpers
+import map from 'lodash/map';
+import keys from 'lodash/keys';
+import head from 'lodash/head';
+// icons
+import FirstPage from '@material-ui/icons/FirstPage';
+import LastPage from '@material-ui/icons/LastPage';
+import NextPage from '@material-ui/icons/KeyboardArrowRight';
+import PreviousPage from '@material-ui/icons/KeyboardArrowLeft';
 
 type Props = {
   classes: Object,
@@ -42,8 +47,8 @@ function DatasetTable({ classes, dataset }: Props) {
         icons={{
           FirstPage,
           LastPage,
-          NextPage: KeyboardArrowRight,
-          PreviousPage: KeyboardArrowLeft,
+          NextPage,
+          PreviousPage,
         }}
         options={{ search: false, sorting: false, toolbar: false }}
         columns={columns}

@@ -1,6 +1,9 @@
-import {
-  forEach, some, size, isEmpty, isNaN, isString,
-} from 'lodash';
+import forEach from 'lodash/forEach';
+import some from 'lodash/some';
+import size from 'lodash/size';
+import isEmpty from 'lodash/isEmpty';
+import isNaN from 'lodash/isNaN';
+import isString from 'lodash/isString';
 import CSV from '../../../utils/csv';
 
 self.addEventListener('message', (ev) => {
@@ -15,7 +18,7 @@ self.addEventListener('message', (ev) => {
 
     const csv = CSV.parse(result);
 
-    console.log('csv file:', csv); // eslint-disable-line
+    // console.log('csv file:', csv); // eslint-disable-line
 
     // is not permitted:
     // empty csv files

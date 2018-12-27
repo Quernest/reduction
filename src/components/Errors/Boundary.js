@@ -1,11 +1,11 @@
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 
 type Props = {
   children: React.Node,
 };
 
-class ErrorBoundary extends Component<Props> {
+class ErrorBoundary extends React.Component<Props> {
   state = {
     error: null,
     errorInfo: null,

@@ -1,9 +1,11 @@
 // @flow
-import React, { Component } from 'react';
-import { withStyles, Grid, Typography } from '@material-ui/core';
-import { Document, Packer, Paragraph } from 'docx';
-import { round } from 'lodash';
+import React from 'react';
+import { withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import round from 'lodash/round';
 import saveAs from 'file-saver';
+import { Document, Packer, Paragraph } from 'docx';
 import { Biplot, Bar } from './Charts';
 import { Header } from '.';
 import { DatasetTable } from './Output';
@@ -48,7 +50,7 @@ type State = {
   error: string,
 };
 
-class Main extends Component<Props, State> {
+class Main extends React.Component<Props, State> {
   state = {
     selectedFile: null,
     dataset: [],

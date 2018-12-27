@@ -1,11 +1,9 @@
 // @flow
-import React, { Component } from 'react';
-import {
-  select, axisBottom, axisLeft, scaleLinear, max,
-} from 'd3';
-import { Typography } from '@material-ui/core';
-import { abs } from 'mathjs';
-import { size } from 'lodash';
+import React from 'react';
+import * as d3 from 'd3';
+import * as math from 'mathjs';
+import Typography from '@material-ui/core/Typography';
+import size from 'lodash/size';
 import { opposite } from '../../../utils/num';
 
 type Props = {
@@ -32,7 +30,7 @@ type State = {
   },
 };
 
-class Biplot extends Component<Props, State> {
+class Biplot extends React.Component<Props, State> {
   state = {
     margin: {
       top: 20,
@@ -69,7 +67,7 @@ class Biplot extends Component<Props, State> {
   selectSVGElement = () => {
     const { fullWidth, fullHeight, margin } = this.state;
 
-    this.svg = select('#biplot')
+    this.svg = d3.select('#biplot')
       .attr('width', '100%')
       .attr('height', '100%')
       .attr('viewBox', `0 0 ${fullWidth} ${fullHeight}`)
@@ -81,17 +79,17 @@ class Biplot extends Component<Props, State> {
   drawAxes = (points, axes, analysis) => {
     const { width, height, margin } = this.state;
 
-    const x = scaleLinear()
+    const x = d3.scaleLinear()
       .rangeRound([0, width])
-      .domain([-max(points, d => abs(d.x)), max(points, d => abs(d.x))]);
+      .domain([-d3.max(points, d => math.abs(d.x)), d3.max(points, d => math.abs(d.x))]);
 
-    const xAxis = axisBottom(x);
+    const xAxis = d3.axisBottom(x);
 
-    const y = scaleLinear()
+    const y = d3.scaleLinear()
       .rangeRound([0, height])
-      .domain([max(points, d => abs(d.y)), -max(points, d => abs(d.y))]);
+      .domain([d3.max(points, d => math.abs(d.y)), -d3.max(points, d => math.abs(d.y))]);
 
-    const yAxis = axisLeft(y);
+    const yAxis = d3.axisLeft(y);
 
     this.svg
       .append('g')

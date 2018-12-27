@@ -1,9 +1,10 @@
 // @flow
 import React from 'react';
-import {
-  Button, IconButton, Typography, withStyles,
-} from '@material-ui/core';
-import { isNull } from 'lodash';
+import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
+import isNull from 'lodash/isNull';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import DeleteIcon from '@material-ui/icons/Delete';
 import styles from '../styles';

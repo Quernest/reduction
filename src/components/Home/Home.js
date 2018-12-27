@@ -1,9 +1,10 @@
 // @flow
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Grid, Button, Typography, withStyles,
-} from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
 import styles from './styles';
 
 type Props = {
