@@ -6,6 +6,7 @@ import { round } from 'lodash';
 import saveAs from 'file-saver';
 import { Biplot, Bar } from './Charts';
 import { Header } from '.';
+import { DatasetTable } from './Output';
 import { UploadWorker, CalculateWorker } from './WebWorkers'; // eslint-disable-line
 import { Controls, UploadControls, AlgorithmControls } from './Controls';
 import ProgressBar from '../ProgressBar';
@@ -236,6 +237,7 @@ class Main extends Component<Props, State> {
       plotting,
       plotted,
       selectedFile,
+      dataset,
       calculations,
       error,
     } = this.state;
@@ -279,11 +281,7 @@ class Main extends Component<Props, State> {
                   names={names}
                   analysis={analysis}
                 />
-                <Bar
-                  values={eigens.lambda.x}
-                  names={names}
-                  analysis={analysis}
-                />
+                <Bar values={eigens.lambda.x} names={names} analysis={analysis} />
               </div>
             )}
             {/* errors should be as list */}
@@ -292,6 +290,7 @@ class Main extends Component<Props, State> {
                 {error.toString()}
               </Typography>
             }
+            {uploaded && !calculated && <DatasetTable dataset={dataset} />}
           </Grid>
         </Grid>
       </div>
