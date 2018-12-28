@@ -8,6 +8,7 @@ import * as math from 'mathjs';
 import sum from 'lodash/sum';
 import map from 'lodash/map';
 import reduce from 'lodash/reduce';
+import transform from 'lodash/transform';
 import values from 'lodash/values';
 import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
@@ -201,13 +202,13 @@ class PCA {
   getFactorNames = (element: { x: any }): Array<string> => keys(element);
 
   transformTo2DArray = (data: Object): Array<number[]> => {
-    const reducer = (acc: Array<number[]>, curr: Object) => {
+    const transformer = (acc: Array<number[]>, curr: Object) => {
       values(curr).forEach((value: number, i: number) => {
         (acc[i] || (acc[i] = [])).push(value);
       });
     };
 
-    return reduce(data, reducer, []);
+    return transform(data, transformer, []);
   };
 }
 
