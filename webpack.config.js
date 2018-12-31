@@ -12,7 +12,7 @@ module.exports = {
   },
   resolve: {
     modules: ['node_modules'],
-    extensions: ['.js', '.jsx', '.scss', '.css'],
+    extensions: ['.js', '.jsx'],
   },
   devServer: {
     historyApiFallback: true,
