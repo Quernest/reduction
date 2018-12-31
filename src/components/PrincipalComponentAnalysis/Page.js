@@ -2,7 +2,7 @@
 import React from 'react';
 import type { Node } from 'react';
 import styled, { css } from 'styled-components';
-
+import { Times } from 'styled-icons/fa-solid/Times';
 // import web workers
 import CalculateWorker from './calculate.worker';
 import UploadWorker from './upload.worker';
@@ -275,6 +275,17 @@ export default class Page extends React.Component<Props, State> {
               >
                 Upload
               </UploadButton>
+              {selectedFile && (
+                <FilesList>
+                  <FilesListElement>
+                    <FilesListElementName>{selectedFile.name}</FilesListElementName>
+                    <CancelIcon
+                      size={24}
+                      onClick={this.onFileCancel}
+                    />
+                  </FilesListElement>
+                </FilesList>
+              )}
             </ButtonsGroup>
           );
         })()}
@@ -370,6 +381,29 @@ const VisualizeButton = styled.button`
 const ButtonsGroup = styled.div`
   margin-top: 16px;
   margin-bottm: 16px;
+`;
+
+const FilesList = styled.ul`
+  margin-top: 20px;
+  margin-bottom: 20px;
+  list-style-type: none;
+  padding-left: 0;
+`;
+
+const FilesListElement = styled.li`
+  display: flex;
+  align-items: center;
+`;
+
+const FilesListElementName = styled.span`
+  font-size: 18px;
+  color: #151f26;
+`;
+
+const CancelIcon = styled(Times)`
+  margin-left: 10px;
+  color: red;
+  cursor: pointer;
 `;
 
 const ErrorBox = styled.div`
