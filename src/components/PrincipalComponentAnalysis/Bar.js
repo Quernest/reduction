@@ -1,8 +1,8 @@
 // @flow
 import React from 'react';
 import * as d3 from 'd3';
-import Typography from '@material-ui/core/Typography';
 import round from 'lodash/round';
+import styled from 'styled-components';
 import transform from 'lodash/transform';
 
 type Props = {
@@ -48,7 +48,11 @@ export default class Bar extends React.Component<Props, State> {
     // transform to array of objects
     const data: Array<{ name: string, value: number }> = transform(
       values,
-      (acc: Array<{ name: string, value: number }>, curr: number, i: number) => {
+      (
+        acc: Array<{ name: string, value: number }>,
+        curr: number,
+        i: number,
+      ) => {
         acc.push({
           name: names[i],
           value: round(curr, 3),
@@ -77,7 +81,10 @@ export default class Bar extends React.Component<Props, State> {
       .attr('transform', `translate(${margin.left},${margin.top})`);
   }
 
-  drawAxes(data: Array<{ name: string, value: number }>, analysis: Array<number>): void {
+  drawAxes(
+    data: Array<{ name: string, value: number }>,
+    analysis: Array<number>,
+  ): void {
     const { width, height } = this.state;
     const padding = 0.25;
 
@@ -99,7 +106,10 @@ export default class Bar extends React.Component<Props, State> {
     this.svg.append('g').call(d3.axisLeft(this.y));
   }
 
-  drawBars(data: Array<{ name: string, value: number }>, analysis: Array<number>): void {
+  drawBars(
+    data: Array<{ name: string, value: number }>,
+    analysis: Array<number>,
+  ): void {
     const { height } = this.state;
 
     this.svg
@@ -118,9 +128,19 @@ export default class Bar extends React.Component<Props, State> {
   render() {
     return (
       <>
-        <Typography variant="h5">Bar chart</Typography>
+        <Title>Bar chart</Title>
         <svg id="bar" />
       </>
     );
   }
 }
+
+const Title = styled.h3`
+  margin-top: 16px;
+  margin-bottom: 16px;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 1.5;
+  color: #151f26;
+`;

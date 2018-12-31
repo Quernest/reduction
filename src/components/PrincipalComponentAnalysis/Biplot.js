@@ -2,9 +2,9 @@
 import React from 'react';
 import * as d3 from 'd3';
 import * as math from 'mathjs';
-import Typography from '@material-ui/core/Typography';
 import size from 'lodash/size';
-import { opposite } from '../../../utils/num';
+import styled from 'styled-components';
+import { opposite } from '../../utils/num';
 
 type Props = {
   points: Array<{
@@ -188,11 +188,21 @@ class Biplot extends React.Component<Props, State> {
 
     return (
       <>
-        <Typography variant="h5">Biplot</Typography>
+        <Title>Biplot</Title>
         <svg id="biplot" />
       </>
     );
   }
 }
+
+const Title = styled.h3`
+  margin-top: 16px;
+  margin-bottom: 16px;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 1.5;
+  color: #151f26;
+`;
 
 export default Biplot;

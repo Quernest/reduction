@@ -87,7 +87,10 @@ class PCA {
      * it is said to be a linear combination of the other vectors.
      * read more: https://www.dsprelated.com/freebooks/mdft/Linear_Combination_Vectors.html
      */
-    this.linearCombinations = this.getLinearCombinations(this.adjustedDataset, this.eigens.E.x);
+    this.linearCombinations = this.getLinearCombinations(
+      this.adjustedDataset,
+      this.eigens.E.x,
+    );
 
     /**
      * step 6
@@ -110,7 +113,10 @@ class PCA {
       const variance: number = math.var(data);
       const std: number = math.sqrt(variance);
 
-      return map(data, (value: number): number => round((value - mean) / std, 3));
+      return map(
+        data,
+        (value: number): number => round((value - mean) / std, 3),
+      );
     },
   );
 
@@ -145,7 +151,11 @@ class PCA {
     dataset: Array<number[]>,
     eigenvectors: Array<number[]>,
   ): Array<number[]> => {
-    const reducer: Array<number[]> = (acc: Array<number[]>, curr: Array<number[]>, i: number) => {
+    const reducer: Array<number[]> = (
+      acc: Array<number[]>,
+      curr: Array<number[]>,
+      i: number,
+    ) => {
       // get column of eigenvectors matrix
       const vector: Array<number> = map(
         eigenvectors,
@@ -155,11 +165,17 @@ class PCA {
       // scalar multiplication of factor by vector
       const multiplication: Array<number[]> = map(
         dataset,
-        (factors: Array<number>, j: number): Array<number> => map(factors, (factor: number): number => opposite(factor * vector[j])),
+        (factors: Array<number>, j: number): Array<number> => map(
+          factors,
+          (factor: number): number => opposite(factor * vector[j]),
+        ),
       );
 
       // get linear combinations (sum of scalar multiples of vectors)
-      const linearCombination: Array<number> = map(math.transpose(multiplication), sum);
+      const linearCombination: Array<number> = map(
+        math.transpose(multiplication),
+        sum,
+      );
 
       // push to the accamulator
       if (!isUndefined(acc)) {
@@ -175,7 +191,10 @@ class PCA {
   analyze = (eigenvalues: Array<number>): Array<number> => {
     const summary: number = math.sum(eigenvalues);
 
-    return map(eigenvalues, (lambda: number): number => round((lambda / summary) * 100, 2));
+    return map(
+      eigenvalues,
+      (lambda: number): number => round((lambda / summary) * 100, 2),
+    );
   };
 
   getScatterPoints = (
