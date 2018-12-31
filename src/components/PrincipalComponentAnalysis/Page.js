@@ -209,13 +209,7 @@ export default class Page extends React.Component<Props, State> {
           numerical values) into a set of values of linearly uncorrelated
           variables called principal components.
         </Description>
-        {(() => {
-          if (error) {
-            return <ErrorBox>{error}</ErrorBox>;
-          }
-
-          return null;
-        })()}
+        <ErrorBox hasError={error}>{error}</ErrorBox>
         {(() => {
           if (uploading || calculating) {
             return <div>loading...</div>;
@@ -278,11 +272,10 @@ export default class Page extends React.Component<Props, State> {
               {selectedFile && (
                 <FilesList>
                   <FilesListElement>
-                    <FilesListElementName>{selectedFile.name}</FilesListElementName>
-                    <CancelIcon
-                      size={24}
-                      onClick={this.onFileCancel}
-                    />
+                    <FilesListElementName>
+                      {selectedFile.name}
+                    </FilesListElementName>
+                    <CancelIcon size={24} onClick={this.onFileCancel} />
                   </FilesListElement>
                 </FilesList>
               )}
@@ -412,4 +405,11 @@ const ErrorBox = styled.div`
   font-size: 18px;
   font-weight: 300;
   color: red;
+  ${props => (props.hasError
+    ? css`
+          display: block;
+        `
+    : css`
+          display: none;
+        `)}
 `;
