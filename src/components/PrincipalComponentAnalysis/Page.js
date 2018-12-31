@@ -2,9 +2,11 @@
 import React from 'react';
 import type { Node } from 'react';
 import styled, { css } from 'styled-components';
+
 // import web workers
 import CalculateWorker from './calculate.worker';
 import UploadWorker from './upload.worker';
+
 // imports charts
 import Bar from './Bar';
 import Biplot from './Biplot';
@@ -34,8 +36,7 @@ type State = {
     linearCombinations: Array<number[]>,
     names: Array<string>,
   },
-  plotting: boolean,
-  plotted: boolean,
+  visualize: boolean,
   calculating: boolean,
   calculated: boolean,
   uploading: boolean,
@@ -54,13 +55,12 @@ export default class Page extends React.Component<Props, State> {
       eigens: {},
       linearCombinations: [],
     },
-    plotting: false,
-    plotted: false,
+    visualize: false,
     calculating: false,
     calculated: false,
     uploading: false,
     uploaded: false,
-    error: '',
+    error: '', // todo: handle array
   };
 
   fileInput: ?HTMLInputElement = React.createRef();
@@ -125,11 +125,13 @@ export default class Page extends React.Component<Props, State> {
   };
 
   onFileUpload = (e: Event): void => {
-    this.setState({
-      error: '',
-      uploaded: false,
-      uploading: true,
-    });
+    this.setState(
+      {
+        uploaded: false,
+        uploading: true,
+      },
+      this.clearErrorBox,
+    );
 
     const { selectedFile } = this.state;
 
@@ -160,18 +162,26 @@ export default class Page extends React.Component<Props, State> {
   };
 
   onFileCancel = () => {
-    this.setState({
-      selectedFile: null,
-      uploaded: false,
-      error: '',
-    });
+    this.setState(
+      {
+        selectedFile: null,
+        uploaded: false,
+      },
+      this.clearErrorBox,
+    );
   };
 
   onVisualize = () => {
     this.setState({
-      plotted: true,
+      visualize: true,
     });
   };
+
+  clearErrorBox() {
+    console.log('cleared');
+
+    this.setState({ error: '' });
+  }
 
   render(): Node {
     const {
@@ -179,8 +189,7 @@ export default class Page extends React.Component<Props, State> {
       uploaded,
       calculating,
       calculated,
-      plotting,
-      plotted,
+      visualize,
       selectedFile,
       dataset,
       calculations,
@@ -201,7 +210,18 @@ export default class Page extends React.Component<Props, State> {
           variables called principal components.
         </Description>
         {(() => {
-          if (plotted) {
+          if (error) {
+            return <ErrorBox>{error}</ErrorBox>;
+          }
+
+          return null;
+        })()}
+        {(() => {
+          if (uploading || calculating) {
+            return <div>loading...</div>;
+          }
+
+          if (visualize) {
             return (
               <>
                 <Biplot
@@ -210,7 +230,11 @@ export default class Page extends React.Component<Props, State> {
                   names={names}
                   analysis={analysis}
                 />
-                <Bar values={eigens.lambda.x} names={names} analysis={analysis} />
+                <Bar
+                  values={eigens.lambda.x}
+                  names={names}
+                  analysis={analysis}
+                />
               </>
             );
           }
@@ -226,6 +250,7 @@ export default class Page extends React.Component<Props, State> {
           }
 
           if (uploaded) {
+            // show dataset here
             return (
               <ButtonsGroup>
                 <CalculateButton onClick={this.onCalculate}>
@@ -294,13 +319,24 @@ const btn = css`
   outline: none;
   padding: 12px 25px;
   text-transform: uppercase;
-  background-color: #0979ff;
+  background-color: #0061d5;
   font-size: 14px;
   color: #fff;
   cursor: pointer;
+  transition: 200ms ease-in;
+
+  &:hover {
+    background-color: #0979ff;
+  }
+
   ${props => props.disabled
     && css`
       background-color: #b3b3b3;
+
+      &:hover {
+        background-color: #b3b3b3;
+        cursor: not-allowed;
+      }
     `}
 `;
 
@@ -334,4 +370,12 @@ const VisualizeButton = styled.button`
 const ButtonsGroup = styled.div`
   margin-top: 16px;
   margin-bottm: 16px;
+`;
+
+const ErrorBox = styled.div`
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: 300;
+  color: red;
 `;
