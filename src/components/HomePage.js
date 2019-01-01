@@ -4,14 +4,12 @@ import type { Node } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-function App(): Node {
-  return (
-    <Wrapper>
-      <Title>Reduction</Title>
-      <Link to="pca">PCA</Link>
-    </Wrapper>
-  );
-}
+const HomePage = (): Node => (
+  <Wrapper>
+    <Title>Reduction</Title>
+    <Link to="pca">Principal Component Analysis</Link>
+  </Wrapper>
+);
 
 const Wrapper = styled.div`
   display: flex;
@@ -33,4 +31,4 @@ const Title = styled.h1`
   color: #151f26;
 `;
 
-export default App;
+export default HomePage;

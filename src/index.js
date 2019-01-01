@@ -4,7 +4,7 @@ import { createGlobalStyle } from 'styled-components';
 import Router from './router';
 
 const GlobalStyles = createGlobalStyle`
-  @import url('https://fonts.googleapis.com/css?family=Lato');
+  @import url('https://fonts.googleapis.com/css?family=Roboto');
 
   *,
   *::before,
@@ -18,7 +18,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   body {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Roboto', sans-serif;
   }
 `;
 

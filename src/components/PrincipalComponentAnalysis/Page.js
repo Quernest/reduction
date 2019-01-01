@@ -312,29 +312,35 @@ const Description = styled.p`
 `;
 
 const btn = css`
-  max-width: 160px;
+  min-height: 36px;
+  min-width: 64px;
   border: 0;
-  border-radius: 5px;
+  border-radius: 3px;
   outline: none;
-  padding: 12px 25px;
+  padding: 10px 20px;
   text-transform: uppercase;
-  background-color: #0061d5;
+  background-color: #2196f3;
   font-size: 14px;
+  font-weight: 500;
   color: #fff;
   cursor: pointer;
-  transition: 200ms ease-in;
+  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
   &:hover {
-    background-color: #0979ff;
+    background-color: #1976d2;
   }
 
   ${props => props.disabled
     && css`
-      background-color: #b3b3b3;
+      background-color: #d1d1d1;
+      color: #9c9ca9;
 
       &:hover {
-        background-color: #b3b3b3;
-        cursor: not-allowed;
+        background-color: #d1d1d1;
+        color: #9c9ca9;
+        cursor: default;
       }
     `}
 `;

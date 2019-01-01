@@ -3,15 +3,18 @@ import React from 'react';
 import type { Node } from 'react';
 import { hot } from 'react-hot-loader/root';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { App, PrincipalComponentAnalysis } from './components';
+import { Header, HomePage, PrincipalComponentAnalysis } from './components';
 
 function AppRouter(): Node {
   return (
     <Router>
-      <Switch>
-        <Route path="/" exact component={App} />
-        <Route path="/pca" component={PrincipalComponentAnalysis} />
-      </Switch>
+      <>
+        <Header />
+        <Switch>
+          <Route path="/" exact component={HomePage} />
+          <Route path="/pca" component={PrincipalComponentAnalysis} />
+        </Switch>
+      </>
     </Router>
   );
 }
