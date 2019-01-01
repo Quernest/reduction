@@ -1,14 +1,21 @@
 // @flow
 import React from 'react';
 import type { Node } from 'react';
-import styled, { css } from 'styled-components';
-import { Times } from 'styled-icons/fa-solid/Times';
+import { withStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Chip from '@material-ui/core/Chip';
+import Grid from '@material-ui/core/Grid';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import CalculateWorker from './calculate.worker';
 import UploadWorker from './upload.worker';
 import Bar from './Bar';
 import Biplot from './Biplot';
 
-type Props = {};
+type Props = {
+  classes: Object,
+};
 
 type State = {
   selectedFile: File,
@@ -41,7 +48,7 @@ type State = {
   error: string,
 };
 
-export default class Page extends React.Component<Props, State> {
+class Page extends React.Component<Props, State> {
   state = {
     selectedFile: null,
     dataset: [],
@@ -179,6 +186,7 @@ export default class Page extends React.Component<Props, State> {
   }
 
   render(): Node {
+    const { classes } = this.props;
     const {
       uploading,
       uploaded,
@@ -195,221 +203,143 @@ export default class Page extends React.Component<Props, State> {
     } = calculations;
 
     return (
-      <Wrapper>
-        <Title>Principal Component Analysis</Title>
-        <Description>
-          Principal component analysis (PCA) is a statistical procedure that
-          uses an orthogonal transformation to convert a set of observations of
-          possibly correlated variables (entities each of which takes on various
-          numerical values) into a set of values of linearly uncorrelated
-          variables called principal components.
-        </Description>
-        <ErrorBox hasError={error}>{error}</ErrorBox>
-        {(() => {
-          if (uploading || calculating) {
-            return <div>loading...</div>;
-          }
+      <div className={classes.root}>
+        <Grid container justify="center">
+          <Grid container className={classes.grid} alignItems="center">
+            <Typography variant="h6" paragraph>
+              Principal Component Analysis
+            </Typography>
+            <Typography variant="subtitle1" color="textSecondary" paragraph>
+              Principal component analysis (PCA) is a statistical procedure that
+              uses an orthogonal transformation to convert a set of observations
+              of possibly correlated variables (entities each of which takes on
+              various numerical values) into a set of values of linearly
+              uncorrelated variables called principal components.
+            </Typography>
+            {(() => {
+              if (uploading || calculating) {
+                return (
+                  <Grid container justify="center">
+                    <CircularProgress className={classes.progress} />
+                  </Grid>
+                );
+              }
 
-          if (visualize) {
-            return (
-              <>
-                <Biplot
-                  points={scatterPoints}
-                  vectors={eigens.E.x}
-                  names={names}
-                  analysis={analysis}
-                />
-                <Bar
-                  values={eigens.lambda.x}
-                  names={names}
-                  analysis={analysis}
-                />
-              </>
-            );
-          }
+              if (visualize) {
+                return (
+                  <>
+                    <Biplot
+                      points={scatterPoints}
+                      vectors={eigens.E.x}
+                      names={names}
+                      analysis={analysis}
+                    />
+                    <Bar
+                      values={eigens.lambda.x}
+                      names={names}
+                      analysis={analysis}
+                    />
+                  </>
+                );
+              }
 
-          if (calculated) {
-            return (
-              <ButtonsGroup>
-                <VisualizeButton onClick={this.onVisualize}>
-                  Visualize
-                </VisualizeButton>
-              </ButtonsGroup>
-            );
-          }
+              if (calculated) {
+                return (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={this.onVisualize}
+                  >
+                    Visualize
+                  </Button>
+                );
+              }
 
-          if (uploaded) {
-            // show dataset here
-            return (
-              <ButtonsGroup>
-                <CalculateButton onClick={this.onCalculate}>
-                  Calculate
-                </CalculateButton>
-              </ButtonsGroup>
-            );
-          }
+              if (uploaded) {
+                return (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={this.onCalculate}
+                  >
+                    Calculate
+                  </Button>
+                );
+              }
 
-          return (
-            <ButtonsGroup>
-              <UploadInput
-                ref={this.fileInput}
-                onChange={this.onFileSelectInputChange}
-              />
-              <ChooseButton onClick={() => this.fileInput.current.click()}>
-                Choose a file
-              </ChooseButton>
-              <UploadButton
-                onClick={this.onFileUpload}
-                disabled={!selectedFile}
-              >
-                Upload
-              </UploadButton>
-              {selectedFile && (
-                <FilesList>
-                  <FilesListElement>
-                    <FilesListElementName>
-                      {selectedFile.name}
-                    </FilesListElementName>
-                    <CancelIcon size={21} onClick={this.onFileCancel} />
-                  </FilesListElement>
-                </FilesList>
-              )}
-            </ButtonsGroup>
-          );
-        })()}
-      </Wrapper>
+              return (
+                <Grid item xs={12}>
+                  <input
+                    ref={this.fileInput}
+                    onChange={this.onFileSelectInputChange}
+                    type="file"
+                    multiple={false}
+                    hidden
+                  />
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => this.fileInput.current.click()}
+                  >
+                    choose a file
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    className={classes.button}
+                    disabled={!selectedFile}
+                    onClick={this.onFileUpload}
+                  >
+                    Upload
+                    <CloudUploadIcon className={classes.rightIcon} />
+                  </Button>
+                  {selectedFile && (
+                    <Grid item xs={12}>
+                      <Chip
+                        label={selectedFile.name}
+                        onDelete={this.onFileCancel}
+                        className={classes.chip}
+                      />
+                    </Grid>
+                  )}
+                </Grid>
+              );
+            })()}
+            {error && (
+              <Typography variant="body2" color="error">
+                {error}
+              </Typography>
+            )}
+          </Grid>
+        </Grid>
+      </div>
     );
   }
 }
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 960px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 20px;
-`;
+const styles = ({ spacing: { unit }, breakpoints: { up, values } }) => ({
+  root: {
+    flexGrow: 1,
+    padding: unit * 2,
+    [up('sm')]: {
+      padding: unit * 3,
+    },
+  },
+  grid: {
+    [up('md')]: {
+      width: values.md,
+    },
+  },
+  button: {
+    margin: unit,
+  },
+  rightIcon: {
+    marginLeft: unit,
+  },
+  chip: {
+    marginTop: unit,
+    marginBottom: unit,
+  },
+});
 
-const Title = styled.h1`
-  margin-top: 16px;
-  margin-bottom: 16px;
-  font-size: 36px;
-  font-style: normal;
-  font-weight: 300;
-  line-height: 1.5;
-  color: #151f26;
-`;
-
-const Description = styled.p`
-  margin-top: 10px;
-  margin-bottom: 10px;
-  font-size: 16px;
-  letter-spacing: 0.2px;
-  line-height: 1.5;
-  color: #72848e;
-`;
-
-const btn = css`
-  min-height: 36px;
-  min-width: 64px;
-  border: 0;
-  border-radius: 3px;
-  outline: none;
-  padding: 10px 20px;
-  text-transform: uppercase;
-  background-color: #2196f3;
-  font-size: 14px;
-  font-weight: 500;
-  color: #fff;
-  cursor: pointer;
-  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-    box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-    border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-
-  &:hover {
-    background-color: #1976d2;
-  }
-
-  ${props => props.disabled
-    && css`
-      background-color: #d1d1d1;
-      color: #9c9ca9;
-
-      &:hover {
-        background-color: #d1d1d1;
-        color: #9c9ca9;
-        cursor: default;
-      }
-    `}
-`;
-
-const UploadInput = styled.input.attrs({
-  type: 'file',
-  multiple: false,
-  hidden: true,
-})`
-  display: none;
-  visibility: hidden;
-`;
-
-const ChooseButton = styled.button`
-  ${btn}
-  margin-right: 16px;
-`;
-
-const UploadButton = styled.button`
-  ${btn}
-`;
-
-const CalculateButton = styled.button`
-  ${btn}
-  margin-right: 16px;
-`;
-
-const VisualizeButton = styled.button`
-  ${btn}
-`;
-
-const ButtonsGroup = styled.div`
-  margin-top: 16px;
-  margin-bottm: 16px;
-`;
-
-const FilesList = styled.ul`
-  margin-top: 20px;
-  margin-bottom: 20px;
-  list-style-type: none;
-  padding-left: 0;
-`;
-
-const FilesListElement = styled.li`
-  display: flex;
-  align-items: center;
-`;
-
-const FilesListElementName = styled.span`
-  font-size: 18px;
-  line-height: 21px;
-  color: #151f26;
-`;
-
-const CancelIcon = styled(Times)`
-  margin-left: 10px;
-  color: #151f26;
-  cursor: pointer;
-`;
-
-const ErrorBox = styled.div`
-  display: none;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  font-size: 18px;
-  font-weight: 300;
-  color: red;
-  ${props => props.hasError
-    && css`
-      display: block;
-    `}
-`;
+export default withStyles(styles)(Page);

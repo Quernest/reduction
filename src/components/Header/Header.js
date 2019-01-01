@@ -1,34 +1,52 @@
 // @flow
 import React from 'react';
 import type { Node } from 'react';
-import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 
-export default function Header(): Node {
-  return (
-    <Wrapper>
-      <Logo to="/">Logo</Logo>
-    </Wrapper>
-  );
-}
+type Props = {
+  classes: Object,
+};
 
-const Wrapper = styled.header`
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  height: 75px;
-  width: 100%;
-  background-color: #18181e;
-`;
+const Header = ({ classes }: Props): Node => (
+  <header className={classes.root}>
+    <AppBar position="static">
+      <Toolbar>
+        <Grid container justify="center">
+          <Grid container alignItems="center" className={classes.grid}>
+            <Typography variant="h6" color="inherit" className={classes.grow}>
+              Logo
+            </Typography>
+            <Button variant="text" color="inherit" component={Link} to="/">
+              Home
+            </Button>
+            <Button variant="text" color="inherit" component={Link} to="/pca">
+              PCA
+            </Button>
+          </Grid>
+        </Grid>
+      </Toolbar>
+    </AppBar>
+  </header>
+);
 
-const Logo = styled(Link)`
-  text-decoration: none;
-  font-size: 24px;
-  font-weight: 700;
-  transition: 220ms ease;
-  color: #e1e2e2;
+const styles = ({ breakpoints: { up, values } }) => ({
+  root: {
+    flexGrow: 1,
+  },
+  grow: {
+    flexGrow: 1,
+  },
+  grid: {
+    [up('md')]: {
+      width: values.md,
+    },
+  },
+});
 
-  &:hover {
-    color: #dec79b;
-  }
-`;
+export default withStyles(styles)(Header);

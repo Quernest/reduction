@@ -2,8 +2,8 @@
 import React from 'react';
 import * as d3 from 'd3';
 import round from 'lodash/round';
-import styled from 'styled-components';
 import transform from 'lodash/transform';
+import Typography from '@material-ui/core/Typography';
 
 type Props = {
   values: Array<number>,
@@ -128,19 +128,11 @@ export default class Bar extends React.Component<Props, State> {
   render() {
     return (
       <>
-        <Title>Bar chart</Title>
+        <Typography variant="h6" paragraph>
+          Bar Chart
+        </Typography>
         <svg id="bar" />
       </>
     );
   }
 }
-
-const Title = styled.h3`
-  margin-top: 16px;
-  margin-bottom: 16px;
-  font-size: 24px;
-  font-style: normal;
-  font-weight: 300;
-  line-height: 1.5;
-  color: #151f26;
-`;

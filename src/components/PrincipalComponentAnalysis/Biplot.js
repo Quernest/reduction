@@ -3,7 +3,7 @@ import React from 'react';
 import * as d3 from 'd3';
 import * as math from 'mathjs';
 import size from 'lodash/size';
-import styled from 'styled-components';
+import Typography from '@material-ui/core/Typography';
 import { opposite } from '../../utils/num';
 
 type Props = {
@@ -67,7 +67,8 @@ class Biplot extends React.Component<Props, State> {
   selectSVGElement = () => {
     const { fullWidth, fullHeight, margin } = this.state;
 
-    this.svg = d3.select('#biplot')
+    this.svg = d3
+      .select('#biplot')
       .attr('width', '100%')
       .attr('height', '100%')
       .attr('viewBox', `0 0 ${fullWidth} ${fullHeight}`)
@@ -79,15 +80,23 @@ class Biplot extends React.Component<Props, State> {
   drawAxes = (points, axes, analysis) => {
     const { width, height, margin } = this.state;
 
-    const x = d3.scaleLinear()
+    const x = d3
+      .scaleLinear()
       .rangeRound([0, width])
-      .domain([-d3.max(points, d => math.abs(d.x)), d3.max(points, d => math.abs(d.x))]);
+      .domain([
+        -d3.max(points, d => math.abs(d.x)),
+        d3.max(points, d => math.abs(d.x)),
+      ]);
 
     const xAxis = d3.axisBottom(x);
 
-    const y = d3.scaleLinear()
+    const y = d3
+      .scaleLinear()
       .rangeRound([0, height])
-      .domain([d3.max(points, d => math.abs(d.y)), -d3.max(points, d => math.abs(d.y))]);
+      .domain([
+        d3.max(points, d => math.abs(d.y)),
+        -d3.max(points, d => math.abs(d.y)),
+      ]);
 
     const yAxis = d3.axisLeft(y);
 
@@ -188,21 +197,13 @@ class Biplot extends React.Component<Props, State> {
 
     return (
       <>
-        <Title>Biplot</Title>
+        <Typography variant="h6" paragraph>
+          Biplot
+        </Typography>
         <svg id="biplot" />
       </>
     );
   }
 }
-
-const Title = styled.h3`
-  margin-top: 16px;
-  margin-bottom: 16px;
-  font-size: 24px;
-  font-style: normal;
-  font-weight: 300;
-  line-height: 1.5;
-  color: #151f26;
-`;
 
 export default Biplot;
