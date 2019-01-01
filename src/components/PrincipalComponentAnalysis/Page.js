@@ -3,11 +3,8 @@ import React from 'react';
 import type { Node } from 'react';
 import styled, { css } from 'styled-components';
 import { Times } from 'styled-icons/fa-solid/Times';
-// import web workers
 import CalculateWorker from './calculate.worker';
 import UploadWorker from './upload.worker';
-
-// imports charts
 import Bar from './Bar';
 import Biplot from './Biplot';
 
@@ -178,8 +175,6 @@ export default class Page extends React.Component<Props, State> {
   };
 
   clearErrorBox() {
-    console.log('cleared');
-
     this.setState({ error: '' });
   }
 
@@ -275,7 +270,7 @@ export default class Page extends React.Component<Props, State> {
                     <FilesListElementName>
                       {selectedFile.name}
                     </FilesListElementName>
-                    <CancelIcon size={24} onClick={this.onFileCancel} />
+                    <CancelIcon size={21} onClick={this.onFileCancel} />
                   </FilesListElement>
                 </FilesList>
               )}
@@ -390,26 +385,25 @@ const FilesListElement = styled.li`
 
 const FilesListElementName = styled.span`
   font-size: 18px;
+  line-height: 21px;
   color: #151f26;
 `;
 
 const CancelIcon = styled(Times)`
   margin-left: 10px;
-  color: red;
+  color: #151f26;
   cursor: pointer;
 `;
 
 const ErrorBox = styled.div`
+  display: none;
   margin-top: 10px;
   margin-bottom: 10px;
   font-size: 18px;
   font-weight: 300;
   color: red;
-  ${props => (props.hasError
-    ? css`
-          display: block;
-        `
-    : css`
-          display: none;
-        `)}
+  ${props => props.hasError
+    && css`
+      display: block;
+    `}
 `;
