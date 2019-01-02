@@ -3,6 +3,7 @@ import React from 'react';
 import * as d3 from 'd3';
 import * as math from 'mathjs';
 import size from 'lodash/size';
+import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { opposite } from '../../utils/num';
 
@@ -15,6 +16,7 @@ type Props = {
   vectors: Array<number[]>,
   names: Array<string>,
   analysis: Array<number>,
+  classes: Object,
 };
 
 type State = {
@@ -188,7 +190,7 @@ class Biplot extends React.Component<Props, State> {
   };
 
   render() {
-    const { names } = this.props;
+    const { names, classes } = this.props;
 
     // 2D only
     if (size(names) > 2) {
@@ -196,14 +198,21 @@ class Biplot extends React.Component<Props, State> {
     }
 
     return (
-      <>
+      <div className={classes.root}>
         <Typography variant="h6" paragraph>
           Biplot
         </Typography>
         <svg id="biplot" />
-      </>
+      </div>
     );
   }
 }
 
-export default Biplot;
+const styles = {
+  root: {
+    width: '100%',
+    height: 'auto',
+  },
+};
+
+export default withStyles(styles)(Biplot);

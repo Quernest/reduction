@@ -3,12 +3,14 @@ import React from 'react';
 import * as d3 from 'd3';
 import round from 'lodash/round';
 import transform from 'lodash/transform';
+import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 
 type Props = {
   values: Array<number>,
   names: Array<string>,
   analysis: Array<number>,
+  classes: Object,
 };
 
 type State = {
@@ -24,7 +26,7 @@ type State = {
   },
 };
 
-export default class Bar extends React.Component<Props, State> {
+class Bar extends React.Component<Props, State> {
   state = {
     margin: {
       top: 20,
@@ -126,13 +128,24 @@ export default class Bar extends React.Component<Props, State> {
   }
 
   render() {
+    const { classes } = this.props;
+
     return (
-      <>
+      <div className={classes.root}>
         <Typography variant="h6" paragraph>
           Bar Chart
         </Typography>
         <svg id="bar" />
-      </>
+      </div>
     );
   }
 }
+
+const styles = {
+  root: {
+    width: '100%',
+    height: 'auto',
+  },
+};
+
+export default withStyles(styles)(Bar);
