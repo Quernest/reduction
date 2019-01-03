@@ -66,8 +66,8 @@ class Bar extends React.Component<Props, State> {
     );
 
     this.selectSVGElement();
-    this.drawAxes(data, analysis);
-    this.drawBars(data, analysis);
+    this.drawAxes(data);
+    this.drawBars(data);
   }
 
   selectSVGElement(): void {
@@ -83,10 +83,7 @@ class Bar extends React.Component<Props, State> {
       .attr('transform', `translate(${margin.left},${margin.top})`);
   }
 
-  drawAxes(
-    data: Array<{ name: string, value: number }>,
-    analysis: Array<number>,
-  ): void {
+  drawAxes(data: Array<{ name: string, value: number }>): void {
     const { width, height } = this.state;
     const padding = 0.25;
 
@@ -94,7 +91,7 @@ class Bar extends React.Component<Props, State> {
       .scaleBand()
       .range([0, width])
       .padding(padding)
-      .domain(data.map((d, i) => `${d.name} (${analysis[i]}%)`));
+      .domain(data.map(d => d.name));
     this.y = d3
       .scaleLinear()
       .range([height, 0])
@@ -108,10 +105,7 @@ class Bar extends React.Component<Props, State> {
     this.svg.append('g').call(d3.axisLeft(this.y));
   }
 
-  drawBars(
-    data: Array<{ name: string, value: number }>,
-    analysis: Array<number>,
-  ): void {
+  drawBars(data: Array<{ name: string, value: number }>): void {
     const { height } = this.state;
 
     this.svg
@@ -121,7 +115,7 @@ class Bar extends React.Component<Props, State> {
       .append('rect')
       .attr('class', 'bar')
       .attr('fill', 'steelblue')
-      .attr('x', (d, i) => this.x(`${d.name} (${analysis[i]}%)`))
+      .attr('x', (d, i) => this.x(d.name))
       .attr('width', this.x.bandwidth())
       .attr('y', d => this.y(d.value))
       .attr('height', d => height - this.y(d.value));

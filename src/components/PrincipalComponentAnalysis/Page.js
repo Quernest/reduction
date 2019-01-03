@@ -8,6 +8,14 @@ import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
 import Grid from '@material-ui/core/Grid';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import MaterialTable from 'material-table';
+import FirstPageIcon from '@material-ui/icons/FirstPage';
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import LastPageIcon from '@material-ui/icons/LastPage';
+import map from 'lodash/map';
+import keys from 'lodash/keys';
+import head from 'lodash/head';
 import CalculateWorker from './calculate.worker';
 import UploadWorker from './upload.worker';
 import Bar from './Bar';
@@ -256,14 +264,56 @@ class Page extends React.Component<Props, State> {
               }
 
               if (uploaded) {
+                const columns = ['№', ...keys(head(dataset))].map(
+                  (element: string, index: number): Object => ({
+                    cellStyle:
+                      index === 0
+                        ? {
+                          width: 30,
+                        }
+                        : undefined,
+                    title: element,
+                    field: element,
+                    type: 'numeric',
+                  }),
+                );
+              
+                const data: Array<Object> = map(
+                  dataset,
+                  (element: Object, index: number): Object => ({
+                    '№': index + 1,
+                    ...element,
+                  }),
+                );
+
                 return (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={this.onCalculate}
-                  >
-                    Calculate
-                  </Button>
+                  <React.Fragment>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={this.onCalculate}
+                    >
+                      Calculate
+                    </Button>
+                    <div style={{ maxWidth: '100%', width: '100%', marginTop: 30, marginBottom: 30 }}>
+                      <MaterialTable
+                        options={{
+                          search: false,
+                          sorting: false,
+                          toolbar: false,
+                        }}
+                        icons={{
+                          FirstPage: FirstPageIcon,
+                          LastPage: LastPageIcon,
+                          NextPage: KeyboardArrowRight,
+                          PreviousPage: KeyboardArrowLeft,
+                        }}
+                        columns={columns}
+                        data={data}
+                        title="Dataset"
+                      />
+                    </div>
+                  </React.Fragment>
                 );
               }
 
