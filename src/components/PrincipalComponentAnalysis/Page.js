@@ -20,6 +20,7 @@ import CalculateWorker from './calculate.worker';
 import UploadWorker from './upload.worker';
 import Bar from './Bar';
 import Biplot from './Biplot';
+import { transform2DArrayToArrayOfObjects } from '../../utils/transformations';
 
 type Props = {
   classes: Object,
@@ -252,32 +253,64 @@ class Page extends React.Component<Props, State> {
               }
 
               if (calculated) {
+                const { adjustedDataset, names } = calculations;
+
+                const columns: Array<Object> = ['№', ...names].map(
+                  (name: string, i: number): Object => ({
+                    title: name,
+                    field: name,
+                    type: i === 0 ? 'date' : 'numeric',
+                  }),
+                );
+
+                const data: Array<Object> = transform2DArrayToArrayOfObjects(adjustedDataset, ['№', ...names], true);
+
                 return (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={this.onVisualize}
-                  >
-                    Visualize
-                  </Button>
+                  <React.Fragment>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={this.onVisualize}
+                    >
+                      Visualize
+                    </Button>
+                    <div
+                      style={{
+                        maxWidth: '100%',
+                        width: '100%',
+                        marginTop: 30,
+                        marginBottom: 30,
+                      }}
+                    >
+                      <MaterialTable
+                        title="Adjusted dataset"
+                        options={{
+                          search: false,
+                          sorting: false,
+                        }}
+                        icons={{
+                          FirstPage: FirstPageIcon,
+                          LastPage: LastPageIcon,
+                          NextPage: KeyboardArrowRight,
+                          PreviousPage: KeyboardArrowLeft,
+                        }}
+                        columns={columns}
+                        data={data}
+                      />
+                    </div>
+                  </React.Fragment>
                 );
               }
 
               if (uploaded) {
                 const columns = ['№', ...keys(head(dataset))].map(
-                  (element: string, index: number): Object => ({
-                    cellStyle:
-                      index === 0
-                        ? {
-                          width: 30,
-                        }
-                        : undefined,
+                  (element: string, i: number): Object => ({
                     title: element,
                     field: element,
-                    type: 'numeric',
+                    type: i === 0 ? 'date' : 'numeric',
                   }),
                 );
-              
+
                 const data: Array<Object> = map(
                   dataset,
                   (element: Object, index: number): Object => ({
@@ -295,12 +328,19 @@ class Page extends React.Component<Props, State> {
                     >
                       Calculate
                     </Button>
-                    <div style={{ maxWidth: '100%', width: '100%', marginTop: 30, marginBottom: 30 }}>
+                    <div
+                      style={{
+                        maxWidth: '100%',
+                        width: '100%',
+                        marginTop: 30,
+                        marginBottom: 30,
+                      }}
+                    >
                       <MaterialTable
+                        title="Dataset"
                         options={{
                           search: false,
                           sorting: false,
-                          toolbar: false,
                         }}
                         icons={{
                           FirstPage: FirstPageIcon,
@@ -310,7 +350,6 @@ class Page extends React.Component<Props, State> {
                         }}
                         columns={columns}
                         data={data}
-                        title="Dataset"
                       />
                     </div>
                   </React.Fragment>

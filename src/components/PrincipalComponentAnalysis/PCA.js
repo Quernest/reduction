@@ -8,10 +8,7 @@ import * as math from 'mathjs';
 import sum from 'lodash/sum';
 import map from 'lodash/map';
 import reduce from 'lodash/reduce';
-import transform from 'lodash/transform';
-import values from 'lodash/values';
 import keys from 'lodash/keys';
-import forEach from 'lodash/forEach';
 import round from 'lodash/round';
 import isArray from 'lodash/isArray';
 import isEmpty from 'lodash/isEmpty';
@@ -24,7 +21,11 @@ import cov from 'compute-covariance';
 import numeric from 'numeric';
 
 // helpers
-import { opposite } from '../../utils/num';
+import { opposite } from '../../utils/numbers';
+import {
+  transformArrayOfObjectsTo2DArray,
+  transform2DArrayToArrayOfObjects,
+} from '../../utils/transformations';
 
 try {
   math.import(numeric, { wrap: true, silent: true });
@@ -53,10 +54,10 @@ class PCA {
      */
     if (!isArray(element)) {
       // get keys (factor names)
-      this.names = this.getFactorNames(element);
+      this.names = keys(element);
 
       // if it's object, transform to the two-dimensional array
-      this.dataset = this.transformTo2DArray(dataset);
+      this.dataset = transformArrayOfObjectsTo2DArray(dataset);
     }
 
     /**
@@ -103,7 +104,7 @@ class PCA {
      * additional calculations
      * get scatter points of the dataset for plotting the scatter
      */
-    this.scatterPoints = this.getScatterPoints(this.adjustedDataset);
+    this.scatterPoints = transform2DArrayToArrayOfObjects(this.adjustedDataset);
   }
 
   adjustDataset = (dataset: Array<number[]>): Array<number[]> => map(
@@ -195,39 +196,6 @@ class PCA {
       eigenvalues,
       (lambda: number): number => round((lambda / summary) * 100, 2),
     );
-  };
-
-  getScatterPoints = (
-    dataset: Array<number[]>,
-    axes: Array<string> = ['x', 'y'],
-  ): Array<{ x: number, y: number, z?: number }> => {
-    const reducer = (acc: Array<number>, curr: number, i: number) => {
-      forEach(curr, (_, j: number) => {
-        if (isUndefined(acc[j])) {
-          acc[j] = {};
-        }
-
-        if (!isUndefined(axes[i])) {
-          acc[j][axes[i]] = curr[j];
-        }
-      });
-
-      return acc;
-    };
-
-    return reduce(dataset, reducer, []);
-  };
-
-  getFactorNames = (element: { x: any }): Array<string> => keys(element);
-
-  transformTo2DArray = (data: Object): Array<number[]> => {
-    const transformer = (acc: Array<number[]>, curr: Object) => {
-      values(curr).forEach((value: number, i: number) => {
-        (acc[i] || (acc[i] = [])).push(value);
-      });
-    };
-
-    return transform(data, transformer, []);
   };
 }
 
