@@ -4,8 +4,6 @@ import transform from 'lodash/transform';
 import values from 'lodash/values';
 import isUndefined from 'lodash/isUndefined';
 import forEach from 'lodash/forEach';
-import head from 'lodash/head';
-import range from 'lodash/range';
 
 export const transformArrayOfObjectsTo2DArray = (
   arr: Array<Object>,
@@ -22,7 +20,6 @@ export const transformArrayOfObjectsTo2DArray = (
 export const transform2DArrayToArrayOfObjects = (
   arr: Array<[]>,
   keys: Array<string> = ['x', 'y', 'z'],
-  withIndex: boolean = false,
 ): Array<Object> => {
   const transformer = (
     accumulator: Array<[]>,
@@ -41,12 +38,6 @@ export const transform2DArrayToArrayOfObjects = (
 
     return accumulator;
   };
-
-  if (withIndex) {
-    const startFrom = 1;
-
-    arr.unshift(range(startFrom, head(arr).length + startFrom));
-  }
 
   return transform(arr, transformer, []);
 };

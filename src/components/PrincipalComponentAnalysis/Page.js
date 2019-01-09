@@ -8,19 +8,11 @@ import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
 import Grid from '@material-ui/core/Grid';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
-import MaterialTable from 'material-table';
-import FirstPageIcon from '@material-ui/icons/FirstPage';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-import LastPageIcon from '@material-ui/icons/LastPage';
-import map from 'lodash/map';
-import keys from 'lodash/keys';
-import head from 'lodash/head';
+import Table from './Table';
 import CalculateWorker from './calculate.worker';
 import UploadWorker from './upload.worker';
 import Bar from './Bar';
 import Biplot from './Biplot';
-import { transform2DArrayToArrayOfObjects } from '../../utils/transformations';
 
 type Props = {
   classes: Object,
@@ -208,7 +200,13 @@ class Page extends React.Component<Props, State> {
       error,
     } = this.state;
     const {
-      scatterPoints, eigens, names, analysis,
+      linearCombinations,
+      adjustedDataset,
+      covariance,
+      scatterPoints,
+      eigens,
+      names,
+      analysis,
     } = calculations;
 
     return (
@@ -253,72 +251,66 @@ class Page extends React.Component<Props, State> {
               }
 
               if (calculated) {
-                const { adjustedDataset, names } = calculations;
-
-                const columns: Array<Object> = ['№', ...names].map(
-                  (name: string, i: number): Object => ({
-                    title: name,
-                    field: name,
-                    type: i === 0 ? 'date' : 'numeric',
-                  }),
-                );
-
-                const data: Array<Object> = transform2DArrayToArrayOfObjects(adjustedDataset, ['№', ...names], true);
-
                 return (
                   <React.Fragment>
                     <Button
                       variant="contained"
                       color="primary"
                       onClick={this.onVisualize}
+                      className={classes.btnVisualize}
                     >
                       Visualize
                     </Button>
-                    <div
-                      style={{
-                        maxWidth: '100%',
-                        width: '100%',
-                        marginTop: 30,
-                        marginBottom: 30,
-                      }}
-                    >
-                      <MaterialTable
-                        title="Adjusted dataset"
-                        options={{
-                          search: false,
-                          sorting: false,
-                        }}
-                        icons={{
-                          FirstPage: FirstPageIcon,
-                          LastPage: LastPageIcon,
-                          NextPage: KeyboardArrowRight,
-                          PreviousPage: KeyboardArrowLeft,
-                        }}
-                        columns={columns}
-                        data={data}
+                    <Grid item xs={12}>
+                      <Typography variant="subtitle1">
+                        Count of observations: {dataset.length}
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        Count of factors: {names.length}
+                      </Typography>
+                    </Grid>
+                    <Grid className={classes.tableBox} item xs={12}>
+                      <Typography variant="h5">Original dataset</Typography>
+                      <Table rows={dataset} columns={names} />
+                    </Grid>
+                    <Grid className={classes.tableBox} item xs={12}>
+                      <Typography variant="h5">Adjusted dataset</Typography>
+                      <Table rows={adjustedDataset} columns={names} />
+                    </Grid>
+                    <Grid className={classes.tableBox} item xs={12}>
+                      <Typography variant="h5">Covariation Matrix</Typography>
+                      <Table rows={covariance} columns={names} />
+                    </Grid>
+                    <Grid className={classes.tableBox} item xs={12}>
+                      <Typography variant="h5" className={classes.h5}>
+                        Eigenanalysis of the Covariation Matrix
+                      </Typography>
+                      <Table
+                        enumerateSymbol="Component"
+                        rows={[eigens.lambda.x, analysis]}
+                        columns={['Eigenvalue', 'Proportion, %']}
                       />
-                    </div>
+                    </Grid>
+                    <Grid className={classes.tableBox} item xs={12}>
+                      <Typography variant="h5" className={classes.h5}>
+                        Eigenvectors (component loadings)
+                      </Typography>
+                      <Table
+                        rows={eigens.E.x}
+                        columns={names.map(
+                          (name, index) => `PC${index + 1} (${name})`,
+                        )}
+                      />
+                    </Grid>
+                    <Grid className={classes.tableBox} item xs={12}>
+                      <Typography variant="h5">Linear Combinations</Typography>
+                      <Table rows={linearCombinations} columns={names} />
+                    </Grid>
                   </React.Fragment>
                 );
               }
 
               if (uploaded) {
-                const columns = ['№', ...keys(head(dataset))].map(
-                  (element: string, i: number): Object => ({
-                    title: element,
-                    field: element,
-                    type: i === 0 ? 'date' : 'numeric',
-                  }),
-                );
-
-                const data: Array<Object> = map(
-                  dataset,
-                  (element: Object, index: number): Object => ({
-                    '№': index + 1,
-                    ...element,
-                  }),
-                );
-
                 return (
                   <React.Fragment>
                     <Button
@@ -328,30 +320,7 @@ class Page extends React.Component<Props, State> {
                     >
                       Calculate
                     </Button>
-                    <div
-                      style={{
-                        maxWidth: '100%',
-                        width: '100%',
-                        marginTop: 30,
-                        marginBottom: 30,
-                      }}
-                    >
-                      <MaterialTable
-                        title="Dataset"
-                        options={{
-                          search: false,
-                          sorting: false,
-                        }}
-                        icons={{
-                          FirstPage: FirstPageIcon,
-                          LastPage: LastPageIcon,
-                          NextPage: KeyboardArrowRight,
-                          PreviousPage: KeyboardArrowLeft,
-                        }}
-                        columns={columns}
-                        data={data}
-                      />
-                    </div>
+                    <Table rows={dataset} />
                   </React.Fragment>
                 );
               }
@@ -422,12 +391,22 @@ const styles = ({ spacing: { unit }, breakpoints: { up, values } }) => ({
   button: {
     margin: unit,
   },
+  btnVisualize: {
+    marginBottom: unit * 2,
+  },
   rightIcon: {
     marginLeft: unit,
   },
   chip: {
     marginTop: unit,
     marginBottom: unit,
+  },
+  tableBox: {
+    marginTop: unit * 2,
+    marginBottom: unit * 2,
+  },
+  h5: {
+    marginTop: unit * 2,
   },
 });
 

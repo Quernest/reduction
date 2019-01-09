@@ -21,7 +21,7 @@ import cov from 'compute-covariance';
 import numeric from 'numeric';
 
 // helpers
-import { opposite } from '../../utils/numbers';
+// import { opposite } from '../../utils/numbers';
 import {
   transformArrayOfObjectsTo2DArray,
   transform2DArrayToArrayOfObjects,
@@ -166,10 +166,8 @@ class PCA {
       // scalar multiplication of factor by vector
       const multiplication: Array<number[]> = map(
         dataset,
-        (factors: Array<number>, j: number): Array<number> => map(
-          factors,
-          (factor: number): number => opposite(factor * vector[j]),
-        ),
+        // maybe opposite(factor * vector[j])
+        (factors: Array<number>, j: number): Array<number> => map(factors, (factor: number): number => factor * vector[j]),
       );
 
       // get linear combinations (sum of scalar multiples of vectors)
