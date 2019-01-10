@@ -122,13 +122,33 @@ class Page extends React.Component<Props, State> {
     const { files }: FileList = event.target;
     const [file]: File = files;
 
+    // get type of file
+    const currentFileExtension: string = file.name.substring(
+      file.name.lastIndexOf('.'),
+    );
+
+    // list of accepted file extensions
+    const acceptedExtensions: Array<string> = ['.txt', '.csv'];
+
+    // return the error if it's not .csv extension
+    if (acceptedExtensions.indexOf(currentFileExtension) < 0) {
+      this.setState({
+        error: `Invalid file selected, valid files are of ${acceptedExtensions.toString()} types.`,
+      });
+
+      return;
+    }
+
     // reset input
     // to be able to upload the same file again if it was canceled
     event.target.value = ''; // eslint-disable-line
 
-    this.setState({
-      selectedFile: file,
-    });
+    this.setState(
+      {
+        selectedFile: file,
+      },
+      this.clearErrorBox,
+    );
   };
 
   onFileUpload = (e: Event): void => {
@@ -323,7 +343,10 @@ class Page extends React.Component<Props, State> {
                     >
                       Calculate
                     </Button>
-                    <Table rows={dataset} />
+                    <Grid className={classes.tableBox} item xs={12}>
+                      <Typography variant="h6">Your dataset</Typography>
+                      <Table rows={dataset} />
+                    </Grid>
                   </React.Fragment>
                 );
               }
@@ -334,6 +357,7 @@ class Page extends React.Component<Props, State> {
                     ref={this.fileInput}
                     onChange={this.onFileSelectInputChange}
                     type="file"
+                    // accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                     multiple={false}
                     hidden
                   />
