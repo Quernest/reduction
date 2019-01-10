@@ -130,7 +130,7 @@ class Page extends React.Component<Props, State> {
     // list of accepted file extensions
     const acceptedExtensions: Array<string> = ['.txt', '.csv'];
 
-    // return the error if it's not .csv extension
+    // return the error if it's not accepted extension
     if (acceptedExtensions.indexOf(currentFileExtension) < 0) {
       this.setState({
         error: `Invalid file selected, valid files are of ${acceptedExtensions.toString()} types.`,
