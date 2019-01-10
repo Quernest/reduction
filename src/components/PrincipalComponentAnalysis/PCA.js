@@ -143,7 +143,7 @@ class PCA {
       );
     }
 
-    const matrix = math.matrix(covariance);
+    const matrix: Object = math.matrix(covariance);
 
     return math.eval(`eig(${matrix})`);
   };
@@ -153,35 +153,38 @@ class PCA {
     eigenvectors: Array<number[]>,
   ): Array<number[]> => {
     const reducer: Array<number[]> = (
-      acc: Array<number[]>,
-      curr: Array<number[]>,
-      i: number,
+      accumulator: Array<number[]>,
+      _,
+      index: number,
     ) => {
       // get column of eigenvectors matrix
       const vector: Array<number> = map(
         eigenvectors,
-        (eigenvector: Array<number>): Array<number> => eigenvector[i],
+        (eigenvector: Array<number>): Array<number> => eigenvector[index],
       );
 
       // scalar multiplication of factor by vector
-      const multiplication: Array<number[]> = map(
+      const scalarMultiplication: Array<number[]> = map(
         dataset,
-        // maybe opposite(factor * vector[j])
-        (factors: Array<number>, j: number): Array<number> => map(factors, (factor: number): number => factor * vector[j]),
+        // for inverting the vector use -> opposite(factor * vector[j])
+        (factors: Array<number>, factorIndex: number): Array<number> => map(
+          factors,
+          (factor: number): number => factor * vector[factorIndex],
+        ),
       );
 
       // get linear combinations (sum of scalar multiples of vectors)
       const linearCombination: Array<number> = map(
-        math.transpose(multiplication),
+        math.transpose(scalarMultiplication),
         sum,
       );
 
       // push to the accamulator
-      if (!isUndefined(acc)) {
-        acc.push(linearCombination);
+      if (!isUndefined(accumulator)) {
+        accumulator.push(linearCombination);
       }
 
-      return acc;
+      return accumulator;
     };
 
     return reduce(eigenvectors, reducer, []);
