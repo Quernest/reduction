@@ -20,7 +20,7 @@ const Header = ({ classes }: Props): Node => (
         <Grid container justify="center">
           <Grid container alignItems="center" className={classes.grid}>
             <Typography variant="h6" color="inherit" className={classes.grow}>
-              Logo
+              Reduction
             </Typography>
             <Button variant="text" color="inherit" component={Link} to="/">
               Home
