@@ -8,15 +8,15 @@
 import isString from 'lodash/isString';
 
 export default class CSV {
-  static parse(csv: string): Array<{ value: number }> {
+  static parse(csv: string): Array<{ [string]: number }> {
     const lines: Array<string> = csv.split('\n');
-    const result: Array<{ value: number }> = [];
+    const result: Array<{ [string]: number }> = [];
     const headers: Array<string> = lines[0].split(',');
 
     lines.map((line: string, indexLine: number) => {
       if (indexLine < 1) return; // Jump header line
 
-      const obj: { value: number } = {};
+      const obj: { [string]: number } = {};
       const currentline: Array<string> = line.split(',');
 
       headers.map((header: string, indexHeader: number) => {

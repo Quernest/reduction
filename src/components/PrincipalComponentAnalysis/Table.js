@@ -33,13 +33,13 @@ type Props = {
   enumerate: boolean,
   enumerateSymbol: string,
   columns: Array<string>,
-  rows: Array<{ index: number, value: any }> | Array<any[]>,
+  rows: Array<{ [string]: any }> | Array<any[]>,
   classes: Object,
 };
 
 type State = {
   columns: Array<string>,
-  rows: Array<{ index: number, value: any }> | Array<any[]>,
+  rows: Array<{ index: number, [string]: any }>,
   page: number,
   rowsPerPage: number,
 };

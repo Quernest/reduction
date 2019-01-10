@@ -27,6 +27,7 @@ type State = {
     scatterPoints: Array<{
       x: number,
       y: number,
+      z?: number,
     }>,
     adjustedDataset: Array<number[]>,
     covariance: Array<number[]>,
