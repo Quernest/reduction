@@ -47,7 +47,7 @@ type State = {
 class CustomPaginationActionsTable extends React.Component<Props, State> {
   static defaultProps = {
     enumerate: true,
-    enumerateSymbol: 'N',
+    enumerateSymbol: '№',
     columns: [],
     rows: [],
   };

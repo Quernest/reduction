@@ -328,7 +328,13 @@ class Page extends React.Component<Props, State> {
                     </Grid>
                     <Grid className={classes.tableBox} item xs={12}>
                       <Typography variant="h5">Linear Combinations</Typography>
-                      <Table rows={linearCombinations} columns={names} />
+                      <Table
+                        rows={linearCombinations}
+                        columns={map(
+                          names,
+                          (name, index) => `PC${index + 1} (${name})`,
+                        )}
+                      />
                     </Grid>
                   </React.Fragment>
                 );
