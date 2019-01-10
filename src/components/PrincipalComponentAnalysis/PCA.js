@@ -46,15 +46,15 @@ class PCA {
     // copy the original dataset
     this.dataset = dataset;
 
-    const [element] = this.dataset;
+    const [instance]: Array<number> | Object = this.dataset;
 
     /**
      * check whether the transferred data to the required type Array<number[]>
      * if not, transform into a two-dimensional array.
      */
-    if (!isArray(element)) {
+    if (!isArray(instance)) {
       // get keys (factor names)
-      this.names = keys(element);
+      this.names = keys(instance);
 
       // if it's object, transform to the two-dimensional array
       this.dataset = transformArrayOfObjectsTo2DArray(dataset);
