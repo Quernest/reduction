@@ -8,6 +8,8 @@ import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
 import Grid from '@material-ui/core/Grid';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import map from 'lodash/map';
+import * as math from 'mathjs';
 import Table from './Table';
 import CalculateWorker from './calculate.worker';
 import UploadWorker from './upload.worker';
@@ -296,8 +298,9 @@ class Page extends React.Component<Props, State> {
                         Eigenvectors (component loadings)
                       </Typography>
                       <Table
-                        rows={eigens.E.x}
-                        columns={names.map(
+                        rows={math.transpose(eigens.E.x)}
+                        columns={map(
+                          names,
                           (name, index) => `PC${index + 1} (${name})`,
                         )}
                       />

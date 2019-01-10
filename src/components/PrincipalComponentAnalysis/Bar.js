@@ -67,7 +67,7 @@ class Bar extends React.Component<Props, State> {
 
     this.selectSVGElement();
     this.drawAxes(data);
-    this.drawBars(data);
+    this.drawBars(data, analysis);
   }
 
   selectSVGElement(): void {
@@ -105,7 +105,10 @@ class Bar extends React.Component<Props, State> {
     this.svg.append('g').call(d3.axisLeft(this.y));
   }
 
-  drawBars(data: Array<{ name: string, value: number }>): void {
+  drawBars(
+    data: Array<{ name: string, value: number }>,
+    analysis: Array<number>,
+  ): void {
     const { height } = this.state;
 
     this.svg
@@ -114,11 +117,29 @@ class Bar extends React.Component<Props, State> {
       .enter()
       .append('rect')
       .attr('class', 'bar')
-      .attr('fill', 'steelblue')
-      .attr('x', (d, i) => this.x(d.name))
+      .attr('fill', '#3F51B5')
+      .attr('x', d => this.x(d.name))
       .attr('width', this.x.bandwidth())
       .attr('y', d => this.y(d.value))
       .attr('height', d => height - this.y(d.value));
+
+    // the text labels at the top of each bar.
+    this.svg
+      .selectAll('.text')
+      .data(data)
+      .enter()
+      .append('text')
+      .attr('class', 'label')
+      .attr('x', d => this.x(d.name) + this.x.bandwidth() / 2)
+      .attr('y', d => this.y(d.value) - 15)
+      .attr('dy', '.75em')
+      .style('text-anchor', 'middle')
+      //  change text size depending on data size
+      .style('font-size', data.length > 15 ? 10 : 12)
+      // if analysis reliable more than 70% fill label to the primary color
+      .style('fill', (_, i) => (analysis[i] > 70 ? '#3F51B5' : '#000'))
+      // display percentage
+      .text((_, i) => `${analysis[i]}%`);
   }
 
   render() {

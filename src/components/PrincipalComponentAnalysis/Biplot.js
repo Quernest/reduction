@@ -3,6 +3,7 @@ import React from 'react';
 import * as d3 from 'd3';
 import * as math from 'mathjs';
 import size from 'lodash/size';
+import forEach from 'lodash/forEach';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { opposite } from '../../utils/numbers';
@@ -113,6 +114,7 @@ class Biplot extends React.Component<Props, State> {
       .attr('x', 0 - height / 2)
       .attr('y', 0 - margin.left)
       .attr('dy', '1em')
+      .style('font-size', 12)
       .style('text-anchor', 'middle')
       .attr('transform', 'rotate(-90)');
 
@@ -127,6 +129,7 @@ class Biplot extends React.Component<Props, State> {
       .attr('x', width / 2)
       .attr('y', height + margin.bottom)
       .attr('dy', '-1em')
+      .style('font-size', 12)
       .style('text-anchor', 'middle');
 
     this.svg
@@ -175,8 +178,8 @@ class Biplot extends React.Component<Props, State> {
       .style('stroke-width', 1.5)
       .attr('x1', this.xScale(0))
       .attr('y1', this.yScale(0))
-      .attr('x2', this.xScale(opposite(vectors[0][0])))
-      .attr('y2', this.yScale(opposite(vectors[1][0])))
+      .attr('x2', this.xScale(vectors[0][0]))
+      .attr('y2', this.yScale(vectors[1][0]))
       .attr('marker-end', 'url(#arrow)');
     this.svg
       .append('line')
@@ -184,8 +187,8 @@ class Biplot extends React.Component<Props, State> {
       .style('stroke-width', 1.5)
       .attr('x1', this.xScale(0))
       .attr('y1', this.yScale(0))
-      .attr('x2', this.xScale(opposite(vectors[0][1])))
-      .attr('y2', this.yScale(opposite(vectors[1][1])))
+      .attr('x2', this.xScale(vectors[0][1]))
+      .attr('y2', this.yScale(vectors[1][1]))
       .attr('marker-end', 'url(#arrow)');
   };
 
