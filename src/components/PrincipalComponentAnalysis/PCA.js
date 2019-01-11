@@ -21,7 +21,7 @@ import cov from 'compute-covariance';
 import numeric from 'numeric';
 
 // helpers
-// import { opposite } from '../../utils/numbers';
+import { opposite } from '../../utils/numbers';
 import {
   transformArrayOfObjectsTo2DArray,
   transform2DArrayToArrayOfObjects,
@@ -145,7 +145,15 @@ class PCA {
 
     const matrix: Object = math.matrix(covariance);
 
-    return math.eval(`eig(${matrix})`);
+    const { lambda, E } = math.eval(`eig(${matrix})`);
+
+    return {
+      lambda,
+      E: {
+        x: opposite(E.x),
+        y: opposite(E.y),
+      },
+    };
   };
 
   getLinearCombinations = (

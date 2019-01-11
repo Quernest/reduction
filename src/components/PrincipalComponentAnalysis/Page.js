@@ -261,8 +261,7 @@ class Page extends React.Component<Props, State> {
                     <Biplot
                       points={scatterPoints}
                       vectors={eigens.E.x}
-                      names={names}
-                      analysis={analysis}
+                      axes={names}
                     />
                     <Bar
                       values={eigens.lambda.x}

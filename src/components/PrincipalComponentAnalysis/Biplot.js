@@ -3,7 +3,6 @@ import React from 'react';
 import * as d3 from 'd3';
 import * as math from 'mathjs';
 import size from 'lodash/size';
-import forEach from 'lodash/forEach';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { opposite } from '../../utils/numbers';
@@ -15,8 +14,7 @@ type Props = {
     z?: number,
   }>,
   vectors: Array<number[]>,
-  names: Array<string>,
-  analysis: Array<number>,
+  axes: Array<string>,
   classes: Object,
 };
 
@@ -41,7 +39,7 @@ class Biplot extends React.Component<Props, State> {
       bottom: 35,
       left: 35,
     },
-    fullWidth: 825,
+    fullWidth: 960,
     fullHeight: 625,
     get width() {
       return this.fullWidth - this.margin.left - this.margin.right;
@@ -52,17 +50,15 @@ class Biplot extends React.Component<Props, State> {
   };
 
   componentDidMount() {
-    const {
-      points, vectors, names, analysis,
-    } = this.props;
+    const { points, vectors, axes } = this.props;
 
     // 2D only
-    if (size(names) > 2) {
+    if (size(axes) > 2) {
       return;
     }
 
     this.selectSVGElement();
-    this.drawAxes(points, names, analysis);
+    this.drawAxes(points, axes);
     this.drawPoints(points);
     this.drawVectors(vectors);
   }
@@ -80,7 +76,7 @@ class Biplot extends React.Component<Props, State> {
       .attr('transform', `translate(${margin.left},${margin.top})`);
   };
 
-  drawAxes = (points, axes, analysis) => {
+  drawAxes = (points, axes) => {
     const { width, height, margin } = this.state;
 
     const x = d3
@@ -110,7 +106,7 @@ class Biplot extends React.Component<Props, State> {
 
     this.svg
       .append('text')
-      .text(`${axes[0]} (${analysis[0]}%)`)
+      .text(axes[1])
       .attr('x', 0 - height / 2)
       .attr('y', 0 - margin.left)
       .attr('dy', '1em')
@@ -125,7 +121,7 @@ class Biplot extends React.Component<Props, State> {
 
     this.svg
       .append('text')
-      .text(`${axes[1]} (${analysis[1]}%)`)
+      .text(axes[0])
       .attr('x', width / 2)
       .attr('y', height + margin.bottom)
       .attr('dy', '-1em')
@@ -176,8 +172,8 @@ class Biplot extends React.Component<Props, State> {
       .append('line')
       .style('stroke', '#000')
       .style('stroke-width', 1.5)
-      .attr('x1', this.xScale(0))
-      .attr('y1', this.yScale(0))
+      .attr('x1', this.xScale(-vectors[0][0]))
+      .attr('y1', this.yScale(-vectors[1][0]))
       .attr('x2', this.xScale(vectors[0][0]))
       .attr('y2', this.yScale(vectors[1][0]))
       .attr('marker-end', 'url(#arrow)');
@@ -185,18 +181,18 @@ class Biplot extends React.Component<Props, State> {
       .append('line')
       .style('stroke', '#000')
       .style('stroke-width', 1.5)
-      .attr('x1', this.xScale(0))
-      .attr('y1', this.yScale(0))
+      .attr('x1', this.xScale(-vectors[0][1]))
+      .attr('y1', this.yScale(-vectors[1][1]))
       .attr('x2', this.xScale(vectors[0][1]))
       .attr('y2', this.yScale(vectors[1][1]))
       .attr('marker-end', 'url(#arrow)');
   };
 
   render() {
-    const { names, classes } = this.props;
+    const { axes, classes } = this.props;
 
     // 2D only
-    if (size(names) > 2) {
+    if (size(axes) > 2) {
       return null;
     }
 
