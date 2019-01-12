@@ -145,13 +145,23 @@ class PCA {
 
     const matrix: Object = math.matrix(covariance);
 
-    const { lambda, E } = math.eval(`eig(${matrix})`);
+    const eigens: {
+      lambda: {
+        x: Array<number[]>,
+        y: Array<number[]>,
+      },
+      E: {
+        x: Array<number>,
+        y: Array<number>,
+      },
+    } = math.eval(`eig(${matrix})`);
 
     return {
-      lambda,
+      ...eigens,
       E: {
-        x: opposite(E.x),
-        y: opposite(E.y),
+        // invert eigenvectors because they have wrong direction
+        x: opposite(eigens.E.x),
+        y: opposite(eigens.E.y),
       },
     };
   };
