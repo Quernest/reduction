@@ -258,11 +258,7 @@ class Page extends React.Component<Props, State> {
               if (visualize) {
                 return (
                   <>
-                    <Biplot
-                      points={points}
-                      vectors={eigens.E.x}
-                      axes={names}
-                    />
+                    <Biplot points={points} vectors={eigens.E.x} axes={names} />
                     <Bar
                       values={eigens.lambda.x}
                       names={names}

@@ -29,20 +29,20 @@ import {
   transform2DArrayToArrayOfObjects,
 } from '../../utils/transformations';
 
+try {
+  math.import(numeric, { wrap: true, silent: true });
+} catch (error) {
+  throw new Error('there is no numeric.js library');
+}
+
 // types
-type DatasetInstance = { [string]: number } | Array<number>;
-
-type Dataset = Array<DatasetInstance>;
-
-type AdjustedDataset = Array<number[]>;
-
-type Covariance = Array<number[]>;
-
-type LinearCombinations = Array<number[]>;
-
-type Analysis = Array<number>;
-
-type Eigens = {
+export type DatasetInstance = { [string]: number } | Array<number>;
+export type Dataset = Array<DatasetInstance>;
+export type AdjustedDataset = Array<number[]>;
+export type Covariance = Array<number[]>;
+export type LinearCombinations = Array<number[]>;
+export type Analysis = Array<number>;
+export type Eigens = {
   // vectors
   lambda: {
     x: Array<number[]>,
@@ -54,14 +54,6 @@ type Eigens = {
     y: Array<number>,
   },
 };
-
-try {
-  math.import(numeric, { wrap: true, silent: true });
-} catch (error) {
-  throw new Error(
-    'To use numeric.js, the library must be installed first via "npm install numeric"',
-  );
-}
 
 /**
  * Creates new PCA (Principal Component Analysis) from the dataset
