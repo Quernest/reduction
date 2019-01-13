@@ -24,7 +24,7 @@ type State = {
   selectedFile: File,
   dataset: Array<number[]>,
   calculations: {
-    scatterPoints: Array<{
+    points: Array<{
       x: number,
       y: number,
       z?: number,
@@ -57,7 +57,7 @@ class Page extends React.Component<Props, State> {
     selectedFile: null,
     dataset: [],
     calculations: {
-      scatterPoints: [],
+      points: [],
       adjustedDataset: [],
       covariance: [],
       eigens: {},
@@ -226,7 +226,7 @@ class Page extends React.Component<Props, State> {
       linearCombinations,
       adjustedDataset,
       covariance,
-      scatterPoints,
+      points,
       eigens,
       names,
       analysis,
@@ -259,7 +259,7 @@ class Page extends React.Component<Props, State> {
                 return (
                   <>
                     <Biplot
-                      points={scatterPoints}
+                      points={points}
                       vectors={eigens.E.x}
                       axes={names}
                     />
@@ -363,7 +363,6 @@ class Page extends React.Component<Props, State> {
                     ref={this.fileInput}
                     onChange={this.onFileSelectInputChange}
                     type="file"
-                    // accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                     multiple={false}
                     hidden
                   />

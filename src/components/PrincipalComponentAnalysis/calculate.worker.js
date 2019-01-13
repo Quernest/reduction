@@ -12,7 +12,7 @@ if (!isUndefined(self)) {
       const {
         covariance,
         analysis,
-        scatterPoints,
+        points,
         eigens,
         linearCombinations,
         adjustedDataset,
@@ -22,7 +22,7 @@ if (!isUndefined(self)) {
       const calculations = {
         covariance,
         analysis,
-        scatterPoints,
+        points,
         eigens,
         linearCombinations,
         adjustedDataset,

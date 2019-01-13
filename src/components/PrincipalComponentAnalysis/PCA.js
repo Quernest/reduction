@@ -5,6 +5,8 @@
 import * as math from 'mathjs';
 
 // utility library delivering modularity, performance & extras.
+import assign from 'lodash/assign';
+import head from 'lodash/head';
 import sum from 'lodash/sum';
 import map from 'lodash/map';
 import reduce from 'lodash/reduce';
@@ -27,6 +29,32 @@ import {
   transform2DArrayToArrayOfObjects,
 } from '../../utils/transformations';
 
+// types
+type DatasetInstance = { [string]: number } | Array<number>;
+
+type Dataset = Array<DatasetInstance>;
+
+type AdjustedDataset = Array<number[]>;
+
+type Covariance = Array<number[]>;
+
+type LinearCombinations = Array<number[]>;
+
+type Analysis = Array<number>;
+
+type Eigens = {
+  // vectors
+  lambda: {
+    x: Array<number[]>,
+    y: Array<number[]>,
+  },
+  // values
+  E: {
+    x: Array<number>,
+    y: Array<number>,
+  },
+};
+
 try {
   math.import(numeric, { wrap: true, silent: true });
 } catch (error) {
@@ -35,10 +63,13 @@ try {
   );
 }
 
-// Principal Component Analysis class
+/**
+ * Creates new PCA (Principal Component Analysis) from the dataset
+ * @see https://en.wikipedia.org/wiki/Principal_component_analysis
+ */
 class PCA {
-  constructor(dataset: Array<number[]> | Array<Object>) {
-    // handle if empty
+  constructor(dataset: Dataset) {
+    // handle if the dataset is empty
     if (isEmpty(dataset)) {
       throw new Error('no dataset found');
     }
@@ -46,7 +77,7 @@ class PCA {
     // copy the original dataset
     this.dataset = dataset;
 
-    const [instance]: Array<number> | Object = this.dataset;
+    const instance: DatasetInstance = head(this.dataset);
 
     /**
      * check whether the transferred data to the required type Array<number[]>
@@ -86,7 +117,7 @@ class PCA {
      * step 5
      * If one vector is equal to the sum of scalar multiples of other vectors,
      * it is said to be a linear combination of the other vectors.
-     * read more: https://www.dsprelated.com/freebooks/mdft/Linear_Combination_Vectors.html
+     * @see https://www.dsprelated.com/freebooks/mdft/Linear_Combination_Vectors.html
      */
     this.linearCombinations = this.getLinearCombinations(
       this.adjustedDataset,
@@ -104,72 +135,42 @@ class PCA {
      * additional calculations
      * get scatter points of the dataset for plotting the scatter
      */
-    this.scatterPoints = transform2DArrayToArrayOfObjects(this.adjustedDataset);
+    this.points = transform2DArrayToArrayOfObjects(this.adjustedDataset);
   }
 
-  adjustDataset = (dataset: Array<number[]>): Array<number[]> => map(
+  adjustDataset = (dataset: Dataset): AdjustedDataset => map(
     dataset,
-    (data: Array<number>): Array<number> => {
-      const mean: number = math.mean(data);
-      const variance: number = math.var(data);
+    (instance: Array<number>): Array<number> => {
+      const mean: number = math.mean(instance);
+      const variance: number = math.var(instance);
       const std: number = math.sqrt(variance);
 
       return map(
-        data,
+        instance,
         (value: number): number => round((value - mean) / std, 3),
       );
     },
   );
 
-  computeCovariance = (dataset: Array<number[]>): Array<number[]> => cov(dataset);
+  computeCovariance = (dataset: Dataset | AdjustedDataset): Covariance => cov(dataset);
 
-  getEigens = (
-    covariance: Array<number[]>,
-  ): {
-    // eigenvalues
-    lambda: {
-      x: Array<number[]>,
-      y: Array<number[]>,
-    },
-    // eigenvectors
-    E: {
-      x: Array<number>,
-      y: Array<number>,
-    },
-  } => {
-    if (!math.eig) {
-      throw new Error(
-        'Numeric.js is required, the library must be installed first via "npm install numeric"',
-      );
-    }
-
+  getEigens = (covariance: Covariance): Eigens => {
     const matrix: Object = math.matrix(covariance);
+    const eigens: Eigens = math.eval(`eig(${matrix})`);
 
-    const eigens: {
-      lambda: {
-        x: Array<number[]>,
-        y: Array<number[]>,
-      },
-      E: {
-        x: Array<number>,
-        y: Array<number>,
-      },
-    } = math.eval(`eig(${matrix})`);
-
-    return {
-      ...eigens,
+    return assign(eigens, {
       E: {
         // invert eigenvectors because they have wrong direction
         x: opposite(eigens.E.x),
         y: opposite(eigens.E.y),
       },
-    };
+    });
   };
 
   getLinearCombinations = (
-    dataset: Array<number[]>,
+    dataset: Dataset,
     eigenvectors: Array<number[]>,
-  ): Array<number[]> => {
+  ): LinearCombinations => {
     const reducer: Array<number[]> = (
       accumulator: Array<number[]>,
       _,
@@ -184,7 +185,6 @@ class PCA {
       // scalar multiplication of factor by vector
       const scalarMultiplication: Array<number[]> = map(
         dataset,
-        // for inverting the vector use -> opposite(factor * vector[j])
         (factors: Array<number>, factorIndex: number): Array<number> => map(
           factors,
           (factor: number): number => factor * vector[factorIndex],
@@ -208,7 +208,7 @@ class PCA {
     return reduce(eigenvectors, reducer, []);
   };
 
-  analyze = (eigenvalues: Array<number>): Array<number> => {
+  analyze = (eigenvalues: Array<number>): Analysis => {
     const summary: number = math.sum(eigenvalues);
 
     return map(
