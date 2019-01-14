@@ -8,13 +8,13 @@ import { Header, Home, PrincipalComponentAnalysis } from './components';
 function AppRouter(): Node {
   return (
     <Router>
-      <>
+      <React.Fragment>
         <Header />
         <Switch>
           <Route path="/" exact component={Home} />
           <Route path="/pca" component={PrincipalComponentAnalysis} />
         </Switch>
-      </>
+      </React.Fragment>
     </Router>
   );
 }
