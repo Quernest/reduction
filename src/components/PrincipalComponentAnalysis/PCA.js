@@ -29,37 +29,64 @@ import {
   transform2DArrayToArrayOfObjects,
 } from '../../utils/transformations';
 
+// types
+import type {
+  PCAInterface,
+  DatasetInstance,
+  Dataset,
+  AdjustedDataset,
+  Covariance,
+  LinearCombinations,
+  Analysis,
+  Eigens,
+  Names,
+  Points,
+} from '../../types/PCA';
+
 try {
   math.import(numeric, { wrap: true, silent: true });
 } catch (error) {
   throw new Error('there is no numeric.js library');
 }
 
-// types
-export type DatasetInstance = { [string]: number } | Array<number>;
-export type Dataset = Array<DatasetInstance>;
-export type AdjustedDataset = Array<number[]>;
-export type Covariance = Array<number[]>;
-export type LinearCombinations = Array<number[]>;
-export type Analysis = Array<number>;
-export type Eigens = {
-  // vectors
-  lambda: {
-    x: Array<number[]>,
-    y: Array<number[]>,
-  },
-  // values
-  E: {
-    x: Array<number>,
-    y: Array<number>,
-  },
-};
-
 /**
  * Creates new PCA (Principal Component Analysis) from the dataset
  * @see https://en.wikipedia.org/wiki/Principal_component_analysis
  */
-class PCA {
+class PCA implements PCAInterface {
+  // keys (factor names)
+  names: Names = [];
+
+  // original dataset
+  dataset: Dataset = [];
+
+  // adjusted dataset (centered and scaled)
+  adjustedDataset: AdjustedDataset = [];
+
+  // a covariance matrix (also known as dispersion matrix or variance–covariance matrix)
+  covariance: Covariance = [];
+
+  // a linear transformation is a non-zero vector
+  eigens: Eigens = {
+    E: {
+      x: [],
+      y: [],
+    },
+    lambda: {
+      x: [],
+      y: [],
+    },
+  };
+
+  // linear combination of vectors
+  linearCombinations: LinearCombinations = [];
+
+  // array with percentages of variances
+  analysis: Analysis = [];
+
+  // scatter points of the dataset for plotting the scatter
+  points: Points = [];
+
   constructor(dataset: Dataset) {
     // handle if the dataset is empty
     if (isEmpty(dataset)) {
@@ -100,7 +127,7 @@ class PCA {
 
     /**
      * step 3-4
-     * a linear transformation is a non-zero vector that changes
+     * get a linear transformation is a non-zero vector that changes
      * by only a scalar factor when that linear transformation is applied to it.
      */
     this.eigens = this.getEigens(this.covariance);
@@ -148,7 +175,7 @@ class PCA {
 
   getEigens = (covariance: Covariance): Eigens => {
     const matrix: Object = math.matrix(covariance);
-    const eigens: Eigens = math.eval(`eig(${matrix})`);
+    const eigens: Eigens = math.eval(`eig(${matrix.toString()})`);
 
     return assign(eigens, {
       E: {
@@ -160,14 +187,14 @@ class PCA {
   };
 
   getLinearCombinations = (
-    dataset: Dataset,
+    adjustedDataset: AdjustedDataset,
     eigenvectors: Array<number[]>,
   ): LinearCombinations => {
     const reducer: Array<number[]> = (
       accumulator: Array<number[]>,
       _,
       index: number,
-    ) => {
+    ): Array<number[]> => {
       // get column of eigenvectors matrix
       const vector: Array<number> = map(
         eigenvectors,
@@ -176,7 +203,7 @@ class PCA {
 
       // scalar multiplication of factor by vector
       const scalarMultiplication: Array<number[]> = map(
-        dataset,
+        adjustedDataset,
         (factors: Array<number>, factorIndex: number): Array<number> => map(
           factors,
           (factor: number): number => factor * vector[factorIndex],

@@ -16,33 +16,33 @@ import UploadWorker from './upload.worker';
 import Bar from './Bar';
 import Biplot from './Biplot';
 
+// types
+import type {
+  Dataset,
+  Points,
+  AdjustedDataset,
+  Covariance,
+  Eigens,
+  LinearCombinations,
+  Names,
+  Analysis,
+} from '../../types/PCA';
+
 type Props = {
   classes: Object,
 };
 
 type State = {
   selectedFile: File,
-  dataset: Array<number[]>,
+  dataset: Dataset,
   calculations: {
-    points: Array<{
-      x: number,
-      y: number,
-      z?: number,
-    }>,
-    adjustedDataset: Array<number[]>,
-    covariance: Array<number[]>,
-    eigens: {
-      lambda: {
-        x: Array<number[]>,
-        y: Array<number[]>,
-      },
-      E: {
-        x: Array<number>,
-        y: Array<number>,
-      },
-    },
-    linearCombinations: Array<number[]>,
-    names: Array<string>,
+    points: Points,
+    adjustedDataset: AdjustedDataset,
+    covariance: Covariance,
+    eigens: Eigens,
+    linearCombinations: LinearCombinations,
+    analysis: Analysis,
+    names: Names,
   },
   visualize: boolean,
   calculating: boolean,
@@ -60,16 +60,31 @@ class Page extends React.Component<Props, State> {
       points: [],
       adjustedDataset: [],
       covariance: [],
-      eigens: {},
+      eigens: {
+        E: {
+          x: [],
+          y: [],
+        },
+        lambda: {
+          x: [],
+          y: [],
+        },
+      },
       linearCombinations: [],
+      names: [],
+      analysis: [],
     },
     visualize: false,
     calculating: false,
     calculated: false,
     uploading: false,
     uploaded: false,
-    error: '', // todo: handle array
+    error: '',
   };
+
+  uploadWorker = {};
+
+  calculateWorker = {};
 
   fileInput: ?HTMLInputElement = React.createRef();
 
@@ -83,7 +98,7 @@ class Page extends React.Component<Props, State> {
   }
 
   onCalculate = (e: Event): void => {
-    const { dataset }: Array<number[]> = this.state;
+    const { dataset }: Dataset = this.state;
 
     this.setState({
       calculating: true,
