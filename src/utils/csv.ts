@@ -1,28 +1,23 @@
-import isString from 'lodash/isString';
+import isString = require('lodash/isString');
 
-type ParsedCSV = {
-  [key: string]: any;
-};
+interface IObject {
+  [key: string]: string | number;
+}
 
-export default function parseCSV(csv: string): ParsedCSV[] {
+export default function parseCSV(csv: string): IObject[] {
   const lines: string[] = csv.split('\n');
-  const result: ParsedCSV[] = [];
+  const result: IObject[] = [];
   const headers: string[] = lines[0].split(',');
 
   lines.map((line: string, indexLine: number) => {
     if (indexLine < 1) return; // Jump header line
 
-    const obj = {};
-    const currentline = line.split(',');
+    const obj: IObject = {};
+    const currentLine: string[] = line.split(',');
 
     headers.map((header: string, indexHeader: number) => {
-      // convert to the number
-      if (isString(currentline[indexHeader])) {
-        currentline[indexHeader] = parseFloat(currentline[indexHeader]);
-      }
-
-      // remove double quotes from the object key
-      obj[header.trim()] = currentline[indexHeader];
+      // remove double quotes from the object key and convert string to the number
+      obj[header.trim()] = parseFloat(currentLine[indexHeader]);
 
       return obj[header];
     });

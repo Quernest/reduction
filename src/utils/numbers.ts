@@ -1,5 +1,5 @@
-import isArray from 'lodash/isArray';
-import map from 'lodash/map';
+import isArray = require('lodash/isArray');
+import map = require('lodash/map');
 
 // recursive function
 export const opposite = (value: Array<any> | number): Array<any> | number => {

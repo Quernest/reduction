@@ -3,7 +3,7 @@ import React from 'react';
 import * as d3 from 'd3';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { transform2DArrayToArrayOfObjects } from '../../utils/transformations.ts';
+import { from2D } from '../../utils/transformations.ts';
 
 type Props = {
   values: Array<number>,
@@ -53,7 +53,7 @@ class Bar extends React.Component<Props, State> {
       component: string,
       eigenvalue: number,
       comulative: number,
-    }> = transform2DArrayToArrayOfObjects([names, values, analysis], keys);
+    }> = from2D([names, values, analysis], keys);
 
     this.selectSVGElement();
     this.drawAxes(data);

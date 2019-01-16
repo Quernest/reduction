@@ -151,7 +151,7 @@ class PCA implements PCAInterface {
      * additional calculations
      * get scatter points of the dataset for plotting the scatter
      */
-    this.points = from2D(this.adjustedDataset, this.names);
+    this.points = from2D(this.adjustedDataset);
   }
 
   adjustDataset = (dataset: Dataset): AdjustedDataset => map(

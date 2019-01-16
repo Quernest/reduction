@@ -6,7 +6,7 @@ import isEmpty from 'lodash/isEmpty';
 import isNaN from 'lodash/isNaN';
 import isString from 'lodash/isString';
 import isUndefined from 'lodash/isUndefined';
-import CSV from '../../utils/csv.ts';
+import parseCSV from '../../utils/csv.ts';
 
 if (!isUndefined(self)) {
   self.addEventListener('message', (ev) => {
@@ -19,9 +19,9 @@ if (!isUndefined(self)) {
     fr.onload = () => {
       const { result } = fr;
 
-      const csv = CSV.parse(result);
+      const csv = parseCSV(result);
 
-      // console.log('csv file:', csv); // eslint-disable-line
+      console.log('csv file:', csv); // eslint-disable-line
 
       // is not permitted:
       // empty csv files

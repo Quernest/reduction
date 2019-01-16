@@ -1,7 +1,7 @@
-import transform from 'lodash/transform';
-import values from 'lodash/values';
-import isUndefined from 'lodash/isUndefined';
-import forEach from 'lodash/forEach';
+import transform = require('lodash/transform');
+import values = require('lodash/values');
+import isUndefined = require('lodash/isUndefined');
+import forEach = require('lodash/forEach');
 
 // transforms object collection to the two-dimensional array
 export function to2D(arr: object[]): any[][] {
