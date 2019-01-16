@@ -2,7 +2,7 @@ import isArray from 'lodash/isArray';
 import map from 'lodash/map';
 
 // recursive function
-export const opposite = (value: Array<any> | number): any => {
+export const opposite = (value: Array<any> | number): Array<any> | number => {
   if (!value) {
     return value;
   }
