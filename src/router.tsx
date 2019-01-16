@@ -1,11 +1,11 @@
 // @flow
-import React from 'react';
-import type { Node } from 'react';
-import { hot } from 'react-hot-loader/root';
+import * as React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { Header, Home, PrincipalComponentAnalysis } from './components';
+import PrincipalComponentAnalysis from './components/PrincipalComponentAnalysis';
+import Header from './components/Header';
+import Home from './components/Home';
 
-function AppRouter(): Node {
+function AppRouter() {
   return (
     <Router>
       <React.Fragment>
@@ -19,4 +19,4 @@ function AppRouter(): Node {
   );
 }
 
-export default hot(AppRouter);
+export default AppRouter;

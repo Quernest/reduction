@@ -1,14 +1,10 @@
-// @flow
-
 import transform from 'lodash/transform';
 import values from 'lodash/values';
 import isUndefined from 'lodash/isUndefined';
 import forEach from 'lodash/forEach';
 
-export const transformArrayOfObjectsTo2DArray = (
-  arr: Array<Object>,
-): Array<[]> => {
-  const transformer = (accumulator: Array<number[]>, current: Object) => {
+export const transformArrayOfObjectsTo2DArray = (arr: object[]): [][] => {
+  const transformer = (accumulator: number[][], current: object) => {
     values(current).forEach((value: number, i: number) => {
       (accumulator[i] || (accumulator[i] = [])).push(value);
     });
@@ -18,14 +14,10 @@ export const transformArrayOfObjectsTo2DArray = (
 };
 
 export const transform2DArrayToArrayOfObjects = (
-  arr: Array<[]>,
-  keys: Array<string> = ['x', 'y', 'z'],
-): Array<Object> => {
-  const transformer = (
-    accumulator: Array<[]>,
-    current: Array<any>,
-    i: number,
-  ) => {
+  arr: [][],
+  keys: string[] = ['x', 'y', 'z'],
+): object[] => {
+  const transformer = (accumulator: [][], current: any[], i: number) => {
     forEach(current, (_, j: number) => {
       if (isUndefined(accumulator[j])) {
         accumulator[j] = {};

@@ -15,7 +15,7 @@ import round from 'lodash/round';
 import isEmpty from 'lodash/isEmpty';
 import isArray from 'lodash/isArray';
 import isObject from 'lodash/isObject';
-import { transform2DArrayToArrayOfObjects } from '../../utils/transformations';
+import { transform2DArrayToArrayOfObjects } from '../../utils/transformations.ts';
 import TablePaginationActions from './TablePaginationActions';
 
 const CustomTableCell = withStyles(theme => ({

@@ -6,7 +6,7 @@ import isEmpty from 'lodash/isEmpty';
 import isNaN from 'lodash/isNaN';
 import isString from 'lodash/isString';
 import isUndefined from 'lodash/isUndefined';
-import CSV from '../../utils/csv';
+import CSV from '../../utils/csv.ts';
 
 if (!isUndefined(self)) {
   self.addEventListener('message', (ev) => {

@@ -3,7 +3,7 @@ import React from 'react';
 import * as d3 from 'd3';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { transform2DArrayToArrayOfObjects } from '../../utils/transformations';
+import { transform2DArrayToArrayOfObjects } from '../../utils/transformations.ts';
 
 type Props = {
   values: Array<number>,

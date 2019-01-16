@@ -4,8 +4,8 @@ import PCA from './PCA';
 if (!isUndefined(self)) {
   self.addEventListener(
     'message',
-    (ev) => {
-      const { data } = ev;
+    (event) => {
+      const { data } = event;
 
       const pca = new PCA(data);
 

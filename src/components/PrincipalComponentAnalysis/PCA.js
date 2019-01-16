@@ -23,11 +23,11 @@ import cov from 'compute-covariance';
 import numeric from 'numeric';
 
 // helpers
-import { opposite } from '../../utils/numbers';
+import { opposite } from '../../utils/numbers.ts';
 import {
   transformArrayOfObjectsTo2DArray,
   transform2DArrayToArrayOfObjects,
-} from '../../utils/transformations';
+} from '../../utils/transformations.ts';
 
 // types
 import type {

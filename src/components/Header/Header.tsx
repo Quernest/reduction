@@ -1,19 +1,17 @@
-// @flow
-import React from 'react';
-import type { Node } from 'react';
-import { Link } from 'react-router-dom';
-import { withStyles } from '@material-ui/core/styles';
+import * as React from 'react';
+import { Link, LinkProps } from 'react-router-dom';
+import { withStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
-type Props = {
-  classes: Object,
-};
+export interface Props {
+  classes?: any;
+}
 
-const Header = ({ classes }: Props): Node => (
+const Header = ({ classes }: Props) => (
   <header className={classes.root}>
     <AppBar position="static">
       <Toolbar>
@@ -22,10 +20,18 @@ const Header = ({ classes }: Props): Node => (
             <Typography variant="h6" color="inherit" className={classes.grow}>
               Reduction
             </Typography>
-            <Button variant="text" color="inherit" component={Link} to="/">
+            <Button
+              variant="text"
+              color="inherit"
+              component={props => <Link to="/" {...props as LinkProps} />}
+            >
               Home
             </Button>
-            <Button variant="text" color="inherit" component={Link} to="/pca">
+            <Button
+              variant="text"
+              color="inherit"
+              component={props => <Link to="/pca" {...props as LinkProps} />}
+            >
               PCA
             </Button>
           </Grid>
@@ -35,7 +41,7 @@ const Header = ({ classes }: Props): Node => (
   </header>
 );
 
-const styles = ({ breakpoints: { up, values } }) => ({
+const styles = ({ breakpoints }: Theme) => createStyles({
   root: {
     flexGrow: 1,
   },
@@ -43,8 +49,8 @@ const styles = ({ breakpoints: { up, values } }) => ({
     flexGrow: 1,
   },
   grid: {
-    [up('md')]: {
-      width: values.md,
+    [breakpoints.up('md')]: {
+      width: breakpoints.values.md,
     },
   },
 });

@@ -1,10 +1,8 @@
-// @flow
 import isArray from 'lodash/isArray';
 import map from 'lodash/map';
 
-export const opposite = (
-  value: number | Array<number> | Array<number[]>,
-): number => {
+// recursive function
+export const opposite = (value: Array<any> | number): any => {
   if (!value) {
     return value;
   }

@@ -5,7 +5,6 @@ import * as math from 'mathjs';
 import size from 'lodash/size';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { opposite } from '../../utils/numbers';
 
 type Props = {
   points: Array<{
