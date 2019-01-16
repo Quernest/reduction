@@ -3,21 +3,23 @@ import values from 'lodash/values';
 import isUndefined from 'lodash/isUndefined';
 import forEach from 'lodash/forEach';
 
-export const transformArrayOfObjectsTo2DArray = (arr: object[]): [][] => {
-  const transformer = (accumulator: number[][], current: object) => {
-    values(current).forEach((value: number, i: number) => {
+// transforms object collection to the two-dimensional array
+export function to2D(arr: object[]): any[][] {
+  const transformer = (accumulator: any[], current: any) => {
+    values(current).forEach((value: any, i: number) => {
       (accumulator[i] || (accumulator[i] = [])).push(value);
     });
   };
 
   return transform(arr, transformer, []);
-};
+}
 
-export const transform2DArrayToArrayOfObjects = (
-  arr: [][],
+// transforms two-dimensional array to the object collection
+export function from2D(
+  arr: any[][],
   keys: string[] = ['x', 'y', 'z'],
-): object[] => {
-  const transformer = (accumulator: [][], current: any[], i: number) => {
+): object[] {
+  const transformer = (accumulator: any[], current: any[], i: number) => {
     forEach(current, (_, j: number) => {
       if (isUndefined(accumulator[j])) {
         accumulator[j] = {};
@@ -32,4 +34,4 @@ export const transform2DArrayToArrayOfObjects = (
   };
 
   return transform(arr, transformer, []);
-};
+}

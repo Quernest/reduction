@@ -24,10 +24,7 @@ import numeric from 'numeric';
 
 // helpers
 import { opposite } from '../../utils/numbers.ts';
-import {
-  transformArrayOfObjectsTo2DArray,
-  transform2DArrayToArrayOfObjects,
-} from '../../utils/transformations.ts';
+import { to2D, from2D } from '../../utils/transformations.ts';
 
 // types
 import type {
@@ -107,7 +104,7 @@ class PCA implements PCAInterface {
       this.names = keys(instance);
 
       // if it's object, transform to the two-dimensional array
-      this.dataset = transformArrayOfObjectsTo2DArray(dataset);
+      this.dataset = to2D(dataset);
     }
 
     /**
@@ -154,7 +151,7 @@ class PCA implements PCAInterface {
      * additional calculations
      * get scatter points of the dataset for plotting the scatter
      */
-    this.points = transform2DArrayToArrayOfObjects(this.adjustedDataset);
+    this.points = from2D(this.adjustedDataset, this.names);
   }
 
   adjustDataset = (dataset: Dataset): AdjustedDataset => map(

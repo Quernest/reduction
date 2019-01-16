@@ -15,7 +15,7 @@ import round from 'lodash/round';
 import isEmpty from 'lodash/isEmpty';
 import isArray from 'lodash/isArray';
 import isObject from 'lodash/isObject';
-import { transform2DArrayToArrayOfObjects } from '../../utils/transformations.ts';
+import { from2D } from '../../utils/transformations.ts';
 import TablePaginationActions from './TablePaginationActions';
 
 const CustomTableCell = withStyles(theme => ({
@@ -70,7 +70,7 @@ class CustomPaginationActionsTable extends React.Component<Props, State> {
 
       // if the instance type is array -> call transform to the array of objects function
       if (isArray(instance)) {
-        rows = transform2DArrayToArrayOfObjects(props.rows, columns);
+        rows = from2D(props.rows, columns);
       }
 
       // add indexes to rows
