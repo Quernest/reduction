@@ -99,10 +99,7 @@ class PCA {
       this.eigens.E.x
     );
 
-    /**
-     * step 6
-     * analysis. How {PC1, PC2 ... PCn} accounts of the total variation around the PCs.
-     */
+    // step 6
     this.analysis = this.analyze(this.eigens.lambda.x);
 
     /**
