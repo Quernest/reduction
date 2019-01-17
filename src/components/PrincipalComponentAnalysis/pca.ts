@@ -77,11 +77,11 @@ class PCA {
      * if not, transform into a two-dimensional array.
      */
     if (typeof instance === "object" && !isArray(instance)) {
-      // get keys (factor names)
-      this.names = keys(instance);
-
       // if it's object, transform to the two-dimensional array
       this.dataset = to2D(dataset);
+
+      // and get factor names
+      this.names = keys(instance);
     }
 
     // step 1
