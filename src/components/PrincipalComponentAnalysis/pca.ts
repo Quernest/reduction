@@ -84,36 +84,16 @@ class PCA {
       this.dataset = to2D(dataset);
     }
 
-    /**
-     * step 1
-     * If some variables have a large variance and some small,
-     * PCA (maximizing variance) will load on the large variances.
-     */
+    // step 1
     this.adjustedDataset = this.adjustDataset(this.dataset);
 
-    /**
-     * step 2
-     * a covariance matrix (also known as dispersion matrix or variance–covariance matrix)
-     * is a matrix whose element in the i, j position is the covariance
-     * between the i-th and j-th elements of a random vector.
-     * @see https://en.wikipedia.org/wiki/Covariance_matrix
-     */
+    // step 2
     this.covariance = this.computeCovariance(this.adjustedDataset);
 
-    /**
-     * step 3-4
-     * get a linear transformation is a non-zero vector that changes
-     * by only a scalar factor when that linear transformation is applied to it.
-     * @see https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors
-     */
+    // step 3-4
     this.eigens = this.getEigens(this.covariance);
 
-    /**
-     * step 5
-     * If one vector is equal to the sum of scalar multiples of other vectors,
-     * it is said to be a linear combination of the other vectors.
-     * @see https://www.dsprelated.com/freebooks/mdft/Linear_Combination_Vectors.html
-     */
+    // step 5
     this.linearCombinations = this.getLinearCombinations(
       this.adjustedDataset,
       this.eigens.E.x
@@ -134,7 +114,7 @@ class PCA {
   }
 
   /**
-   * get mean-adjusted data
+   * get mean-adjusted data - PCA (maximizing variance)
    */
   public adjustDataset(dataset: number[][]): number[][] {
     return map(dataset, (instance: number[]) => {
@@ -151,6 +131,7 @@ class PCA {
 
   /**
    * compute a covariance matrix from the adjusted dataset
+   * @see https://en.wikipedia.org/wiki/Covariance_matrix
    */
   public computeCovariance(adjustedDataset: number[][]): number[][] {
     return cov(adjustedDataset);
@@ -158,6 +139,7 @@ class PCA {
 
   /**
    * get the eigenvectors and eigenvalues of the covariance matrix
+   * @see https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors
    */
   public getEigens(
     covariance: number[][]
@@ -185,6 +167,7 @@ class PCA {
 
   /**
    * get linear combinations of eigenvectors
+   * @see https://www.dsprelated.com/freebooks/mdft/Linear_Combination_Vectors.html
    */
   public getLinearCombinations(
     adjustedDataset: number[][],
@@ -227,6 +210,7 @@ class PCA {
 
   /**
    * analyze eigenvalues (compute PCs proportion in %)
+   * describes how much {PC1, PC2 ... PCn} accounts of the total variation around the PCs.
    */
   public analyze(eigenvalues: number[]): number[] {
     const summary: number = math.sum(eigenvalues);
