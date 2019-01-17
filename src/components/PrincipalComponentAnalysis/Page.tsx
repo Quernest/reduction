@@ -1,5 +1,7 @@
 import * as React from "react";
 import { withStyles, createStyles, Theme } from "@material-ui/core/styles";
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
 import CalculateWorker from "worker-loader!./calculate.worker";
 import UploadWorker from "worker-loader!./upload.worker";
 
@@ -9,7 +11,7 @@ export interface Props {
 
 export interface State {
   selectedFile: File;
-  dataset: object[] | number[][];
+  dataset: object[];
   calculations: any; // TODO types
   visualize: boolean;
   calculating: boolean;
@@ -20,18 +22,51 @@ export interface State {
 }
 
 class Page extends React.Component<Props, State> {
+  /**
+   * upload web worker for uploading files in a separate thread
+   */
   private uploadWorker: Worker;
+
+  /**
+   * calculate web worker for calculating principal component analysis algorithm in a separate thread
+   */
   private calculateWorker: Worker;
 
-  public componentDidMount() {
+  /**
+   * reference (access) to the DOM file input node
+   */
+  private fileInput: React.RefObject<HTMLInputElement> = React.createRef();
+
+  private initializeWebWorkers(): void {
     this.uploadWorker = new UploadWorker();
     this.calculateWorker = new CalculateWorker();
+  }
+
+  public componentDidMount() {
+    this.initializeWebWorkers();
   }
 
   public render() {
     const { classes } = this.props;
 
-    return <div className={classes.root}>.ts rewriting</div>;
+    return (
+      <div className={classes.root}>
+        <Grid container justify="center">
+          <Grid container className={classes.grid} alignItems="center">
+            <Typography variant="h6" paragraph>
+              Principal Component Analysis
+            </Typography>
+            <Typography variant="subtitle1" color="textSecondary" paragraph>
+              Principal component analysis (PCA) is a statistical procedure that
+              uses an orthogonal transformation to convert a set of observations
+              of possibly correlated variables (entities each of which takes on
+              various numerical values) into a set of values of linearly
+              uncorrelated variables called principal components.
+            </Typography>
+          </Grid>
+        </Grid>
+      </div>
+    );
   }
 }
 

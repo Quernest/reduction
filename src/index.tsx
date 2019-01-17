@@ -1,5 +1,7 @@
-import * as React from 'react';
-import { render } from 'react-dom';
-import Router from './router';
+import * as React from "react";
+import * as DOM from "react-dom";
+import Router from "./router";
 
-render(<Router />, document.getElementById('root')); // eslint-disable-line
+const root = document.getElementById("root");
+
+DOM.render(<Router />, root);

@@ -1,10 +1,8 @@
-import * as React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import PrincipalComponentAnalysis from './components/PrincipalComponentAnalysis';
-import Header from './components/Header';
-import Home from './components/Home';
+import * as React from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { PrincipalComponentAnalysis, Header, Home } from "./components";
 
-function AppRouter() {
+const AppRouter: React.StatelessComponent<{}> = (props: any) => {
   return (
     <Router>
       <React.Fragment>
@@ -16,6 +14,6 @@ function AppRouter() {
       </React.Fragment>
     </Router>
   );
-}
+};
 
 export default AppRouter;
