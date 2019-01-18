@@ -8,8 +8,8 @@
   ],
   "jsRules": {},
   "rules": {
-    "ordered-imporst": false,
-    "object-literal-sort-keys": false,
+    "ordered-imports": [false],
+    "object-literal-sort-keys": [false],
     "member-ordering": false,
     "js-no-lambda": false,
     "js-boolean-value": false
