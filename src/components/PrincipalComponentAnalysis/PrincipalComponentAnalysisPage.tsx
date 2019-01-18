@@ -1,16 +1,21 @@
 import * as React from "react";
-import { withStyles, createStyles, Theme } from "@material-ui/core/styles";
+import {
+  withStyles,
+  createStyles,
+  Theme,
+  StyleRules
+} from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import CalculateWorker from "worker-loader!./calculate.worker";
 import UploadWorker from "worker-loader!./upload.worker";
-import Bar from "./Bar";
+import { Bar } from "./Bar";
 
-export interface Props {
+interface IProps {
   classes?: any;
 }
 
-export interface State {
+interface IState {
   selectedFile: File;
   dataset: object[];
   calculations: any; // TODO types
@@ -22,56 +27,7 @@ export interface State {
   error: string;
 }
 
-class Page extends React.Component<Props, State> {
-  /**
-   * upload web worker for uploading files in a separate thread
-   */
-  private uploadWorker: Worker;
-
-  /**
-   * calculate web worker for calculating principal component analysis algorithm in a separate thread
-   */
-  private calculateWorker: Worker;
-
-  /**
-   * reference (access) to the DOM file input node
-   */
-  private fileInput: React.RefObject<HTMLInputElement> = React.createRef();
-
-  private initializeWebWorkers(): void {
-    this.uploadWorker = new UploadWorker();
-    this.calculateWorker = new CalculateWorker();
-  }
-
-  public componentDidMount() {
-    this.initializeWebWorkers();
-  }
-
-  public render() {
-    const { classes } = this.props;
-
-    return (
-      <div className={classes.root}>
-        <Grid container justify="center">
-          <Grid container className={classes.grid} alignItems="center">
-            <Typography variant="h6" paragraph>
-              Principal Component Analysis
-            </Typography>
-            <Typography variant="subtitle1" color="textSecondary" paragraph>
-              Principal component analysis (PCA) is a statistical procedure that
-              uses an orthogonal transformation to convert a set of observations
-              of possibly correlated variables (entities each of which takes on
-              various numerical values) into a set of values of linearly
-              uncorrelated variables called principal components.
-            </Typography>
-          </Grid>
-        </Grid>
-      </div>
-    );
-  }
-}
-
-const styles = ({ spacing, breakpoints }: Theme) =>
+const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
   createStyles({
     root: {
       flexGrow: 1,
@@ -107,7 +63,60 @@ const styles = ({ spacing, breakpoints }: Theme) =>
     }
   });
 
-export default withStyles(styles)(Page);
+export const PrincipalComponentAnalysisPage = withStyles(styles)(
+  class extends React.Component<IProps, IState> {
+    /**
+     * upload web worker for uploading files in a separate thread
+     */
+    private uploadWorker: Worker;
+
+    /**
+     * calculate web worker for calculating principal component analysis algorithm in a separate thread
+     */
+    private calculateWorker: Worker;
+
+    /**
+     * reference (access) to the DOM file input node
+     */
+    private fileInput: React.RefObject<HTMLInputElement> = React.createRef();
+
+    private initializeWebWorkers(): void {
+      this.uploadWorker = new UploadWorker();
+      this.calculateWorker = new CalculateWorker();
+    }
+
+    public componentDidMount() {
+      this.initializeWebWorkers();
+    }
+
+    public render() {
+      const { classes } = this.props;
+
+      return (
+        <div className={classes.root}>
+          <Grid container={true} justify="center">
+            <Grid container={true} className={classes.grid} alignItems="center">
+              <Typography variant="h6" paragraph={true}>
+                Principal Component Analysis
+              </Typography>
+              <Typography
+                variant="subtitle1"
+                color="textSecondary"
+                paragraph={true}
+              >
+                Principal component analysis (PCA) is a statistical procedure
+                that uses an orthogonal transformation to convert a set of
+                observations of possibly correlated variables (entities each of
+                which takes on various numerical values) into a set of values of
+                linearly uncorrelated variables called principal components.
+              </Typography>
+            </Grid>
+          </Grid>
+        </div>
+      );
+    }
+  }
+);
 
 // // @flow
 // import React from "react";

@@ -26,8 +26,6 @@ ctx.addEventListener("message", ev => {
       throw new Error("data reading error");
     }
 
-    console.log("csv file:", csv); // eslint-disable-line
-
     // is not permitted:
     // empty csv files
     if (isEmpty(csv)) {

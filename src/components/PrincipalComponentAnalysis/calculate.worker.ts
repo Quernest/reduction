@@ -1,4 +1,4 @@
-import PCA from "./pca";
+import { PCA } from "./pca";
 
 const ctx: Worker = self as any;
 

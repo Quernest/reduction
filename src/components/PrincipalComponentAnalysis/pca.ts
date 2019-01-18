@@ -33,7 +33,7 @@ try {
  * Creates new PCA (Principal Component Analysis) from the dataset
  * @see https://en.wikipedia.org/wiki/Principal_component_analysis
  */
-class PCA {
+export class PCA {
   public names: string[];
 
   public dataset: number[][];
@@ -218,5 +218,3 @@ class PCA {
     );
   }
 }
-
-export default PCA;

@@ -1,19 +1,21 @@
 import * as React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { PrincipalComponentAnalysis, Header, Home } from "./components";
+import {
+  PrincipalComponentAnalysisPage,
+  Header,
+  Home
+} from "./components/index";
 
-const AppRouter: React.StatelessComponent<{}> = (props: any) => {
+export const AppRouter: React.StatelessComponent<{}> = (props: any) => {
   return (
     <Router>
       <React.Fragment>
         <Header />
         <Switch>
-          <Route path="/" exact component={Home} />
-          <Route path="/pca" component={PrincipalComponentAnalysis} />
+          <Route path="/" exact={true} component={Home} />
+          <Route path="/pca" component={PrincipalComponentAnalysisPage} />
         </Switch>
       </React.Fragment>
     </Router>
   );
 };
-
-export default AppRouter;
