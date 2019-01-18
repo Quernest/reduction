@@ -4,6 +4,7 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import CalculateWorker from "worker-loader!./calculate.worker";
 import UploadWorker from "worker-loader!./upload.worker";
+import Bar from "./Bar";
 
 export interface Props {
   classes?: any;
