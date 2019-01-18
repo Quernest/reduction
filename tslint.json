@@ -1,0 +1,18 @@
+{
+  "defaultServity": "error",
+  "extends": [
+    "tslint:recommended",
+    "tslint-config-standard",
+    "tslint-react",
+    "tslint-config-prettier"
+  ],
+  "jsRules": {},
+  "rules": {
+    "ordered-imporst": false,
+    "object-literal-sort-keys": false,
+    "member-ordering": false,
+    "js-no-lambda": false,
+    "js-boolean-value": false
+  },
+  "rulesDirectory": []
+}

@@ -1,9 +1,8 @@
-// @flow
-import * as React from "react";
-import * as d3 from "d3";
-import { withStyles, createStyles } from "@material-ui/core/styles";
+import { createStyles, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import { from2D, IObject } from "../../utils/transformations";
+import * as d3 from "d3";
+import * as React from "react";
+import { from2D } from "../../utils/transformations";
 
 export interface IProps {
   values: number[];
@@ -66,11 +65,11 @@ class Bar extends React.Component<IProps, IState> {
     const keys: string[] = ["component", "eigenvalue", "comulative"];
 
     // formatted data which represents a collection of objects with provided keys and values
-    const data: {
+    const data: Array<{
       component?: string;
       eigenvalue?: number;
       comulative?: number;
-    }[] = from2D(combinedData, keys);
+    }> = from2D(combinedData, keys);
 
     this.selectSVGElement();
     this.drawAxes(data);
@@ -160,7 +159,7 @@ class Bar extends React.Component<IProps, IState> {
 
     return (
       <div className={classes.root}>
-        <Typography variant="h6" paragraph>
+        <Typography variant="h6" paragraph={true}>
           Bar Chart
         </Typography>
         <svg id="bar" />
