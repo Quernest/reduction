@@ -106,7 +106,7 @@ module.exports = {
   plugins: [
     new HtmlWebPackPlugin({
       minify: true,
-      template: "./src/index.html",
+      template: "./public/index.html",
       filename: "./index.html"
     }),
     new CleanWebpackPlugin("dist")

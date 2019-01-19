@@ -6,6 +6,11 @@ import {
   Home
 } from "./components/index";
 
+/**
+ * AppRouter is component which contains all page routes
+ * and provide a wrapper for the react-router-dom library
+ * @param props any
+ */
 export const AppRouter: React.StatelessComponent<{}> = (props: any) => {
   return (
     <Router>
