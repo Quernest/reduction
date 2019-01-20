@@ -33,13 +33,19 @@ interface IState {
 
 export const Bar = withStyles(styles)(
   class extends React.Component<IProps, IState> {
-    // main svg element
+    /**
+     * main svg element
+     */
     private svg: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
-    // x axis
+    /**
+     * x axis
+     */
     private x: d3.ScaleBand<string>;
 
-    // y axis
+    /**
+     * y axis
+     */
     private y: d3.ScaleLinear<number, number>;
 
     public readonly state = {
@@ -62,17 +68,29 @@ export const Bar = withStyles(styles)(
     public componentDidMount() {
       const { values, names, analysis } = this.props;
 
-      // combination of values ​​that we display
+      /**
+       * array of combined values ​​that we display in bar columns
+       */
       const combinedData: [string[], number[], number[]] = [
         names,
         values,
         analysis
       ];
 
-      // keys of this values
+      /**
+       * keys of this values
+       * by default describes:
+       * component name, eigenvalue, comulative percentage
+       */
       const keys: string[] = ["component", "eigenvalue", "comulative"];
 
-      // formatted data which represents a collection of objects with provided keys and values
+      /**
+       * formatted data which represents a collection of objects
+       * with provided keys and values
+       * this values are optional bacause from2D function
+       * returns array of objects with generated (dynamic) properties
+       * from the passed keys
+       */
       const data: Array<{
         component?: string;
         eigenvalue?: number;
@@ -145,7 +163,10 @@ export const Bar = withStyles(styles)(
         .attr("y", d => this.y(d.comulative))
         .attr("height", d => height - this.y(d.comulative));
 
-      // the text labels at the top of each bar.
+      /**
+       * create the text labels at the top of each bar
+       * the label is current component comulative value
+       */
       this.svg
         .selectAll(".text")
         .data(data)
@@ -156,7 +177,7 @@ export const Bar = withStyles(styles)(
         .attr("y", d => this.y(d.comulative) - 15)
         .attr("dy", ".75em")
         .style("text-anchor", "middle")
-        //  change text size depending on data size
+        // change text size depending on data size
         .style("font-size", data.length > 15 ? 10 : 12)
         // display percentage
         .text(d => `${d.comulative}%`);
