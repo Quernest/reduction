@@ -9,20 +9,35 @@ module.exports = {
   context: path.resolve(__dirname, "../src/"),
   module: {
     rules: [
-      // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
-      { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
-      // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-      { enforce: "pre", test: /\.js$/, loader: "source-map-loader" },
+      {
+        enforce: "pre",
+        test: /\.js$/,
+        loader: "source-map-loader"
+      },
+      {
+        test: /\.tsx?$/,
+        loader: "awesome-typescript-loader"
+      },
+      {
+        test: /\.html$/,
+        use: "html-loader"
+      },
       {
         test: /\.css$/,
         use: [
           "style-loader",
-          { loader: "css-loader", options: { importLoaders: 1 } }
+          {
+            loader: "css-loader",
+            options: {
+              importLoaders: 1
+            }
+          }
         ]
       },
-      // static assets
-      { test: /\.html$/, use: "html-loader" },
-      { test: /\.(a?png|svg)$/, use: "url-loader?limit=10000" },
+      {
+        test: /\.(a?png|svg)$/,
+        use: "url-loader?limit=10000"
+      },
       {
         test: /\.(jpe?g|gif|bmp|mp3|mp4|ogg|wav|eot|ttf|woff|woff2)$/,
         use: "file-loader"

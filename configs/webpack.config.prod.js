@@ -1,5 +1,5 @@
 const merge = require("webpack-merge");
-const { resolve } = require("path");
+const path = require("path");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const common = require("./webpack.config.common");
 
@@ -9,7 +9,7 @@ module.exports = merge(common, {
   output: {
     filename: "bundle.[hash].min.js",
     chunkFilename: "[chunkhash].js",
-    path: resolve(__dirname, "../dist"),
+    path: path.resolve(__dirname, "../dist"),
     publicPath: "/",
     globalObject: "this"
   },
@@ -33,7 +33,7 @@ module.exports = merge(common, {
   devtool: "source-map",
   plugins: [
     new CleanWebpackPlugin(["dist"], {
-      root: resolve(__dirname, "../"),
+      root: path.resolve(__dirname, "../"),
       verbose: true
     })
   ]
