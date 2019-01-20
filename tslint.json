@@ -6,7 +6,6 @@
     "no-default-export": true,
     "no-implicit-dependencies": [true],
     "no-submodule-imports": false,
-    "no-relative-imports": true,
     "export-name": false,
     "ordered-imports": [false],
     "object-literal-sort-keys": [false],

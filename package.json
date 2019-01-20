@@ -5,18 +5,12 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "webpack-dev-server --open --mode development",
-    "build": "webpack -p --progress --colors --mode production",
+    "start": "webpack-dev-server --config=configs/webpack.config.dev.js",
+    "build": "webpack -p --progress --colors --config=configs/webpack.config.prod.js",
     "tslint-check": "tslint-config-prettier-check ./tslint.json"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.2",
-    "@babel/plugin-proposal-class-properties": "^7.2.3",
-    "@babel/preset-env": "^7.2.3",
-    "@babel/preset-flow": "^7.0.0",
-    "@babel/preset-react": "^7.0.0",
     "awesome-typescript-loader": "^5.2.1",
-    "babel-loader": "^8.0.4",
     "clean-webpack-plugin": "^1.0.0",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
@@ -29,6 +23,7 @@
     "webpack": "^4.28.3",
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.14",
+    "webpack-merge": "^4.2.1",
     "worker-loader": "^2.0.0"
   },
   "dependencies": {
@@ -45,13 +40,12 @@
     "classnames": "^2.2.6",
     "compute-covariance": "^1.0.1",
     "d3": "^5.7.0",
+    "file-loader": "^3.0.1",
     "lodash": "^4.17.11",
     "mathjs": "^5.4.0",
     "numeric": "^1.2.6",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
-    "react-hot-loader": "^4.6.3",
-    "react-router-dom": "^4.3.1",
-    "recompose": "^0.30.0"
+    "react-router-dom": "^4.3.1"
   }
 }
