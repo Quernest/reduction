@@ -4,7 +4,7 @@
   "jsRules": {},
   "rules": {
     "no-default-export": true,
-    "no-implicit-dependencies": [true],
+    "no-implicit-dependencies": [true, "dev"],
     "no-submodule-imports": false,
     "export-name": false,
     "ordered-imports": [false],

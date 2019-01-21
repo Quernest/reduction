@@ -6,11 +6,9 @@
     "module": "commonjs",
     "target": "es5",
     "jsx": "react",
+    "esModuleInterop": true,
     "typeRoots": ["./src/types", "./node_modules/@types"]
   },
   "include": ["./src/**/*"],
-  "exclude": ["node_modules"],
-  "awesomeTypescriptLoaderOptions": {
-    "reportFiles": ["./src/**/*"]
-  }
+  "exclude": ["node_modules"]
 }

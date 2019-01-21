@@ -10,13 +10,15 @@ module.exports = {
   module: {
     rules: [
       {
-        enforce: "pre",
-        test: /\.js$/,
-        loader: "source-map-loader"
-      },
-      {
         test: /\.tsx?$/,
-        loader: "awesome-typescript-loader"
+        use: [
+          {
+            loader: "ts-loader",
+            options: {
+              transpileOnly: false // enable it if you want to increase compilation performance
+            }
+          }
+        ]
       },
       {
         test: /\.html$/,

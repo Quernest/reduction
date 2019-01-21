@@ -57,7 +57,7 @@ export class PCA {
 
   public analysis: number[];
 
-  public points: object[];
+  public points: Array<{ x?: number; y?: number }>;
 
   constructor(dataset: object[] | number[][]) {
     // handle if the dataset is empty
@@ -107,7 +107,7 @@ export class PCA {
      * additional calculations
      * get scatter points of the dataset for plotting the scatter
      */
-    this.points = from2D(this.adjustedDataset);
+    this.points = from2D(this.adjustedDataset, ["x", "y"]);
   }
 
   /**
