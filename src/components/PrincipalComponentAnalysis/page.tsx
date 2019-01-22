@@ -10,6 +10,7 @@ import {
 } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+import has from "lodash/has";
 import map from "lodash/map";
 import * as math from "mathjs";
 import * as React from "react";
@@ -18,39 +19,6 @@ import UploadWorker from "worker-loader!./upload.worker";
 import { Bar } from "./Bar";
 import { Biplot } from "./Biplot";
 import { OutputTable } from "./Table";
-
-interface IProps {
-  classes?: any;
-}
-
-interface IState {
-  selectedFile: File | null;
-  dataset: object[];
-  calculations: {
-    names: string[];
-    adjustedDataset: number[][];
-    covariance: number[][];
-    eigens: {
-      E: {
-        y: number[][];
-        x: number[][];
-      };
-      lambda: {
-        x: number[];
-        y: number[];
-      };
-    };
-    linearCombinations: number[][];
-    analysis: number[];
-    points: Array<{ x?: number; y?: number }>;
-  };
-  visualize: boolean;
-  calculating: boolean;
-  calculated: boolean;
-  uploading: boolean;
-  uploaded: boolean;
-  error: string;
-}
 
 const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
   createStyles({
@@ -87,6 +55,39 @@ const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
       marginTop: spacing.unit * 2
     }
   });
+
+interface IProps {
+  classes?: any;
+}
+
+interface IState {
+  selectedFile: File;
+  dataset: object[];
+  calculations: {
+    names: string[];
+    adjustedDataset: number[][];
+    covariance: number[][];
+    eigens: {
+      E: {
+        y: number[][];
+        x: number[][];
+      };
+      lambda: {
+        x: number[];
+        y: number[];
+      };
+    };
+    linearCombinations: number[][];
+    analysis: number[];
+    points: Array<{ x?: number; y?: number }>;
+  };
+  visualize: boolean;
+  calculating: boolean;
+  calculated: boolean;
+  uploading: boolean;
+  uploaded: boolean;
+  error: string;
+}
 
 export const PrincipalComponentAnalysisPage = withStyles(styles)(
   class extends React.Component<IProps, IState> {
@@ -304,7 +305,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={() => this.fileInput.current.click()}
+                      onClick={this.onChooseFileClick}
                     >
                       choose a file
                     </Button>
@@ -378,37 +379,42 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
       this.calculateWorker.postMessage(dataset);
     };
 
-    private onFileSelectInputChange = (event: any): void => {
-      const { files } = event.target;
-      const [file]: File = files;
+    private onFileSelectInputChange = (
+      event: React.ChangeEvent<HTMLInputElement>
+    ): void => {
+      const fileList: FileList = event.target.files;
 
-      // get type of file
-      const currentFileExtension: string = file.name.substring(
-        file.name.lastIndexOf(".")
-      );
+      if (fileList.length > 0) {
+        const file: File = fileList.item(0);
 
-      // list of accepted file extensions
-      const acceptedExtensions: string[] = [".txt", ".csv"];
+        // get type of file
+        const currentFileExtension: string = file.name.substring(
+          file.name.lastIndexOf(".")
+        );
 
-      // return the error if it's not accepted extension
-      if (acceptedExtensions.indexOf(currentFileExtension) < 0) {
-        this.setState({
-          error: `Invalid file selected, valid files are of ${acceptedExtensions.toString()} types.`
-        });
+        // list of accepted file extensions
+        const acceptedExtensions: string[] = [".txt", ".csv"];
 
-        return;
+        // return the error if it's not accepted extension
+        if (acceptedExtensions.indexOf(currentFileExtension) < 0) {
+          this.setState({
+            error: `Invalid file selected, valid files are of ${acceptedExtensions.toString()} types.`
+          });
+
+          return;
+        }
+
+        // reset input
+        // to be able to upload the same file again if it was canceled
+        event.target.value = ""; // eslint-disable-line
+
+        this.setState(
+          {
+            selectedFile: file
+          },
+          this.clearErrorBox
+        );
       }
-
-      // reset input
-      // to be able to upload the same file again if it was canceled
-      event.target.value = ""; // eslint-disable-line
-
-      this.setState(
-        {
-          selectedFile: file
-        },
-        this.clearErrorBox
-      );
     };
 
     private onFileUpload = (): void => {
@@ -446,6 +452,14 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
 
       // send selected file to the worker
       this.uploadWorker.postMessage(selectedFile);
+    };
+
+    private onChooseFileClick = (event: any): void => {
+      const input = this.fileInput.current;
+
+      if (input) {
+        input.click();
+      }
     };
 
     private onFileCancel = (): void => {

@@ -11,6 +11,12 @@ const styles = createStyles({
   }
 });
 
+interface IBarData {
+  component: string;
+  eigenvalue: number;
+  comulative: number;
+}
+
 interface IProps {
   values: number[];
   names: string[];
@@ -87,15 +93,8 @@ export const Bar = withStyles(styles)(
       /**
        * formatted data which represents a collection of objects
        * with provided keys and values
-       * this values are optional bacause from2D function
-       * returns array of objects with generated (dynamic) properties
-       * from the passed keys
        */
-      const data: Array<{
-        component?: string;
-        eigenvalue?: number;
-        comulative?: number;
-      }> = from2D(combinedData, keys);
+      const data = from2D<IBarData>(combinedData, keys);
 
       this.selectSVGElement();
       this.drawAxes(data);
@@ -115,13 +114,7 @@ export const Bar = withStyles(styles)(
         .attr("transform", `translate(${margin.left},${margin.top})`);
     }
 
-    private drawAxes(
-      data: Array<{
-        component?: string;
-        eigenvalue?: number;
-        comulative?: number;
-      }>
-    ): void {
+    private drawAxes(data: IBarData[]): void {
       const { width, height } = this.state;
 
       this.x = d3
@@ -142,13 +135,7 @@ export const Bar = withStyles(styles)(
       this.svg.append("g").call(d3.axisLeft(this.y));
     }
 
-    private drawBars(
-      data: Array<{
-        component?: string;
-        eigenvalue?: number;
-        comulative?: number;
-      }>
-    ): void {
+    private drawBars(data: IBarData[]): void {
       const { height } = this.state;
 
       this.svg
@@ -158,10 +145,10 @@ export const Bar = withStyles(styles)(
         .append("rect")
         .attr("class", "bar")
         .attr("fill", "#3F51B5")
-        .attr("x", d => this.x(d.component))
+        .attr("x", (d: IBarData): any => this.x(d.component))
         .attr("width", this.x.bandwidth())
-        .attr("y", d => this.y(d.comulative))
-        .attr("height", d => height - this.y(d.comulative));
+        .attr("y", (d: IBarData): any => this.y(d.comulative))
+        .attr("height", (d: IBarData) => height - this.y(d.comulative));
 
       /**
        * create the text labels at the top of each bar
@@ -173,14 +160,43 @@ export const Bar = withStyles(styles)(
         .enter()
         .append("text")
         .attr("class", "label")
-        .attr("x", d => this.x(d.component) + this.x.bandwidth() / 2)
-        .attr("y", d => this.y(d.comulative) - 15)
+        .attr(
+          "x",
+          (d: IBarData): any => {
+            const x = this.x(d.component);
+            const bandWidth = this.x.bandwidth();
+
+            if (x && bandWidth) {
+              return x + bandWidth / 2;
+            }
+
+            return null;
+          }
+        )
+        .attr(
+          "y",
+          (d: IBarData): any => {
+            const dY: number = 12;
+
+            return this.y(d.comulative) - dY;
+          }
+        )
         .attr("dy", ".75em")
         .style("text-anchor", "middle")
         // change text size depending on data size
-        .style("font-size", data.length > 15 ? 10 : 12)
+        .style("font-size", () => {
+          const breakpoint: number = 15;
+          const small: number = 10;
+          const normal: number = 12;
+
+          if (data.length > breakpoint) {
+            return small;
+          }
+
+          return normal;
+        })
         // display percentage
-        .text(d => `${d.comulative}%`);
+        .text((d: IBarData): any => `${d.comulative}%`);
     }
 
     public render(): React.ReactNode {

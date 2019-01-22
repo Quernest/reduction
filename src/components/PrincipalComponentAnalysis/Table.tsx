@@ -20,7 +20,7 @@ import keys from "lodash/keys";
 import map from "lodash/map";
 import round from "lodash/round";
 import * as React from "react";
-import { from2D, IObject } from "../../utils/transformations";
+import { from2D } from "../../utils/transformations";
 import { TablePaginationActionsWrapped } from "./TablePaginationActions";
 
 const CustomTableCell = withStyles((theme: Theme) => ({
@@ -85,7 +85,7 @@ export const OutputTable = withStyles(styles)(
         let { rows, columns } = props;
 
         // get instance of row
-        const instance: IObject | any[] = head(props.rows);
+        const instance: object | any[] = head(props.rows);
 
         // if there are no columns and the instance type is object get columns from the object keys
         if (isEmpty(props.columns) && isObject(instance)) {
@@ -98,7 +98,7 @@ export const OutputTable = withStyles(styles)(
         }
 
         // add indexes to rows
-        rows = map(rows, (row: IObject, index: number) => ({
+        rows = map(rows, (row: object, index: number) => ({
           index: index + 1,
           ...row
         }));

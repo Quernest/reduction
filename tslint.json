@@ -1,6 +1,10 @@
 {
   "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
   "defaultSeverity": "warning",
+  "rules": {
+    "member-ordering": [false],
+    "object-literal-sort-keys": [false]
+  },
   "linterOptions": {
     "exclude": [
       "config/**/*.js",
