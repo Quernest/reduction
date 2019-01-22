@@ -1,17 +1,11 @@
 {
-  "defaultServity": "error",
-  "extends": ["tslint:latest", "tslint-react", "tslint-config-prettier"],
-  "jsRules": {},
-  "rules": {
-    "no-default-export": true,
-    "no-implicit-dependencies": [true, "dev"],
-    "no-submodule-imports": false,
-    "export-name": false,
-    "ordered-imports": [false],
-    "object-literal-sort-keys": [false],
-    "member-ordering": false,
-    "js-no-lambda": false,
-    "js-boolean-value": false
-  },
-  "rulesDirectory": []
+  "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+  "defaultSeverity": "warning",
+  "linterOptions": {
+    "exclude": [
+      "config/**/*.js",
+      "node_modules/**/*.ts",
+      "coverage/lcov-report/*.js"
+    ]
+  }
 }

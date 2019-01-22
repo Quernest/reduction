@@ -1,7 +1,7 @@
-import transform = require("lodash/transform");
-import values = require("lodash/values");
-import isUndefined = require("lodash/isUndefined");
-import forEach = require("lodash/forEach");
+import forEach from "lodash/forEach";
+import isUndefined from "lodash/isUndefined";
+import transform from "lodash/transform";
+import values from "lodash/values";
 
 export interface IObject {
   [x: string]: any;

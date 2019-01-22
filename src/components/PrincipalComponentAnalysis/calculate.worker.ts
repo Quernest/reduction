@@ -20,8 +20,8 @@ ctx.addEventListener(
     } = pca;
 
     const calculations = {
-      covariance,
       analysis,
+      covariance,
       points,
       eigens,
       linearCombinations,

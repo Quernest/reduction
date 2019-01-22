@@ -2,26 +2,26 @@
 import * as math from "mathjs";
 
 // lib computes the covariance between one or more numeric arrays.
-import cov = require("compute-covariance");
+import cov from "compute-covariance";
 
 // library for formatting and manipulating numbers.
-import numeric = require("numeric");
+import numeric from "numeric";
 
 // utility library delivering modularity, performance & extras.
-import assign = require("lodash/assign");
-import head = require("lodash/head");
-import sum = require("lodash/sum");
-import map = require("lodash/map");
-import reduce = require("lodash/reduce");
-import keys = require("lodash/keys");
-import round = require("lodash/round");
-import isArray = require("lodash/isArray");
-import isEmpty = require("lodash/isEmpty");
-import isUndefined = require("lodash/isUndefined");
+import assign from "lodash/assign";
+import head from "lodash/head";
+import isArray from "lodash/isArray";
+import isEmpty from "lodash/isEmpty";
+import isUndefined from "lodash/isUndefined";
+import keys from "lodash/keys";
+import map from "lodash/map";
+import reduce from "lodash/reduce";
+import round from "lodash/round";
+import sum from "lodash/sum";
 
 // helpers
 import { opposite } from "../../utils/numbers";
-import { to2D, from2D } from "../../utils/transformations";
+import { from2D, to2D } from "../../utils/transformations";
 
 try {
   math.import(numeric, { wrap: true, silent: true });
@@ -70,18 +70,18 @@ export class PCA {
       throw new Error("the dataset must be an array type");
     }
 
-    const instance: object | number[] = head(this.dataset);
+    const instance: object | number[] = head(dataset);
 
     /**
      * check whether the transferred data to the required type
      * if not, transform into a two-dimensional array.
      */
-    if (typeof instance === "object" && !isArray(instance)) {
-      // if it's object, transform to the two-dimensional array
-      this.dataset = to2D(dataset);
-
+    if (!isArray(instance)) {
       // and get factor names
       this.names = keys(instance);
+
+      // if it's object, transform to the two-dimensional array
+      this.dataset = to2D(dataset);
     }
 
     // step 1

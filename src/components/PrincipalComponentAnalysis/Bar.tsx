@@ -6,8 +6,8 @@ import { from2D } from "../../utils/transformations";
 
 const styles = createStyles({
   root: {
-    width: "100%",
-    height: "auto"
+    height: "auto",
+    width: "100%"
   }
 });
 

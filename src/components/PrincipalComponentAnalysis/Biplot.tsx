@@ -1,14 +1,14 @@
 import { createStyles, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
+import size from "lodash/size";
 import * as math from "mathjs";
 import * as React from "react";
-import size = require("lodash/size");
 
 const styles = createStyles({
   root: {
-    width: "100%",
-    height: "auto"
+    height: "auto",
+    width: "100%"
   }
 });
 
@@ -34,21 +34,6 @@ interface IState {
 
 export const Biplot = withStyles(styles)(
   class extends React.Component<IProps, IState> {
-    /**
-     * main svg element
-     */
-    private svg: d3.Selection<d3.BaseType, any, HTMLElement, any>;
-
-    /**
-     * x axis
-     */
-    private x: d3.ScaleLinear<number, number>;
-
-    /**
-     * y axis
-     */
-    private y: d3.ScaleLinear<number, number>;
-
     public readonly state = {
       margin: {
         top: 20,
@@ -65,6 +50,20 @@ export const Biplot = withStyles(styles)(
         return this.fullHeight - this.margin.top - this.margin.bottom;
       }
     };
+    /**
+     * main svg element
+     */
+    private svg: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+
+    /**
+     * x axis
+     */
+    private x: d3.ScaleLinear<number, number>;
+
+    /**
+     * y axis
+     */
+    private y: d3.ScaleLinear<number, number>;
 
     public componentDidMount() {
       const { points, vectors, axes } = this.props;
@@ -78,6 +77,24 @@ export const Biplot = withStyles(styles)(
       this.drawAxes(points, axes);
       this.drawPoints(points);
       this.drawVectors(vectors);
+    }
+
+    public render() {
+      const { axes, classes } = this.props;
+
+      // 2D only
+      if (size(axes) > 2) {
+        return null;
+      }
+
+      return (
+        <div className={classes.root}>
+          <Typography variant="h6" paragraph={true}>
+            Biplot
+          </Typography>
+          <svg id="biplot" />
+        </div>
+      );
     }
 
     private selectSVGElement(): void {
@@ -203,23 +220,5 @@ export const Biplot = withStyles(styles)(
         .attr("y2", this.y(vectors[1][1]))
         .attr("marker-end", "url(#arrow)");
     };
-
-    public render() {
-      const { axes, classes } = this.props;
-
-      // 2D only
-      if (size(axes) > 2) {
-        return null;
-      }
-
-      return (
-        <div className={classes.root}>
-          <Typography variant="h6" paragraph={true}>
-            Biplot
-          </Typography>
-          <svg id="biplot" />
-        </div>
-      );
-    }
   }
 );

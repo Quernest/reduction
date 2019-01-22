@@ -1,1 +1,1 @@
-export * from "./PrincipalComponentAnalysisPage";
+export * from "./page";

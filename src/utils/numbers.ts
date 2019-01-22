@@ -1,8 +1,8 @@
-import isArray = require('lodash/isArray');
-import map = require('lodash/map');
+import isArray from "lodash/isArray";
+import map from "lodash/map";
 
 // recursive function
-export const opposite = (value: Array<any> | number): Array<any> | number => {
+export const opposite = (value: any[] | number): any[] | number => {
   if (!value) {
     return value;
   }

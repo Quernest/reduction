@@ -1,17 +1,17 @@
-import * as React from "react";
-import { Link, LinkProps } from "react-router-dom";
+import AppBar from "@material-ui/core/AppBar";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
 import {
   createStyles,
-  withStyles,
-  WithStyles,
+  StyleRules,
   Theme,
-  StyleRules
+  withStyles,
+  WithStyles
 } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
+import * as React from "react";
+import { Link, LinkProps } from "react-router-dom";
 
 const styles = ({ breakpoints }: Theme): StyleRules =>
   createStyles({

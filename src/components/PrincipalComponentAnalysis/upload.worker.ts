@@ -1,10 +1,10 @@
-import forEach = require("lodash/forEach");
-import some = require("lodash/some");
-import size = require("lodash/size");
-import isEmpty = require("lodash/isEmpty");
-import isNaN = require("lodash/isNaN");
-import isString = require("lodash/isString");
-import parseCSV, { IObject } from "../../utils/csv";
+import forEach from "lodash/forEach";
+import isEmpty from "lodash/isEmpty";
+import isNaN from "lodash/isNaN";
+import isString from "lodash/isString";
+import size from "lodash/size";
+import some from "lodash/some";
+import { IObject, parseCSV } from "../../utils/csv";
 
 const ctx: Worker = self as any;
 

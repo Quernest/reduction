@@ -1,13 +1,13 @@
-import * as React from "react";
-import { Link, LinkProps } from "react-router-dom";
-import {
-  withStyles,
-  createStyles,
-  Theme,
-  StyleRules
-} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
+import {
+  createStyles,
+  StyleRules,
+  Theme,
+  withStyles
+} from "@material-ui/core/styles";
+import * as React from "react";
+import { Link, LinkProps } from "react-router-dom";
 
 const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
   createStyles({
