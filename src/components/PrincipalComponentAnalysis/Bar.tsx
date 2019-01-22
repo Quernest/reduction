@@ -121,7 +121,7 @@ export const Bar = withStyles(styles)(
         .scaleBand()
         .range([0, width])
         .padding(0.25)
-        .domain(data.map(d => d.component));
+        .domain(data.map((d: IBarData): any => d.component));
       this.y = d3
         .scaleLinear()
         .range([height, 0])
@@ -183,12 +183,12 @@ export const Bar = withStyles(styles)(
         )
         .attr("dy", ".75em")
         .style("text-anchor", "middle")
-        // change text size depending on data size
         .style("font-size", () => {
           const breakpoint: number = 15;
           const small: number = 10;
           const normal: number = 12;
 
+          // change font size depending on the data length
           if (data.length > breakpoint) {
             return small;
           }
