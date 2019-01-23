@@ -12,8 +12,13 @@ const styles = createStyles({
   }
 });
 
+interface IPoint {
+  x: number;
+  y: number;
+}
+
 interface IProps {
-  points: Array<{ x?: number; y?: number }>;
+  points: IPoint[];
   vectors: number[][];
   axes: string[];
   classes?: any;
@@ -79,24 +84,6 @@ export const Biplot = withStyles(styles)(
       this.drawVectors(vectors);
     }
 
-    public render() {
-      const { axes, classes } = this.props;
-
-      // 2D only
-      if (size(axes) > 2) {
-        return null;
-      }
-
-      return (
-        <div className={classes.root}>
-          <Typography variant="h6" paragraph={true}>
-            Biplot
-          </Typography>
-          <svg id="biplot" />
-        </div>
-      );
-    }
-
     private selectSVGElement(): void {
       const { fullWidth, fullHeight, margin } = this.state;
 
@@ -110,31 +97,28 @@ export const Biplot = withStyles(styles)(
         .attr("transform", `translate(${margin.left},${margin.top})`);
     }
 
-    private drawAxes = (
-      points: Array<{ x?: number; y?: number }>,
-      axes: string[]
-    ) => {
+    private drawAxes(points: IPoint[], axes: string[]): void {
       const { width, height, margin } = this.state;
 
-      const x = d3
+      const xScale = d3
         .scaleLinear()
         .rangeRound([0, width])
         .domain([
-          -d3.max(points, d => math.abs(d.x)),
-          d3.max(points, d => math.abs(d.x))
+          -d3.max(points, (d: IPoint): any => math.abs(d.x)),
+          d3.max(points, (d: IPoint): any => math.abs(d.x))
         ]);
 
-      const xAxis = d3.axisBottom(x);
+      const xAxis = d3.axisBottom(xScale);
 
-      const y = d3
+      const yScale = d3
         .scaleLinear()
         .rangeRound([0, height])
         .domain([
-          d3.max(points, d => math.abs(d.y)),
-          -d3.max(points, d => math.abs(d.y))
+          d3.max(points, (d: IPoint): any => math.abs(d.y)),
+          -d3.max(points, (d: IPoint): any => math.abs(d.y))
         ]);
 
-      const yAxis = d3.axisLeft(y);
+      const yAxis = d3.axisLeft(yScale);
 
       this.svg
         .append("g")
@@ -170,23 +154,23 @@ export const Biplot = withStyles(styles)(
         .filter(d => d === 0)
         .remove();
 
-      this.x = x;
-      this.y = y;
-    };
+      this.x = xScale;
+      this.y = yScale;
+    }
 
-    private drawPoints = (points: Array<{ x?: number; y?: number }>) => {
+    private drawPoints(points: IPoint[]): void {
       this.svg
         .selectAll("circle")
         .data(points)
         .enter()
         .append("circle")
-        .attr("cx", d => this.x(d.x))
-        .attr("cy", d => this.y(d.y))
+        .attr("cx", (d: IPoint): any => this.x(d.x))
+        .attr("cy", (d: IPoint): any => this.y(d.y))
         .attr("r", 2)
         .attr("fill", "red");
-    };
+    }
 
-    private drawVectors = (vectors: number[][]) => {
+    private drawVectors(vectors: number[][]): void {
       const defs = this.svg.append("defs");
       const marker = defs
         .append("marker")
@@ -219,6 +203,24 @@ export const Biplot = withStyles(styles)(
         .attr("x2", this.x(vectors[0][1]))
         .attr("y2", this.y(vectors[1][1]))
         .attr("marker-end", "url(#arrow)");
-    };
+    }
+
+    public render() {
+      const { axes, classes } = this.props;
+
+      // 2D only
+      if (size(axes) > 2) {
+        return null;
+      }
+
+      return (
+        <div className={classes.root}>
+          <Typography variant="h6" paragraph={true}>
+            Biplot
+          </Typography>
+          <svg id="biplot" />
+        </div>
+      );
+    }
   }
 );
