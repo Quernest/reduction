@@ -14,6 +14,7 @@ import isEmpty from "lodash/isEmpty";
 import map from "lodash/map";
 import * as math from "mathjs";
 import * as React from "react";
+import { IPCACalculations } from "src/models/pca.model";
 import CalculateWorker from "worker-loader!./calculate.worker";
 import UploadWorker from "worker-loader!./upload.worker";
 import { Bar } from "./Bar";
@@ -63,24 +64,7 @@ interface IProps {
 interface IState {
   selectedFile: null | File;
   dataset: object[];
-  calculations: {
-    names: string[];
-    adjustedDataset: number[][];
-    covariance: number[][];
-    eigens: {
-      E: {
-        y: number[][];
-        x: number[][];
-      };
-      lambda: {
-        x: number[];
-        y: number[];
-      };
-    };
-    linearCombinations: number[][];
-    analysis: number[];
-    points: Array<{ x: number; y: number }>;
-  };
+  calculations: IPCACalculations;
   visualize: boolean;
   calculating: boolean;
   calculated: boolean;
@@ -96,6 +80,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
       dataset: [],
       calculations: {
         points: [],
+        dataset: [],
         adjustedDataset: [],
         covariance: [],
         eigens: {

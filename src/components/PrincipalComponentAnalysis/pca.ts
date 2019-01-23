@@ -19,6 +19,9 @@ import reduce from "lodash/reduce";
 import round from "lodash/round";
 import sum from "lodash/sum";
 
+// models
+import { IPCA } from "src/models/pca.model";
+
 // helpers
 import { opposite } from "../../utils/numbers";
 import { from2D, to2D } from "../../utils/transformations";
@@ -33,7 +36,7 @@ try {
  * Creates new PCA (Principal Component Analysis) from the dataset
  * @see https://en.wikipedia.org/wiki/Principal_component_analysis
  */
-export class PCA {
+export class PCA implements IPCA {
   public names: string[];
 
   public dataset: number[][];

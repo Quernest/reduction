@@ -1,3 +1,4 @@
+import { IPCA, IPCACalculations } from "src/models/pca.model";
 import { PCA } from "./pca";
 
 const ctx: Worker = self as any;
@@ -7,9 +8,10 @@ ctx.addEventListener(
   event => {
     const { data } = event;
 
-    const pca = new PCA(data);
+    const pca: IPCA = new PCA(data);
 
     const {
+      dataset,
       covariance,
       analysis,
       points,
@@ -19,7 +21,8 @@ ctx.addEventListener(
       names
     } = pca;
 
-    const calculations = {
+    const calculations: IPCACalculations = {
+      dataset,
       analysis,
       covariance,
       points,
