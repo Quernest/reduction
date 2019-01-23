@@ -10,7 +10,7 @@ import {
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import * as React from "react";
-import { Link, LinkProps } from "react-router-dom";
+import { redirectTo } from "src/utils/redirectTo";
 
 const styles = ({ breakpoints }: Theme): StyleRules =>
   createStyles({
@@ -40,18 +40,10 @@ export const Header = withStyles(styles)(({ classes }: IProps) => (
             <Typography variant="h6" color="inherit" className={classes.grow}>
               Reduction
             </Typography>
-            <Button
-              variant="text"
-              color="inherit"
-              component={props => <Link to="/" {...props as LinkProps} />}
-            >
+            <Button {...redirectTo("/")} variant="text" color="inherit">
               Home
             </Button>
-            <Button
-              variant="text"
-              color="inherit"
-              component={props => <Link to="/pca" {...props as LinkProps} />}
-            >
+            <Button {...redirectTo("/pca")} variant="text" color="inherit">
               PCA
             </Button>
           </Grid>

@@ -7,7 +7,7 @@ import {
   withStyles
 } from "@material-ui/core/styles";
 import * as React from "react";
-import { Link, LinkProps } from "react-router-dom";
+import { redirectTo } from "src/utils/redirectTo";
 
 const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
   createStyles({
@@ -33,10 +33,7 @@ export const Home = withStyles(styles)(({ classes }: IProps) => (
   <div className={classes.root}>
     <Grid container={true} justify="center">
       <Grid className={classes.grid} container={true} alignItems="center">
-        <Button
-          component={props => <Link {...props as LinkProps} to="/pca" />}
-          variant="contained"
-        >
+        <Button {...redirectTo("/pca")} color="primary" variant="contained">
           Principal Component Analysis
         </Button>
       </Grid>
