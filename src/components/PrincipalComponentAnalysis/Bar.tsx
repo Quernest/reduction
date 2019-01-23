@@ -18,7 +18,7 @@ interface IBarData {
 }
 
 interface IProps {
-  values: number[];
+  eigenvalues: number[];
   names: string[];
   analysis: number[];
   classes?: any;
@@ -72,19 +72,19 @@ export const Bar = withStyles(styles)(
     };
 
     public componentDidMount() {
-      const { values, names, analysis } = this.props;
+      const { eigenvalues, names, analysis } = this.props;
 
       /**
-       * array of combined values ​​that we display in bar columns
+       * array of combined eigenvalues ​​that we display in bar columns
        */
       const combinedData: [string[], number[], number[]] = [
         names,
-        values,
+        eigenvalues,
         analysis
       ];
 
       /**
-       * keys of this values
+       * keys of this eigenvalues
        * by default describes:
        * component name, eigenvalue, comulative percentage
        */
@@ -92,7 +92,7 @@ export const Bar = withStyles(styles)(
 
       /**
        * formatted data which represents a collection of objects
-       * with provided keys and values
+       * with provided keys and eigenvalues
        */
       const data = from2D<IBarData>(combinedData, keys);
 

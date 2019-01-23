@@ -339,7 +339,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                         axes={names}
                       />
                       <Bar
-                        values={eigens.lambda.x}
+                        eigenvalues={eigens.lambda.x}
                         names={names}
                         analysis={analysis}
                       />
