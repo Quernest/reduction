@@ -70,13 +70,13 @@ interface IState {
   calculated: boolean;
   uploading: boolean;
   uploaded: boolean;
-  error: string;
+  error?: string;
 }
 
 export const PrincipalComponentAnalysisPage = withStyles(styles)(
   class extends React.Component<IProps, IState> {
     public readonly state = {
-      selectedFile: null, // tslint:disable-line
+      selectedFile: null,
       dataset: [],
       calculations: {
         points: [],
