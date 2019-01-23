@@ -56,7 +56,7 @@ interface IProps {
   enumerate: boolean;
   enumerateSymbol: string;
   columns: string[];
-  rows: Array<{ [key: string]: any }> | any[];
+  rows: object[] | any[][];
   classes?: any;
 }
 
@@ -85,7 +85,7 @@ export const OutputTable = withStyles(styles)(
         let { rows, columns } = props;
 
         // get instance of row
-        const instance: object | any[] = head(props.rows);
+        const instance = head<object | any[] | undefined>(props.rows);
 
         // if there are no columns and the instance type is object get columns from the object keys
         if (isEmpty(props.columns) && isObject(instance)) {
@@ -94,7 +94,7 @@ export const OutputTable = withStyles(styles)(
 
         // if the instance type is array -> call transform to the array of objects function
         if (isArray(instance)) {
-          rows = from2D(props.rows, columns);
+          rows = from2D<object>(rows as any[][], columns);
         }
 
         // add indexes to rows

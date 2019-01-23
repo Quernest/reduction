@@ -57,7 +57,7 @@ export class PCA {
 
   public analysis: number[];
 
-  public points: Array<{ x?: number; y?: number }>;
+  public points: Array<{ x: number; y: number }>;
 
   constructor(dataset: object[] | number[][]) {
     // handle if the dataset is empty
@@ -70,7 +70,7 @@ export class PCA {
       throw new Error("the dataset must be an array type");
     }
 
-    const instance: object | number[] = head(dataset);
+    const instance: object | number[] | undefined = head(dataset);
 
     /**
      * check whether the transferred data to the required type

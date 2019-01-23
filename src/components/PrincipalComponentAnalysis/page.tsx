@@ -79,7 +79,7 @@ interface IState {
     };
     linearCombinations: number[][];
     analysis: number[];
-    points: Array<{ x?: number; y?: number }>;
+    points: Array<{ x: number; y: number }>;
   };
   visualize: boolean;
   calculating: boolean;
@@ -138,6 +138,151 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
     public componentDidMount() {
       this.initializeWebWorkers();
     }
+
+    private onCalculate = (): void => {
+      const { dataset } = this.state;
+
+      this.setState({
+        calculating: true,
+        calculated: false
+      });
+
+      // communication with worker
+      this.calculateWorker.addEventListener(
+        "message",
+        (event: MessageEvent) => {
+          const { data } = event;
+
+          this.setState({
+            calculating: false,
+            calculated: true,
+            calculations: data
+          });
+        },
+        false
+      );
+
+      // error handler
+      this.calculateWorker.addEventListener("error", (event: ErrorEvent) => {
+        this.setState({
+          uploaded: false,
+          uploading: false,
+          error: event.message
+        });
+      });
+
+      // TODO: add timeout function (stop calculations if too long)
+      // send the dataset to the worker
+      this.calculateWorker.postMessage(dataset);
+    };
+
+    private onFileSelectInputChange = (
+      event: React.ChangeEvent<HTMLInputElement>
+    ): void => {
+      const fileList: FileList = event.target.files;
+
+      if (fileList.length > 0) {
+        const file: File = fileList.item(0);
+
+        // get type of file
+        const currentFileExtension: string = file.name.substring(
+          file.name.lastIndexOf(".")
+        );
+
+        // list of accepted file extensions
+        const acceptedExtensions: string[] = [".txt", ".csv"];
+
+        // return the error if it's not accepted extension
+        if (acceptedExtensions.indexOf(currentFileExtension) < 0) {
+          this.setState({
+            error: `Invalid file selected, valid files are of ${acceptedExtensions.toString()} types.`
+          });
+
+          return;
+        }
+
+        // reset input
+        // to be able to upload the same file again if it was canceled
+        event.target.value = ""; // eslint-disable-line
+
+        this.setState(
+          {
+            selectedFile: file
+          },
+          this.clearErrorBox
+        );
+      }
+    };
+
+    private onFileUpload = (): void => {
+      this.setState(
+        {
+          uploaded: false,
+          uploading: true
+        },
+        this.clearErrorBox
+      );
+
+      const { selectedFile } = this.state;
+
+      // communication with worker
+      this.uploadWorker.addEventListener(
+        "message",
+        (event: MessageEvent) => {
+          this.setState({
+            uploaded: true,
+            uploading: false,
+            dataset: event.data
+          });
+        },
+        false
+      );
+
+      // error handler
+      this.uploadWorker.addEventListener("error", (event: ErrorEvent) => {
+        this.setState({
+          uploaded: false,
+          uploading: false,
+          error: event.message
+        });
+      });
+
+      // send selected file to the worker
+      this.uploadWorker.postMessage(selectedFile);
+    };
+
+    private onChooseFileClick = (event: any): void => {
+      const input = this.fileInput.current;
+
+      if (input) {
+        input.click();
+      }
+    };
+
+    private onFileCancel = (): void => {
+      this.setState(
+        {
+          selectedFile: null,
+          uploaded: false
+        },
+        this.clearErrorBox
+      );
+    };
+
+    private onVisualize = (): void => {
+      this.setState({
+        visualize: true
+      });
+    };
+
+    private clearErrorBox = (): void => {
+      this.setState({ error: "" });
+    };
+
+    private initializeWebWorkers = (): void => {
+      this.uploadWorker = new UploadWorker();
+      this.calculateWorker = new CalculateWorker();
+    };
 
     public render() {
       const { classes } = this.props;
@@ -341,150 +486,5 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
         </div>
       );
     }
-
-    private onCalculate = (): void => {
-      const { dataset } = this.state;
-
-      this.setState({
-        calculating: true,
-        calculated: false
-      });
-
-      // communication with worker
-      this.calculateWorker.addEventListener(
-        "message",
-        (event: MessageEvent) => {
-          const { data } = event;
-
-          this.setState({
-            calculating: false,
-            calculated: true,
-            calculations: data
-          });
-        },
-        false
-      );
-
-      // error handler
-      this.calculateWorker.addEventListener("error", (event: ErrorEvent) => {
-        this.setState({
-          uploaded: false,
-          uploading: false,
-          error: event.message
-        });
-      });
-
-      // TODO: add timeout function (stop calculations if too long)
-      // send the dataset to the worker
-      this.calculateWorker.postMessage(dataset);
-    };
-
-    private onFileSelectInputChange = (
-      event: React.ChangeEvent<HTMLInputElement>
-    ): void => {
-      const fileList: FileList = event.target.files;
-
-      if (fileList.length > 0) {
-        const file: File = fileList.item(0);
-
-        // get type of file
-        const currentFileExtension: string = file.name.substring(
-          file.name.lastIndexOf(".")
-        );
-
-        // list of accepted file extensions
-        const acceptedExtensions: string[] = [".txt", ".csv"];
-
-        // return the error if it's not accepted extension
-        if (acceptedExtensions.indexOf(currentFileExtension) < 0) {
-          this.setState({
-            error: `Invalid file selected, valid files are of ${acceptedExtensions.toString()} types.`
-          });
-
-          return;
-        }
-
-        // reset input
-        // to be able to upload the same file again if it was canceled
-        event.target.value = ""; // eslint-disable-line
-
-        this.setState(
-          {
-            selectedFile: file
-          },
-          this.clearErrorBox
-        );
-      }
-    };
-
-    private onFileUpload = (): void => {
-      this.setState(
-        {
-          uploaded: false,
-          uploading: true
-        },
-        this.clearErrorBox
-      );
-
-      const { selectedFile } = this.state;
-
-      // communication with worker
-      this.uploadWorker.addEventListener(
-        "message",
-        (event: MessageEvent) => {
-          this.setState({
-            uploaded: true,
-            uploading: false,
-            dataset: event.data
-          });
-        },
-        false
-      );
-
-      // error handler
-      this.uploadWorker.addEventListener("error", (event: ErrorEvent) => {
-        this.setState({
-          uploaded: false,
-          uploading: false,
-          error: event.message
-        });
-      });
-
-      // send selected file to the worker
-      this.uploadWorker.postMessage(selectedFile);
-    };
-
-    private onChooseFileClick = (event: any): void => {
-      const input = this.fileInput.current;
-
-      if (input) {
-        input.click();
-      }
-    };
-
-    private onFileCancel = (): void => {
-      this.setState(
-        {
-          selectedFile: null,
-          uploaded: false
-        },
-        this.clearErrorBox
-      );
-    };
-
-    private onVisualize = (): void => {
-      this.setState({
-        visualize: true
-      });
-    };
-
-    private clearErrorBox = (): void => {
-      this.setState({ error: "" });
-    };
-
-    private initializeWebWorkers = (): void => {
-      this.uploadWorker = new UploadWorker();
-      this.calculateWorker = new CalculateWorker();
-    };
   }
 );
