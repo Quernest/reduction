@@ -11,6 +11,7 @@ import {
 import Typography from "@material-ui/core/Typography";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import has from "lodash/has";
+import isNull from "lodash/isNull";
 import map from "lodash/map";
 import * as math from "mathjs";
 import * as React from "react";
@@ -19,6 +20,7 @@ import UploadWorker from "worker-loader!./upload.worker";
 import { Bar } from "./Bar";
 import { Biplot } from "./Biplot";
 import { OutputTable } from "./Table";
+import isEmpty = require("lodash/isEmpty");
 
 const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
   createStyles({
@@ -61,7 +63,7 @@ interface IProps {
 }
 
 interface IState {
-  selectedFile: File;
+  selectedFile: null | File;
   dataset: object[];
   calculations: {
     names: string[];
@@ -92,7 +94,7 @@ interface IState {
 export const PrincipalComponentAnalysisPage = withStyles(styles)(
   class extends React.Component<IProps, IState> {
     public readonly state = {
-      selectedFile: null,
+      selectedFile: null, // tslint:disable-line
       dataset: [],
       calculations: {
         points: [],
@@ -179,10 +181,17 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
     private onFileSelectInputChange = (
       event: React.ChangeEvent<HTMLInputElement>
     ): void => {
-      const fileList: FileList = event.target.files;
+      /**
+       * type conflict with null value in the state, how to fix it?
+       * the value null must be there if the file is not loaded
+       * but it conflicts with the File interface
+       */
+      // @ts-ignore: Unreachable code error
+      const files: FileList = event.target.files;
 
-      if (fileList.length > 0) {
-        const file: File = fileList.item(0);
+      if (!isEmpty(files)) {
+        // @ts-ignore: Unreachable code error (same problem with null)
+        const file: File = files.item(0);
 
         // get type of file
         const currentFileExtension: string = file.name.substring(
@@ -203,7 +212,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
 
         // reset input
         // to be able to upload the same file again if it was canceled
-        event.target.value = ""; // eslint-disable-line
+        event.target.value = "";
 
         this.setState(
           {
@@ -211,6 +220,10 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
           },
           this.clearErrorBox
         );
+      } else {
+        this.setState({
+          error: "input is empty"
+        });
       }
     };
 
@@ -397,7 +410,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                           Eigenvectors (component loadings)
                         </Typography>
                         <OutputTable
-                          rows={math.transpose(eigens.E.x)}
+                          rows={math.transpose(eigens.E.x) as number[][]}
                           columns={map(
                             names,
                             (name, index) => `PC${index + 1} (${name})`
@@ -467,6 +480,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                     {selectedFile && (
                       <Grid item={true} xs={12}>
                         <Chip
+                          // @ts-ignore: Unreachable code error (same problem with null)
                           label={selectedFile.name}
                           onDelete={this.onFileCancel}
                           className={classes.chip}
