@@ -10,9 +10,7 @@ import {
 } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
-import has from "lodash/has";
 import isEmpty from "lodash/isEmpty";
-import isNull from "lodash/isNull";
 import map from "lodash/map";
 import * as math from "mathjs";
 import * as React from "react";
