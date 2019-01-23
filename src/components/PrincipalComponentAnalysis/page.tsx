@@ -335,7 +335,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                     <>
                       <Biplot
                         points={points}
-                        vectors={eigens.E.x}
+                        eigenvectors={eigens.E.x}
                         axes={names}
                       />
                       <Bar

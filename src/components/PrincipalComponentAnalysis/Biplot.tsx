@@ -19,7 +19,7 @@ interface IPoint {
 
 interface IProps {
   points: IPoint[];
-  vectors: number[][];
+  eigenvectors: number[][];
   axes: string[];
   classes?: any;
 }
@@ -71,7 +71,7 @@ export const Biplot = withStyles(styles)(
     private y: d3.ScaleLinear<number, number>;
 
     public componentDidMount() {
-      const { points, vectors, axes } = this.props;
+      const { points, eigenvectors, axes } = this.props;
 
       // 2D only
       if (size(axes) > 2) {
@@ -81,7 +81,7 @@ export const Biplot = withStyles(styles)(
       this.selectSVGElement();
       this.drawAxes(points, axes);
       this.drawPoints(points);
-      this.drawVectors(vectors);
+      this.drawVectors(eigenvectors);
     }
 
     private selectSVGElement(): void {
@@ -170,7 +170,7 @@ export const Biplot = withStyles(styles)(
         .attr("fill", "red");
     }
 
-    private drawVectors(vectors: number[][]): void {
+    private drawVectors(eigenvectors: number[][]): void {
       const defs = this.svg.append("defs");
       const marker = defs
         .append("marker")
@@ -189,19 +189,19 @@ export const Biplot = withStyles(styles)(
         .append("line")
         .style("stroke", "#000")
         .style("stroke-width", 1.5)
-        .attr("x1", this.x(-vectors[0][0]))
-        .attr("y1", this.y(-vectors[1][0]))
-        .attr("x2", this.x(vectors[0][0]))
-        .attr("y2", this.y(vectors[1][0]))
+        .attr("x1", this.x(-eigenvectors[0][0]))
+        .attr("y1", this.y(-eigenvectors[1][0]))
+        .attr("x2", this.x(eigenvectors[0][0]))
+        .attr("y2", this.y(eigenvectors[1][0]))
         .attr("marker-end", "url(#arrow)");
       this.svg
         .append("line")
         .style("stroke", "#000")
         .style("stroke-width", 1.5)
-        .attr("x1", this.x(-vectors[0][1]))
-        .attr("y1", this.y(-vectors[1][1]))
-        .attr("x2", this.x(vectors[0][1]))
-        .attr("y2", this.y(vectors[1][1]))
+        .attr("x1", this.x(-eigenvectors[0][1]))
+        .attr("y1", this.y(-eigenvectors[1][1]))
+        .attr("x2", this.x(eigenvectors[0][1]))
+        .attr("y2", this.y(eigenvectors[1][1]))
         .attr("marker-end", "url(#arrow)");
     }
 
