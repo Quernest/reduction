@@ -11,6 +11,7 @@ import {
 import Typography from "@material-ui/core/Typography";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import has from "lodash/has";
+import isEmpty from "lodash/isEmpty";
 import isNull from "lodash/isNull";
 import map from "lodash/map";
 import * as math from "mathjs";
@@ -20,7 +21,6 @@ import UploadWorker from "worker-loader!./upload.worker";
 import { Bar } from "./Bar";
 import { Biplot } from "./Biplot";
 import { OutputTable } from "./Table";
-import isEmpty = require("lodash/isEmpty");
 
 const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
   createStyles({
