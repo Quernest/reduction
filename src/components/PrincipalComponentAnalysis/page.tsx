@@ -306,21 +306,21 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
       return (
         <div className={classes.root}>
           <Grid container={true} justify="center">
-            <Grid container={true} className={classes.grid} alignItems="center">
-              <Typography variant="h6" paragraph={true}>
-                Principal Component Analysis
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                color="textSecondary"
-                paragraph={true}
-              >
-                Principal component analysis (PCA) is a statistical procedure
-                that uses an orthogonal transformation to convert a set of
-                observations of possibly correlated variables (entities each of
-                which takes on various numerical values) into a set of values of
-                linearly uncorrelated variables called principal components.
-              </Typography>
+            <Grid container={true} className={classes.grid}>
+              <Grid item={true} xs={12}>
+                <Typography variant="h6" paragraph={true}>
+                  Principal Component Analysis
+                </Typography>
+              </Grid>
+              <Grid item={true} xs={12}>
+                <Typography
+                  variant="body2"
+                  color="textSecondary"
+                  paragraph={true}
+                >
+                  How to use?
+                </Typography>
+              </Grid>
               {(() => {
                 if (uploading || calculating) {
                   return (
@@ -396,7 +396,8 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                           rows={math.transpose(eigens.E.x) as number[][]}
                           columns={map(
                             names,
-                            (name, index) => `PC${index + 1} (${name})`
+                            (name: string, index: number): string =>
+                              `PC${index + 1} (${name})`
                           )}
                         />
                       </Grid>
@@ -408,7 +409,8 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                           rows={linearCombinations}
                           columns={map(
                             names,
-                            (name, index) => `PC${index + 1} (${name})`
+                            (name: string, index: number): string =>
+                              `PC${index + 1} (${name})`
                           )}
                         />
                       </Grid>

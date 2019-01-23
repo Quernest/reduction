@@ -46,6 +46,9 @@ export const Header = withStyles(styles)(({ classes }: IProps) => (
             <Button {...redirectTo("/pca")} variant="text" color="inherit">
               PCA
             </Button>
+            <Button {...redirectTo("/som")} variant="text" color="inherit">
+              SOM
+            </Button>
           </Grid>
         </Grid>
       </Toolbar>

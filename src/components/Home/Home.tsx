@@ -6,6 +6,7 @@ import {
   Theme,
   withStyles
 } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
 import * as React from "react";
 import { redirectTo } from "src/utils/redirectTo";
 
@@ -22,6 +23,10 @@ const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
       [breakpoints.up("md")]: {
         width: breakpoints.values.md
       }
+    },
+    bigAvatar: {
+      width: 96,
+      height: 96
     }
   });
 
@@ -32,10 +37,43 @@ interface IProps {
 export const Home = withStyles(styles)(({ classes }: IProps) => (
   <div className={classes.root}>
     <Grid container={true} justify="center">
-      <Grid className={classes.grid} container={true} alignItems="center">
-        <Button {...redirectTo("/pca")} color="primary" variant="contained">
-          Principal Component Analysis
-        </Button>
+      <Grid
+        className={classes.grid}
+        container={true}
+        alignItems="flex-start"
+        spacing={24}
+      >
+        <Grid item={true} xs={12} md={6}>
+          <Typography variant="h6" paragraph={true}>
+            Principal Component Analysis
+          </Typography>
+          <Typography variant="body2" color="textSecondary" paragraph={true}>
+            Principal component analysis (PCA) is a statistical procedure that
+            uses an orthogonal transformation to convert a set of observations
+            of possibly correlated variables (entities each of which takes on
+            various numerical values) into a set of values of linearly
+            uncorrelated variables called principal components.
+          </Typography>
+          <Button {...redirectTo("/pca")} color="primary" variant="contained">
+            Try it
+          </Button>
+        </Grid>
+        <Grid item={true} xs={12} md={6}>
+          <Typography variant="h6" paragraph={true}>
+            Self-Organizing Map
+          </Typography>
+          <Typography variant="body2" color="textSecondary" paragraph={true}>
+            A self-organizing map (SOM) or self-organizing feature map (SOFM) is
+            a type of artificial neural network (ANN) that is trained using
+            unsupervised learning to produce a low-dimensional (typically
+            two-dimensional), discretized representation of the input space of
+            the training samples, called a map, and is therefore a method to do
+            dimensionality reduction.
+          </Typography>
+          <Button {...redirectTo("/som")} color="primary" variant="contained">
+            Try it
+          </Button>
+        </Grid>
       </Grid>
     </Grid>
   </div>
