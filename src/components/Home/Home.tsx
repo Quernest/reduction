@@ -35,6 +35,18 @@ export const Home = withStyles(styles)(({ classes }: IProps) => (
   <div className={classes.root}>
     <div className={classes.wrap}>
       <Grid container={true} alignItems="flex-start" spacing={24}>
+        <Grid item={true} xs={12}>
+          <Typography variant="h5" paragraph={true}>
+            What is "reduction" ?
+          </Typography>
+          <Typography variant="body2" color="textSecondary" paragraph={true}>
+            In statistics, machine learning, and information theory,
+            dimensionality reduction or dimension reduction is the process of
+            reducing the number of random variables under consideration by
+            obtaining a set of principal variables. It can be divided into
+            feature selection and feature extraction.
+          </Typography>
+        </Grid>
         <Grid item={true} xs={12} md={6}>
           <Typography variant="h6" paragraph={true}>
             Principal Component Analysis

@@ -321,7 +321,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
               {(() => {
                 if (uploading || calculating) {
                   return (
-                    <Grid item={true} xs={12}>
+                    <Grid container={true} justify="center" alignItems="center">
                       <CircularProgress className={classes.progress} />
                     </Grid>
                   );
