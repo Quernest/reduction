@@ -347,6 +347,22 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                 if (calculated) {
                   return (
                     <React.Fragment>
+                      <Grid item={true} xs={12}>
+                        <Typography
+                          variant="body2"
+                          color="textSecondary"
+                          paragraph={true}
+                        >
+                          Calculations is ready. Press on the visualize button
+                          if you want represent the dataset.
+                        </Typography>
+                        <Typography variant="body2">
+                          Count of observations: {dataset.length}
+                        </Typography>
+                        <Typography variant="body2" paragraph={true}>
+                          Count of factors: {names.length}
+                        </Typography>
+                      </Grid>
                       <Button
                         variant="contained"
                         color="primary"
@@ -355,28 +371,26 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                       >
                         Visualize
                       </Button>
-                      <Grid item={true} xs={12}>
-                        <Typography variant="subtitle1">
-                          Count of observations: {dataset.length}
-                        </Typography>
-                        <Typography variant="subtitle1">
-                          Count of factors: {names.length}
-                        </Typography>
-                      </Grid>
                       <Grid className={classes.tableBox} item={true} xs={12}>
-                        <Typography variant="h5">Original dataset</Typography>
+                        <Typography variant="title">
+                          Original dataset
+                        </Typography>
                         <OutputTable rows={dataset} columns={names} />
                       </Grid>
                       <Grid className={classes.tableBox} item={true} xs={12}>
-                        <Typography variant="h5">Adjusted dataset</Typography>
+                        <Typography variant="title">
+                          Adjusted dataset
+                        </Typography>
                         <OutputTable rows={adjustedDataset} columns={names} />
                       </Grid>
                       <Grid className={classes.tableBox} item={true} xs={12}>
-                        <Typography variant="h5">Covariation Matrix</Typography>
+                        <Typography variant="title">
+                          Covariation Matrix
+                        </Typography>
                         <OutputTable rows={covariance} columns={names} />
                       </Grid>
                       <Grid className={classes.tableBox} item={true} xs={12}>
-                        <Typography variant="h5" className={classes.h5}>
+                        <Typography variant="title" className={classes.h5}>
                           Eigenanalysis of the Covariation Matrix
                         </Typography>
                         <OutputTable
@@ -386,7 +400,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                         />
                       </Grid>
                       <Grid className={classes.tableBox} item={true} xs={12}>
-                        <Typography variant="h5" className={classes.h5}>
+                        <Typography variant="title" className={classes.h5}>
                           Eigenvectors (component loadings)
                         </Typography>
                         <OutputTable
@@ -399,7 +413,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                         />
                       </Grid>
                       <Grid className={classes.tableBox} item={true} xs={12}>
-                        <Typography variant="h5">
+                        <Typography variant="title">
                           Linear Combinations
                         </Typography>
                         <OutputTable
@@ -418,6 +432,16 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                 if (uploaded) {
                   return (
                     <React.Fragment>
+                      <Grid item={true} xs={12}>
+                        <Typography
+                          variant="body2"
+                          color="textSecondary"
+                          paragraph={true}
+                        >
+                          The dataset is uploaded. Use calculate button for
+                          analysing.
+                        </Typography>
+                      </Grid>
                       <Button
                         variant="contained"
                         color="primary"
