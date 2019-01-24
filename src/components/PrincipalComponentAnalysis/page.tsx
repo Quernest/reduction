@@ -30,6 +30,12 @@ const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
         padding: spacing.unit * 3
       }
     },
+    wrap: {
+      width: "100%",
+      maxWidth: breakpoints.values.md,
+      marginLeft: "auto",
+      marginRight: "auto"
+    },
     grid: {
       [breakpoints.up("md")]: {
         width: breakpoints.values.md
@@ -305,26 +311,17 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
 
       return (
         <div className={classes.root}>
-          <Grid container={true} justify="center">
+          <div className={classes.wrap}>
             <Grid container={true} className={classes.grid}>
               <Grid item={true} xs={12}>
                 <Typography variant="h6" paragraph={true}>
                   Principal Component Analysis
                 </Typography>
               </Grid>
-              <Grid item={true} xs={12}>
-                <Typography
-                  variant="body2"
-                  color="textSecondary"
-                  paragraph={true}
-                >
-                  How to use?
-                </Typography>
-              </Grid>
               {(() => {
                 if (uploading || calculating) {
                   return (
-                    <Grid container={true} justify="center">
+                    <Grid item={true} xs={12}>
                       <CircularProgress className={classes.progress} />
                     </Grid>
                   );
@@ -437,42 +434,53 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                 }
 
                 return (
-                  <Grid item={true} xs={12}>
-                    <input
-                      ref={this.fileInput}
-                      onChange={this.onFileSelectInputChange}
-                      type="file"
-                      multiple={false}
-                      hidden={true}
-                    />
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={this.onChooseFileClick}
-                    >
-                      choose a file
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      className={classes.button}
-                      disabled={!selectedFile}
-                      onClick={this.onFileUpload}
-                    >
-                      Upload
-                      <CloudUploadIcon className={classes.rightIcon} />
-                    </Button>
-                    {selectedFile && (
-                      <Grid item={true} xs={12}>
-                        <Chip
-                          // @ts-ignore: Unreachable code error (same problem with null)
-                          label={selectedFile.name}
-                          onDelete={this.onFileCancel}
-                          className={classes.chip}
-                        />
-                      </Grid>
-                    )}
-                  </Grid>
+                  <React.Fragment>
+                    <Grid item={true} xs={12}>
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        paragraph={true}
+                      >
+                        How to use?
+                      </Typography>
+                    </Grid>
+                    <Grid item={true} xs={12}>
+                      <input
+                        ref={this.fileInput}
+                        onChange={this.onFileSelectInputChange}
+                        type="file"
+                        multiple={false}
+                        hidden={true}
+                      />
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={this.onChooseFileClick}
+                      >
+                        choose a file
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.button}
+                        disabled={!selectedFile}
+                        onClick={this.onFileUpload}
+                      >
+                        Upload
+                        <CloudUploadIcon className={classes.rightIcon} />
+                      </Button>
+                      {selectedFile && (
+                        <Grid item={true} xs={12}>
+                          <Chip
+                            // @ts-ignore: Unreachable code error (same problem with null)
+                            label={selectedFile.name}
+                            onDelete={this.onFileCancel}
+                            className={classes.chip}
+                          />
+                        </Grid>
+                      )}
+                    </Grid>
+                  </React.Fragment>
                 );
               })()}
               {error && (
@@ -481,7 +489,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                 </Typography>
               )}
             </Grid>
-          </Grid>
+          </div>
         </div>
       );
     }

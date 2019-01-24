@@ -24,6 +24,12 @@ const styles = ({ breakpoints }: Theme): StyleRules =>
       [breakpoints.up("md")]: {
         width: breakpoints.values.md
       }
+    },
+    wrap: {
+      width: "100%",
+      maxWidth: breakpoints.values.md,
+      marginLeft: "auto",
+      marginRight: "auto"
     }
   });
 
@@ -35,7 +41,7 @@ export const Header = withStyles(styles)(({ classes }: IProps) => (
   <header className={classes.root}>
     <AppBar position="static">
       <Toolbar>
-        <Grid container={true} justify="center">
+        <div className={classes.wrap}>
           <Grid container={true} alignItems="center" className={classes.grid}>
             <Typography variant="h6" color="inherit" className={classes.grow}>
               Reduction
@@ -50,7 +56,7 @@ export const Header = withStyles(styles)(({ classes }: IProps) => (
               SOM
             </Button>
           </Grid>
-        </Grid>
+        </div>
       </Toolbar>
     </AppBar>
   </header>

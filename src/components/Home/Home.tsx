@@ -19,14 +19,11 @@ const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
         padding: spacing.unit * 3
       }
     },
-    grid: {
-      [breakpoints.up("md")]: {
-        width: breakpoints.values.md
-      }
-    },
-    bigAvatar: {
-      width: 96,
-      height: 96
+    wrap: {
+      width: "100%",
+      maxWidth: breakpoints.values.md,
+      marginLeft: "auto",
+      marginRight: "auto"
     }
   });
 
@@ -36,13 +33,8 @@ interface IProps {
 
 export const Home = withStyles(styles)(({ classes }: IProps) => (
   <div className={classes.root}>
-    <Grid container={true} justify="center">
-      <Grid
-        className={classes.grid}
-        container={true}
-        alignItems="flex-start"
-        spacing={24}
-      >
+    <div className={classes.wrap}>
+      <Grid container={true} alignItems="flex-start" spacing={24}>
         <Grid item={true} xs={12} md={6}>
           <Typography variant="h6" paragraph={true}>
             Principal Component Analysis
@@ -75,6 +67,6 @@ export const Home = withStyles(styles)(({ classes }: IProps) => (
           </Button>
         </Grid>
       </Grid>
-    </Grid>
+    </div>
   </div>
 ));
