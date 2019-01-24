@@ -2,6 +2,7 @@ import { createStyles, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
 import * as React from "react";
+import { IChart } from "src/models/chart.model";
 import { from2D } from "../../utils/transformations";
 
 const styles = createStyles({
@@ -24,21 +25,8 @@ interface IProps {
   classes?: any;
 }
 
-interface IState {
-  fullWidth: number;
-  fullHeight: number;
-  width: number;
-  height: number;
-  margin: {
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-  };
-}
-
 export const Bar = withStyles(styles)(
-  class extends React.Component<IProps, IState> {
+  class extends React.Component<IProps, IChart> {
     /**
      * main svg element
      */
@@ -63,10 +51,10 @@ export const Bar = withStyles(styles)(
       },
       fullWidth: 960,
       fullHeight: 425,
-      get width(): number {
+      get width() {
         return this.fullWidth - this.margin.left - this.margin.right;
       },
-      get height(): number {
+      get height() {
         return this.fullHeight - this.margin.top - this.margin.bottom;
       }
     };

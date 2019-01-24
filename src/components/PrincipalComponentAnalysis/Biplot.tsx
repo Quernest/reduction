@@ -4,6 +4,7 @@ import * as d3 from "d3";
 import size from "lodash/size";
 import * as math from "mathjs";
 import * as React from "react";
+import { IChart } from "src/models/chart.model";
 
 const styles = createStyles({
   root: {
@@ -24,21 +25,8 @@ interface IProps {
   classes?: any;
 }
 
-interface IState {
-  fullWidth: number;
-  fullHeight: number;
-  width: number;
-  height: number;
-  margin: {
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-  };
-}
-
 export const Biplot = withStyles(styles)(
-  class extends React.Component<IProps, IState> {
+  class extends React.Component<IProps, IChart> {
     public readonly state = {
       margin: {
         top: 20,
