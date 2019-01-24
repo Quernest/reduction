@@ -3,8 +3,9 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import {
   Header,
   Home,
+  Page404,
   PrincipalComponentAnalysisPage
-} from "./components/index";
+} from "./components";
 
 /**
  * AppRouter is component which contains all page routes
@@ -19,6 +20,7 @@ export const AppRouter: React.StatelessComponent<{}> = (props: any) => {
         <Switch>
           <Route path="/" exact={true} component={Home} />
           <Route path="/pca" component={PrincipalComponentAnalysisPage} />
+          <Route component={Page404} />
         </Switch>
       </React.Fragment>
     </Router>
