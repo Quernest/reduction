@@ -2,6 +2,7 @@
   "name": "reduction",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://quernest.github.io/projects/reduction",
   "dependencies": {
     "@material-ui/core": "^3.8.1",
     "@material-ui/icons": "^3.0.1",
@@ -19,6 +20,8 @@
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
+    "predeploy": "yarn run build",
+    "deploy": "gh-pages -d build",
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
@@ -31,6 +34,7 @@
     "@types/react": "^16.7.20",
     "@types/react-dom": "^16.0.11",
     "@types/react-router-dom": "^4.3.1",
+    "gh-pages": "^2.0.1",
     "typescript": "^3.2.4",
     "worker-loader": "^2.0.0"
   }
