@@ -2,7 +2,7 @@
   "name": "reduction",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://quernest.github.io/projects/reduction",
+  "homepage": "https://quernest.github.io/reduction",
   "dependencies": {
     "@material-ui/core": "^3.8.1",
     "@material-ui/icons": "^3.0.1",
