@@ -82,7 +82,9 @@ export const Bar = withStyles(styles)(
        * formatted data which represents a collection of objects
        * with provided keys and eigenvalues
        */
-      const data = from2D<IBarData>(combinedData, keys);
+      const data = from2D<IBarData>(combinedData, keys).sort(
+        (a, b) => b.comulative - a.comulative
+      );
 
       this.selectSVGElement();
       this.drawAxes(data);
@@ -103,7 +105,7 @@ export const Bar = withStyles(styles)(
     }
 
     private drawAxes(data: IBarData[]): void {
-      const { width, height } = this.state;
+      const { width, height, margin } = this.state;
 
       this.x = d3
         .scaleBand()
@@ -121,11 +123,33 @@ export const Bar = withStyles(styles)(
         .call(d3.axisBottom(this.x));
 
       this.svg.append("g").call(d3.axisLeft(this.y));
+
+      // y axis label
+      this.svg
+        .append("text")
+        .text("Comulative, %")
+        .attr("transform", "rotate(-90)")
+        .attr("x", 0 - height / 2)
+        .attr("y", 0 - margin.left)
+        .attr("dy", "1em")
+        .style("font-size", 12)
+        .style("text-anchor", "middle");
+
+      // x axis label
+      this.svg
+        .append("text")
+        .text("Dimensions")
+        .attr("x", width / 2)
+        .attr("y", height + margin.bottom)
+        .attr("dy", "1em")
+        .style("font-size", 12)
+        .style("text-anchor", "middle");
     }
 
     private drawBars(data: IBarData[]): void {
       const { height } = this.state;
 
+      // draw bars based on data
       this.svg
         .selectAll(".bar")
         .data(data)
@@ -139,6 +163,60 @@ export const Bar = withStyles(styles)(
         .attr("height", (d: IBarData) => height - this.y(d.comulative));
 
       /**
+       * the line based on the bar data
+       */
+      const line: d3.Line<IBarData> = d3
+        .line<IBarData>()
+        .x(
+          (d: IBarData): number => {
+            const x = this.x(d.component);
+            const bandWidth = this.x.bandwidth();
+
+            if (x && bandWidth) {
+              return x + bandWidth / 2;
+            }
+
+            return 0;
+          }
+        )
+        .y((d: IBarData): number => this.y(d.comulative))
+        .curve(d3.curveMonotoneX);
+
+      // draw the path based on created line
+      this.svg
+        .append("path")
+        .data([data])
+        .attr("fill", "none")
+        .attr("stroke", "red")
+        .attr("stroke-width", 2)
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .attr("d", line);
+
+      // add the scatterplot
+      this.svg
+        .selectAll("dot")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("fill", "red")
+        .attr("r", 3.5)
+        .attr(
+          "cx",
+          (d: IBarData): number => {
+            const x = this.x(d.component);
+            const bandWidth = this.x.bandwidth();
+
+            if (x && bandWidth) {
+              return x + bandWidth / 2;
+            }
+
+            return 0;
+          }
+        )
+        .attr("cy", (d: IBarData): number => this.y(d.comulative));
+
+      /**
        * create the text labels at the top of each bar
        * the label is current component comulative value
        */
@@ -150,7 +228,7 @@ export const Bar = withStyles(styles)(
         .attr("class", "label")
         .attr(
           "x",
-          (d: IBarData): any => {
+          (d: IBarData): number => {
             const x = this.x(d.component);
             const bandWidth = this.x.bandwidth();
 
@@ -158,33 +236,29 @@ export const Bar = withStyles(styles)(
               return x + bandWidth / 2;
             }
 
-            return null;
+            return 0;
           }
         )
-        .attr(
-          "y",
-          (d: IBarData): any => {
-            const dY: number = 12;
-
-            return this.y(d.comulative) - dY;
-          }
-        )
+        .attr("y", (d: IBarData): number => this.y(d.comulative) - 16)
         .attr("dy", ".75em")
-        .style("text-anchor", "middle")
-        .style("font-size", () => {
-          const breakpoint: number = 15;
-          const small: number = 10;
-          const normal: number = 12;
+        .style("text-anchor", "start")
+        .style(
+          "font-size",
+          (): number => {
+            const bp: number = 15;
+            const sm: number = 10;
+            const md: number = 12;
 
-          // change font size depending on the data length
-          if (data.length > breakpoint) {
-            return small;
+            // change font size depending on the data length
+            if (data.length > bp) {
+              return sm;
+            }
+
+            return md;
           }
-
-          return normal;
-        })
+        )
         // display percentage
-        .text((d: IBarData): any => `${d.comulative}%`);
+        .text((d: IBarData): string => `${d.comulative}%`);
     }
 
     public render(): React.ReactNode {
