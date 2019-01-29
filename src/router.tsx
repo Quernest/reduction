@@ -1,11 +1,7 @@
 import * as React from "react";
 import { HashRouter as Router, Route, Switch } from "react-router-dom";
-import {
-  Header,
-  Home,
-  Page404,
-  PrincipalComponentAnalysisPage
-} from "./components";
+import { Header } from "./components";
+import { Home, Page404, PrincipalComponentAnalysisPage } from "./pages";
 
 /**
  * AppRouter is component which contains all page routes

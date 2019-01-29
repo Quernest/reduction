@@ -1,1 +1,3 @@
-export * from "./page";
+export * from "./Bar";
+export * from "./Biplot";
+export * from "./pca";

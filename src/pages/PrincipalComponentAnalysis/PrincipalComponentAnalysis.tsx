@@ -14,12 +14,11 @@ import isEmpty from "lodash/isEmpty";
 import map from "lodash/map";
 import * as math from "mathjs";
 import * as React from "react";
+import { Bar, Biplot } from "src/components/PrincipalComponentAnalysis";
 import { IPCACalculations } from "src/models/pca.model";
-import CalculateWorker from "worker-loader!./calculate.worker";
-import UploadWorker from "worker-loader!./upload.worker";
-import { OutputTable } from "../Tables";
-import { Bar } from "./Bar";
-import { Biplot } from "./Biplot";
+import CalculateWorker from "worker-loader!src/components/PrincipalComponentAnalysis/calculate.worker";
+import UploadWorker from "worker-loader!src/components/PrincipalComponentAnalysis/upload.worker";
+import { OutputTable } from "../../components/Tables";
 
 const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
   createStyles({
