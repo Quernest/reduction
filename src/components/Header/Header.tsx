@@ -20,11 +20,6 @@ const styles = ({ breakpoints }: Theme): StyleRules =>
     grow: {
       flexGrow: 1
     },
-    grid: {
-      [breakpoints.up("md")]: {
-        width: breakpoints.values.md
-      }
-    },
     wrap: {
       width: "100%",
       maxWidth: breakpoints.values.md,
@@ -42,7 +37,7 @@ export const Header = withStyles(styles)(({ classes }: IProps) => (
     <AppBar position="static">
       <Toolbar>
         <div className={classes.wrap}>
-          <Grid container={true} alignItems="center" className={classes.grid}>
+          <Grid container={true} alignItems="center">
             <Typography variant="h6" color="inherit" className={classes.grow}>
               Reduction
             </Typography>

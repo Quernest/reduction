@@ -18,7 +18,7 @@ import { Bar, Biplot } from "src/components/PrincipalComponentAnalysis";
 import { IPCACalculations } from "src/models/pca.model";
 import CalculateWorker from "worker-loader!src/components/PrincipalComponentAnalysis/calculate.worker";
 import UploadWorker from "worker-loader!src/components/PrincipalComponentAnalysis/upload.worker";
-import { OutputTable } from "../../components/Tables";
+import { OutputTable } from "../components/Tables";
 
 const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
   createStyles({
