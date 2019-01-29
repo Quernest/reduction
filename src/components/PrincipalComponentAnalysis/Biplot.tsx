@@ -2,7 +2,6 @@ import { createStyles, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
 import size from "lodash/size";
-import * as math from "mathjs";
 import * as React from "react";
 import { IChart } from "src/models/chart.model";
 
@@ -92,8 +91,8 @@ export const Biplot = withStyles(styles)(
         .scaleLinear()
         .rangeRound([0, width])
         .domain([
-          -d3.max(points, (d: IPoint): any => math.abs(d.x)),
-          d3.max(points, (d: IPoint): any => math.abs(d.x))
+          -d3.max(points, (d: IPoint): any => Math.abs(d.x)),
+          d3.max(points, (d: IPoint): any => Math.abs(d.x))
         ]);
 
       const xAxis = d3.axisBottom(xScale);
@@ -102,8 +101,8 @@ export const Biplot = withStyles(styles)(
         .scaleLinear()
         .rangeRound([0, height])
         .domain([
-          d3.max(points, (d: IPoint): any => math.abs(d.y)),
-          -d3.max(points, (d: IPoint): any => math.abs(d.y))
+          d3.max(points, (d: IPoint): any => Math.abs(d.y)),
+          -d3.max(points, (d: IPoint): any => Math.abs(d.y))
         ]);
 
       const yAxis = d3.axisLeft(yScale);
@@ -119,7 +118,7 @@ export const Biplot = withStyles(styles)(
         .attr("x", 0 - height / 2)
         .attr("y", 0 - margin.left)
         .attr("dy", "1em")
-        .style("font-size", 12)
+        .style("font-size", "12px")
         .style("text-anchor", "middle")
         .attr("transform", "rotate(-90)");
 
@@ -134,7 +133,7 @@ export const Biplot = withStyles(styles)(
         .attr("x", width / 2)
         .attr("y", height + margin.bottom)
         .attr("dy", "-1em")
-        .style("font-size", 12)
+        .style("font-size", "12px")
         .style("text-anchor", "middle");
 
       this.svg
@@ -152,8 +151,8 @@ export const Biplot = withStyles(styles)(
         .data(points)
         .enter()
         .append("circle")
-        .attr("cx", (d: IPoint): any => this.x(d.x))
-        .attr("cy", (d: IPoint): any => this.y(d.y))
+        .attr("cx", (d: IPoint): number => this.x(d.x))
+        .attr("cy", (d: IPoint): number => this.y(d.y))
         .attr("r", 2)
         .attr("fill", "red");
     }

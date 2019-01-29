@@ -132,7 +132,7 @@ export const Bar = withStyles(styles)(
         .attr("x", 0 - height / 2)
         .attr("y", 0 - margin.left)
         .attr("dy", "1em")
-        .style("font-size", 12)
+        .style("font-size", "12px")
         .style("text-anchor", "middle");
 
       // x axis label
@@ -142,7 +142,7 @@ export const Bar = withStyles(styles)(
         .attr("x", width / 2)
         .attr("y", height + margin.bottom)
         .attr("dy", "1em")
-        .style("font-size", 12)
+        .style("font-size", "12px")
         .style("text-anchor", "middle");
     }
 
@@ -244,17 +244,17 @@ export const Bar = withStyles(styles)(
         .style("text-anchor", "start")
         .style(
           "font-size",
-          (): number => {
+          (): string => {
             const bp: number = 15;
             const sm: number = 10;
             const md: number = 12;
 
             // change font size depending on the data length
             if (data.length > bp) {
-              return sm;
+              return `${sm}px`;
             }
 
-            return md;
+            return `${md}px`;
           }
         )
         // display percentage
