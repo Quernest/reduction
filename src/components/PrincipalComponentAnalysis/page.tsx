@@ -17,9 +17,9 @@ import * as React from "react";
 import { IPCACalculations } from "src/models/pca.model";
 import CalculateWorker from "worker-loader!./calculate.worker";
 import UploadWorker from "worker-loader!./upload.worker";
+import { OutputTable } from "../Tables";
 import { Bar } from "./Bar";
 import { Biplot } from "./Biplot";
-import { OutputTable } from "./Table";
 
 const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
   createStyles({
