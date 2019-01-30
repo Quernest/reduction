@@ -8,7 +8,7 @@ import cov from "compute-covariance";
 import numeric from "numeric";
 
 // utility library delivering modularity, performance & extras.
-import assign from "lodash/assign";
+// import assign from "lodash/assign";
 import head from "lodash/head";
 import isArray from "lodash/isArray";
 import isEmpty from "lodash/isEmpty";
@@ -23,7 +23,7 @@ import sum from "lodash/sum";
 import { IPCA } from "src/models/pca.model";
 
 // helpers
-import { opposite } from "../../utils/numbers";
+// import { opposite } from "../../utils/numbers";
 import { from2D, to2D } from "../../utils/transformations";
 
 try {
@@ -156,13 +156,15 @@ export class PCA implements IPCA {
     const matrix = math.matrix(covariance);
     const eigens = math.eval(`eig(${matrix.toString()})`);
 
-    // opposite eigenvectors direction because they are wrong
-    return assign(eigens, {
-      E: {
-        x: opposite(eigens.E.x),
-        y: opposite(eigens.E.y)
-      }
-    });
+    return eigens;
+
+    // you can opposite eigenvectors direction if they are wrong
+    // return assign(eigens, {
+    //   E: {
+    //     x: opposite(eigens.E.x),
+    //     y: opposite(eigens.E.y)
+    //   }
+    // });
   }
 
   /**

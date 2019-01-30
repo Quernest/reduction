@@ -1,6 +1,7 @@
 import { createStyles, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
+import round from "lodash/round";
 import size from "lodash/size";
 import * as React from "react";
 import { IChart } from "src/models/chart.model";
@@ -20,10 +21,13 @@ interface IPoint {
 interface IProps {
   points: IPoint[];
   eigenvectors: number[][];
-  axes: string[];
+  names: string[];
   classes?: any;
 }
 
+/**
+ * Biplot of score variables
+ */
 export const Biplot = withStyles(styles)(
   class extends React.Component<IProps, IChart> {
     public readonly state = {
@@ -42,33 +46,33 @@ export const Biplot = withStyles(styles)(
         return this.fullHeight - this.margin.top - this.margin.bottom;
       }
     };
-    /**
-     * main svg element
-     */
+
     private svg: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
-    /**
-     * x axis
-     */
     private x: d3.ScaleLinear<number, number>;
-
-    /**
-     * y axis
-     */
     private y: d3.ScaleLinear<number, number>;
 
-    public componentDidMount() {
-      const { points, eigenvectors, axes } = this.props;
+    private xAxis: d3.Axis<
+      | number
+      | {
+          valueOf(): number;
+        }
+    >;
 
-      // 2D only
-      if (size(axes) > 2) {
-        return;
-      }
+    private yAxis: d3.Axis<
+      | number
+      | {
+          valueOf(): number;
+        }
+    >;
+
+    public componentDidMount() {
+      const { points, eigenvectors, names } = this.props;
 
       this.selectSVGElement();
-      this.drawAxes(points, axes);
+      this.drawAxes(points);
       this.drawPoints(points);
-      this.drawVectors(eigenvectors);
+      this.drawVectors(eigenvectors, names);
     }
 
     private selectSVGElement(): void {
@@ -84,10 +88,10 @@ export const Biplot = withStyles(styles)(
         .attr("transform", `translate(${margin.left},${margin.top})`);
     }
 
-    private drawAxes(points: IPoint[], axes: string[]): void {
+    private drawAxes(points: IPoint[]): void {
       const { width, height, margin } = this.state;
 
-      const xScale = d3
+      this.x = d3
         .scaleLinear()
         .rangeRound([0, width])
         .domain([
@@ -95,9 +99,9 @@ export const Biplot = withStyles(styles)(
           d3.max(points, (d: IPoint): any => Math.abs(d.x))
         ]);
 
-      const xAxis = d3.axisBottom(xScale);
+      this.xAxis = d3.axisBottom(this.x);
 
-      const yScale = d3
+      this.y = d3
         .scaleLinear()
         .rangeRound([0, height])
         .domain([
@@ -105,16 +109,21 @@ export const Biplot = withStyles(styles)(
           -d3.max(points, (d: IPoint): any => Math.abs(d.y))
         ]);
 
-      const yAxis = d3.axisLeft(yScale);
+      this.yAxis = d3.axisLeft(this.y);
 
       this.svg
         .append("g")
         .attr("transform", `translate(0, ${height / 2})`)
-        .call(xAxis);
+        .call(this.xAxis);
+
+      this.svg
+        .append("g")
+        .attr("transform", `translate(${width / 2}, 0)`)
+        .call(this.yAxis);
 
       this.svg
         .append("text")
-        .text(axes[1])
+        .text("Component 2")
         .attr("x", 0 - height / 2)
         .attr("y", 0 - margin.left)
         .attr("dy", "1em")
@@ -123,13 +132,8 @@ export const Biplot = withStyles(styles)(
         .attr("transform", "rotate(-90)");
 
       this.svg
-        .append("g")
-        .attr("transform", `translate(${width / 2}, 0)`)
-        .call(yAxis);
-
-      this.svg
         .append("text")
-        .text(axes[0])
+        .text("Component 1")
         .attr("x", width / 2)
         .attr("y", height + margin.bottom)
         .attr("dy", "-1em")
@@ -140,9 +144,6 @@ export const Biplot = withStyles(styles)(
         .selectAll(".tick")
         .filter(d => d === 0)
         .remove();
-
-      this.x = xScale;
-      this.y = yScale;
     }
 
     private drawPoints(points: IPoint[]): void {
@@ -157,7 +158,9 @@ export const Biplot = withStyles(styles)(
         .attr("fill", "red");
     }
 
-    private drawVectors(eigenvectors: number[][]): void {
+    private drawVectors(eigenvectors: number[][], names: string[]): void {
+      const getColumn = (arr: number[][], n: number) => arr.map(x => x[n]);
+
       const defs = this.svg.append("defs");
       const marker = defs
         .append("marker")
@@ -172,33 +175,60 @@ export const Biplot = withStyles(styles)(
 
       marker.append("path").attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2");
 
-      this.svg
-        .append("line")
-        .style("stroke", "#000")
-        .style("stroke-width", 1.5)
-        .attr("x1", this.x(-eigenvectors[0][0]))
-        .attr("y1", this.y(-eigenvectors[1][0]))
-        .attr("x2", this.x(eigenvectors[0][0]))
-        .attr("y2", this.y(eigenvectors[1][0]))
-        .attr("marker-end", "url(#arrow)");
-      this.svg
-        .append("line")
-        .style("stroke", "#000")
-        .style("stroke-width", 1.5)
-        .attr("x1", this.x(-eigenvectors[0][1]))
-        .attr("y1", this.y(-eigenvectors[1][1]))
-        .attr("x2", this.x(eigenvectors[0][1]))
-        .attr("y2", this.y(eigenvectors[1][1]))
-        .attr("marker-end", "url(#arrow)");
+      /**
+       * collection of x values
+       */
+      const xs: number[] = getColumn(eigenvectors, 0);
+
+      /**
+       * collection of y values
+       */
+      const ys: number[] = getColumn(eigenvectors, 1);
+
+      // if xs and ys are the same length
+      if (size(xs) === size(ys)) {
+        // plot the eigenvectors
+        xs.forEach((value: number, i: number) => {
+          /**
+           * current x value
+           */
+          const x: number = round(value, 3);
+
+          /**
+           * current y value
+           */
+          const y: number = round(ys[i], 3);
+
+          /**
+           * current variable
+           */
+          const variable: string = names[i];
+
+          // plot the vector
+          this.svg
+            .append("line")
+            .style("stroke", "#000")
+            .style("stroke-width", 1.5)
+            .attr("x1", this.x(0))
+            .attr("y1", this.y(0))
+            .attr("x2", this.x(x))
+            .attr("y2", this.y(y))
+            .attr("marker-end", "url(#arrow)");
+
+          this.svg
+            .append("text")
+            .attr("x", this.x(x))
+            .attr("y", this.y(y))
+            .attr("text-anchor", "middle")
+            .style("font-size", "12px")
+            .style("font-weight", "bold")
+            .text(`${variable} (${x}, ${y})`);
+        });
+      }
     }
 
     public render() {
-      const { axes, classes } = this.props;
-
-      // 2D only
-      if (size(axes) > 2) {
-        return null;
-      }
+      const { classes } = this.props;
 
       return (
         <div className={classes.root}>

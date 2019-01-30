@@ -330,9 +330,9 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                   return (
                     <>
                       <Biplot
-                        points={points}
                         eigenvectors={eigens.E.x}
-                        axes={names}
+                        names={names}
+                        points={points}
                       />
                       <Bar
                         eigenvalues={eigens.lambda.x}
