@@ -354,7 +354,6 @@ export const Biplot = withStyles(styles)(
             .attr("y2", this.y(y * k))
             .attr("marker-end", "url(#arrow)");
 
-          // todo: align by vector angle
           this.view
             .append("text")
             .attr("class", "variable")
