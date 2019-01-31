@@ -329,6 +329,19 @@ export const Biplot = withStyles(styles)(
            */
           const variable: string = names[i];
 
+          /**
+           * angle of current vector
+           */
+          const angle: number =
+            (Math.atan2(this.y(y * k) - this.y(0), this.x(x * k) - this.x(0)) *
+              180) /
+            Math.PI;
+
+          /**
+           * distance from the end of arrow to the text (variable)
+           */
+          const deviation: number = angle >= 0 ? 12 : -6;
+
           // plot the vector
           this.view
             .append("line")
@@ -345,10 +358,12 @@ export const Biplot = withStyles(styles)(
           this.view
             .append("text")
             .attr("class", "variable")
-            .attr("x", this.x(x * k))
-            .attr("y", this.y(y * k))
             .attr("text-anchor", "middle")
             .style("font-size", "12px")
+            .attr(
+              "transform",
+              `translate(${this.x(x * k)},${this.y(y * k) + deviation})`
+            )
             .text(variable);
         });
       }
