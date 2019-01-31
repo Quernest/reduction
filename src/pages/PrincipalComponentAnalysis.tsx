@@ -405,11 +405,19 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                           Eigenvectors (component loadings)
                         </Typography>
                         <OutputTable
-                          rows={math.transpose(eigens.E.x) as number[][]}
-                          columns={map(
+                          rows={[
                             names,
-                            (name: string, index: number): string =>
-                              `PC${index + 1} (${name})`
+                            ...(math.transpose(eigens.E.x) as number[][])
+                          ]}
+                          columns={map(
+                            ["Loadings", ...names],
+                            (name: string, index: number): string => {
+                              if (index === 0) {
+                                return "Loadings";
+                              }
+
+                              return `PC${index}`;
+                            }
                           )}
                         />
                       </Grid>

@@ -15,6 +15,7 @@ import TableRow from "@material-ui/core/TableRow";
 import head from "lodash/head";
 import isArray from "lodash/isArray";
 import isEmpty from "lodash/isEmpty";
+import isNumber from "lodash/isNumber";
 import isObject from "lodash/isObject";
 import keys from "lodash/keys";
 import map from "lodash/map";
@@ -137,7 +138,7 @@ export const OutputTable = withStyles(styles)(
                       {enumerateSymbol}
                     </CustomTableCell>
                   )}
-                  {columns.map((column, index) => (
+                  {columns.map((column: string, index: number) => (
                     <CustomTableCell key={index} align="right">
                       {column}
                     </CustomTableCell>
@@ -159,9 +160,17 @@ export const OutputTable = withStyles(styles)(
                         if (key !== "index") {
                           return (
                             <TableCell key={index} align="right">
-                              {row[key].length > 3
-                                ? row[key]
-                                : round(row[key], 3)}
+                              {(() => {
+                                // round long numbers
+                                if (
+                                  isNumber(row[key]) &&
+                                  String(row[key]).replace(".", "").length > 3
+                                ) {
+                                  return round(row[key], 3);
+                                }
+
+                                return row[key];
+                              })()}
                             </TableCell>
                           );
                         }
