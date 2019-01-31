@@ -65,6 +65,22 @@ export const Biplot = withStyles(styles)(
     private svg: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
     /**
+     * zoom listener
+     */
+    private zoom: d3.ZoomBehavior<Element, {}>;
+
+    /**
+     * clip-path (wrapper for view)
+     */
+    private clip: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+
+    /**
+     * group element for zooming
+     * append here translating elements
+     */
+    private view: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+
+    /**
      * x linear scale
      */
     private x: d3.ScaleLinear<number, number>;
@@ -81,15 +97,10 @@ export const Biplot = withStyles(styles)(
     private axisRight: d3.Axis<number | { valueOf(): number }>;
 
     // axes g (group) elements
-    private gAxisTop: any;
-    private gAxisBottom: any;
-    private gAxisLeft: any;
-    private gAxisRight: any;
-
-    /**
-     * group element for zooming
-     */
-    private view: any;
+    private gAxisTop: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+    private gAxisBottom: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+    private gAxisLeft: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+    private gAxisRight: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
     public componentDidMount() {
       const { points, eigenvectors, names } = this.props;
@@ -125,29 +136,39 @@ export const Biplot = withStyles(styles)(
     };
 
     private selectSVGElement(): void {
-      const { width, height, fullWidth, fullHeight, margin } = this.state;
+      const { fullWidth, fullHeight, margin } = this.state;
 
-      const zoom = d3
+      this.zoom = d3
         .zoom()
-        .scaleExtent([1, Infinity])
-        .translateExtent([[0, 0], [width, height]])
-        .extent([[0, 0], [width, height]])
+        .scaleExtent([1, 3])
+        // .translateExtent([[0, 0], [this.state.width, this.state.height]])
+        // .extent([[0, 0], [this.state.width, this.state.height]])
         .on("zoom", this.onZoom);
 
       this.svg = d3
         .select("#biplot")
         .attr("viewBox", `0 0 ${fullWidth} ${fullHeight}`)
         .attr("preserveAspectRatio", "xMinYMin meet")
-        .call(zoom)
+        .call(this.zoom)
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-      this.view = this.svg.append("g").attr("class", "view");
+      /**
+       * append group with clip-path
+       */
+      this.clip = this.svg.append("g").attr("clip-path", "url(#clip)");
+
+      /**
+       * append view
+       */
+      this.view = this.clip.append("g").attr("pointer-events", "all");
     }
 
     private createDefs(): void {
+      const { width, height } = this.state;
       const defs = this.svg.append("defs");
 
+      // append markers for vectors
       const marker = defs
         .append("marker")
         .attr("id", "arrow")
@@ -160,6 +181,14 @@ export const Biplot = withStyles(styles)(
         .attr("orient", "auto");
 
       marker.append("path").attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2");
+
+      // append clip-path
+      defs
+        .append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("width", width)
+        .attr("height", height);
     }
 
     private drawAxes(points: IPoint[]): void {
@@ -189,7 +218,6 @@ export const Biplot = withStyles(styles)(
       // svg element of left axis
       this.gAxisLeft = this.svg
         .append("g")
-        .attr("class", "axis axis--left")
         .attr("transform", `translate(0, 0)`)
         .call(this.axisLeft);
 
@@ -199,7 +227,6 @@ export const Biplot = withStyles(styles)(
       // svg element of top axis
       this.gAxisTop = this.svg
         .append("g")
-        .attr("class", "axis axis--top")
         .attr("transform", `translate(0, 0)`)
         .call(this.axisTop);
 
@@ -209,7 +236,6 @@ export const Biplot = withStyles(styles)(
       // svg element of right axis
       this.gAxisRight = this.svg
         .append("g")
-        .attr("class", "axis axis--right")
         .attr("transform", `translate(${width}, 0)`)
         .call(this.axisRight);
 
@@ -219,7 +245,6 @@ export const Biplot = withStyles(styles)(
       // svg element of bottom axis
       this.gAxisBottom = this.svg
         .append("g")
-        .attr("class", "axis axis--bottom")
         .attr("transform", `translate(0, ${height})`)
         .call(this.axisBottom);
 
@@ -245,6 +270,11 @@ export const Biplot = withStyles(styles)(
         .style("text-anchor", "middle");
     }
 
+    /**
+     * draw points on 2d scatter
+     * @param points points for scatter plot
+     * @param k zooming coeff
+     */
     private drawPoints(points: IPoint[], k: number = 1): void {
       this.view
         .selectAll("circle.point")
@@ -258,13 +288,18 @@ export const Biplot = withStyles(styles)(
         .attr("fill", "red");
     }
 
+    /**
+     * draw eigenvectors (component loadings)
+     * @param eigenvectors array of eigenvectors
+     * @param names factor names
+     * @param k zooming coeff
+     */
     private drawVectors(
       eigenvectors: number[][],
       names: string[],
       k: number = 1
     ): void {
       const getColumn = (arr: number[][], n: number) => arr.map(x => x[n]);
-
       /**
        * collection of x values
        */
