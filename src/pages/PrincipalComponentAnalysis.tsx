@@ -330,11 +330,13 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                   return (
                     <>
                       <Biplot
+                        title="Biplot of score variables"
                         eigenvectors={eigens.E.x}
                         names={names}
                         points={points}
                       />
                       <Bar
+                        title="Scree plot of eigenvalues"
                         eigenvalues={eigens.lambda.x}
                         names={names}
                         analysis={analysis}

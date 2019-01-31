@@ -19,6 +19,7 @@ interface IBarData {
 }
 
 interface IProps {
+  title?: string;
   eigenvalues: number[];
   names: string[];
   analysis: number[];
@@ -44,10 +45,10 @@ export const Bar = withStyles(styles)(
 
     public readonly state = {
       margin: {
-        top: 20,
-        right: 20,
-        bottom: 30,
-        left: 40
+        top: 50,
+        right: 50,
+        bottom: 50,
+        left: 50
       },
       fullWidth: 960,
       fullHeight: 425,
@@ -136,14 +137,14 @@ export const Bar = withStyles(styles)(
         .style("text-anchor", "middle");
 
       // x axis label
-      this.svg
-        .append("text")
-        .text("Dimensions")
-        .attr("x", width / 2)
-        .attr("y", height + margin.bottom)
-        .attr("dy", "1em")
-        .style("font-size", "12px")
-        .style("text-anchor", "middle");
+      // this.svg
+      //   .append("text")
+      //   .text("Dimensions")
+      //   .attr("x", width / 2)
+      //   .attr("y", height + margin.bottom)
+      //   .attr("dy", "1em")
+      //   .style("font-size", "12px")
+      //   .style("text-anchor", "middle");
     }
 
     private drawBars(data: IBarData[]): void {
@@ -262,13 +263,15 @@ export const Bar = withStyles(styles)(
     }
 
     public render(): React.ReactNode {
-      const { classes } = this.props;
+      const { classes, title } = this.props;
 
       return (
         <div className={classes.root}>
-          <Typography variant="h6" paragraph={true}>
-            Bar Chart
-          </Typography>
+          {title && (
+            <Typography variant="h6" paragraph={true}>
+              {title}
+            </Typography>
+          )}
           <svg id="bar" />
         </div>
       );
