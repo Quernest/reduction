@@ -7,8 +7,20 @@ import { IChart } from "src/models/chart.model";
 
 const styles = createStyles({
   root: {
-    height: "auto",
     width: "100%"
+  },
+  svgContainer: {
+    position: "relative",
+    height: 0,
+    width: "100%",
+    padding: 0 // reset
+  },
+  svg: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%"
   }
 });
 
@@ -68,26 +80,86 @@ export const Biplot = withStyles(styles)(
     private axisLeft: d3.Axis<number | { valueOf(): number }>;
     private axisRight: d3.Axis<number | { valueOf(): number }>;
 
+    // axes g (group) elements
+    private gAxisTop: any;
+    private gAxisBottom: any;
+    private gAxisLeft: any;
+    private gAxisRight: any;
+
+    /**
+     * group element for zooming
+     */
+    private view: any;
+
     public componentDidMount() {
       const { points, eigenvectors, names } = this.props;
 
       this.selectSVGElement();
+      this.createDefs();
       this.drawAxes(points);
       this.drawPoints(points);
       this.drawVectors(eigenvectors, names);
     }
 
+    private onZoom = () => {
+      const { eigenvectors, names } = this.props;
+      const { transform } = d3.event;
+
+      // update view
+      this.view.attr("transform", transform);
+
+      // update x axes
+      this.gAxisTop.call(this.axisTop.scale(transform.rescaleX(this.x)));
+      this.gAxisBottom.call(this.axisBottom.scale(transform.rescaleX(this.x)));
+
+      // update y axes
+      this.gAxisLeft.call(this.axisLeft.scale(transform.rescaleY(this.y)));
+      this.gAxisRight.call(this.axisRight.scale(transform.rescaleY(this.y)));
+
+      // remove previous created elements
+      this.svg.selectAll("line.vector").remove();
+      this.svg.selectAll("text.variable").remove();
+
+      // redraw elemenets
+      this.drawVectors(eigenvectors, names, transform.k);
+    };
+
     private selectSVGElement(): void {
-      const { fullWidth, fullHeight, margin } = this.state;
+      const { width, height, fullWidth, fullHeight, margin } = this.state;
+
+      const zoom = d3
+        .zoom()
+        .scaleExtent([1, Infinity])
+        .translateExtent([[0, 0], [width, height]])
+        .extent([[0, 0], [width, height]])
+        .on("zoom", this.onZoom);
 
       this.svg = d3
         .select("#biplot")
-        .attr("width", "100%")
-        .attr("height", "100%")
         .attr("viewBox", `0 0 ${fullWidth} ${fullHeight}`)
         .attr("preserveAspectRatio", "xMinYMin meet")
+        .call(zoom)
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      this.view = this.svg.append("g").attr("class", "view");
+    }
+
+    private createDefs(): void {
+      const defs = this.svg.append("defs");
+
+      const marker = defs
+        .append("marker")
+        .attr("id", "arrow")
+        .attr("markerUnits", "strokeWidth")
+        .attr("markerWidth", 12)
+        .attr("markerHeight", 12)
+        .attr("viewBox", "0 0 12 12")
+        .attr("refX", 6)
+        .attr("refY", 6)
+        .attr("orient", "auto");
+
+      marker.append("path").attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2");
     }
 
     private drawAxes(points: IPoint[]): void {
@@ -115,8 +187,9 @@ export const Biplot = withStyles(styles)(
       this.axisLeft = d3.axisLeft(this.y);
 
       // svg element of left axis
-      this.svg
+      this.gAxisLeft = this.svg
         .append("g")
+        .attr("class", "axis axis--left")
         .attr("transform", `translate(0, 0)`)
         .call(this.axisLeft);
 
@@ -124,8 +197,9 @@ export const Biplot = withStyles(styles)(
       this.axisTop = d3.axisTop(this.x);
 
       // svg element of top axis
-      this.svg
+      this.gAxisTop = this.svg
         .append("g")
+        .attr("class", "axis axis--top")
         .attr("transform", `translate(0, 0)`)
         .call(this.axisTop);
 
@@ -133,8 +207,9 @@ export const Biplot = withStyles(styles)(
       this.axisRight = d3.axisRight(this.y);
 
       // svg element of right axis
-      this.svg
+      this.gAxisRight = this.svg
         .append("g")
+        .attr("class", "axis axis--right")
         .attr("transform", `translate(${width}, 0)`)
         .call(this.axisRight);
 
@@ -142,8 +217,9 @@ export const Biplot = withStyles(styles)(
       this.axisBottom = d3.axisBottom(this.x);
 
       // svg element of bottom axis
-      this.svg
+      this.gAxisBottom = this.svg
         .append("g")
+        .attr("class", "axis axis--bottom")
         .attr("transform", `translate(0, ${height})`)
         .call(this.axisBottom);
 
@@ -164,39 +240,30 @@ export const Biplot = withStyles(styles)(
         .text("Component 1")
         .attr("x", width / 2)
         .attr("y", height + margin.bottom)
-        .attr("dy", "-1em")
+        .attr("dy", "-0.75em")
         .style("font-size", "12px")
         .style("text-anchor", "middle");
     }
 
-    private drawPoints(points: IPoint[]): void {
-      this.svg
-        .selectAll("circle")
+    private drawPoints(points: IPoint[], k: number = 1): void {
+      this.view
+        .selectAll("circle.point")
         .data(points)
         .enter()
         .append("circle")
-        .attr("cx", (d: IPoint): number => this.x(d.x))
-        .attr("cy", (d: IPoint): number => this.y(d.y))
-        .attr("r", 2)
+        .attr("class", "point")
+        .attr("cx", (d: IPoint): number => this.x(d.x * k))
+        .attr("cy", (d: IPoint): number => this.y(d.y * k))
+        .attr("r", 2 * k)
         .attr("fill", "red");
     }
 
-    private drawVectors(eigenvectors: number[][], names: string[]): void {
+    private drawVectors(
+      eigenvectors: number[][],
+      names: string[],
+      k: number = 1
+    ): void {
       const getColumn = (arr: number[][], n: number) => arr.map(x => x[n]);
-
-      const defs = this.svg.append("defs");
-      const marker = defs
-        .append("marker")
-        .attr("id", "arrow")
-        .attr("markerUnits", "strokeWidth")
-        .attr("markerWidth", 12)
-        .attr("markerHeight", 12)
-        .attr("viewBox", "0 0 12 12")
-        .attr("refX", 6)
-        .attr("refY", 6)
-        .attr("orient", "auto");
-
-      marker.append("path").attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2");
 
       /**
        * collection of x values
@@ -225,33 +292,36 @@ export const Biplot = withStyles(styles)(
           /**
            * current variable
            */
-          // const variable: string = names[i];
+          const variable: string = names[i];
 
           // plot the vector
-          this.svg
+          this.view
             .append("line")
+            .attr("class", "vector")
             .style("stroke", "#000")
             .style("stroke-width", 1.5)
             .attr("x1", this.x(0))
             .attr("y1", this.y(0))
-            .attr("x2", this.x(x))
-            .attr("y2", this.y(y))
+            .attr("x2", this.x(x * k))
+            .attr("y2", this.y(y * k))
             .attr("marker-end", "url(#arrow)");
 
-          // create label
-          // this.svg
-          //   .append("text")
-          //   .attr("x", this.x(x))
-          //   .attr("y", this.y(y))
-          //   .attr("text-anchor", "middle")
-          //   .style("font-size", "10px")
-          //   .text(variable);
+          // todo: align by vector angle
+          this.view
+            .append("text")
+            .attr("class", "variable")
+            .attr("x", this.x(x * k))
+            .attr("y", this.y(y * k))
+            .attr("text-anchor", "middle")
+            .style("font-size", "12px")
+            .text(variable);
         });
       }
     }
 
     public render() {
       const { classes, title } = this.props;
+      const { fullWidth, fullHeight } = this.state;
 
       return (
         <div className={classes.root}>
@@ -260,7 +330,12 @@ export const Biplot = withStyles(styles)(
               {title}
             </Typography>
           )}
-          <svg id="biplot" />
+          <div
+            className={classes.svgContainer}
+            style={{ paddingBottom: `${(fullHeight / fullWidth) * 100}%` }}
+          >
+            <svg className={classes.svg} id="biplot" />
+          </div>
         </div>
       );
     }

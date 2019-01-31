@@ -7,8 +7,20 @@ import { from2D } from "../../utils/transformations";
 
 const styles = createStyles({
   root: {
-    height: "auto",
     width: "100%"
+  },
+  svgContainer: {
+    position: "relative",
+    height: 0,
+    width: "100%",
+    padding: 0 // reset
+  },
+  svg: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%"
   }
 });
 
@@ -264,6 +276,7 @@ export const Bar = withStyles(styles)(
 
     public render(): React.ReactNode {
       const { classes, title } = this.props;
+      const { fullWidth, fullHeight } = this.state;
 
       return (
         <div className={classes.root}>
@@ -272,7 +285,12 @@ export const Bar = withStyles(styles)(
               {title}
             </Typography>
           )}
-          <svg id="bar" />
+          <div
+            className={classes.svgContainer}
+            style={{ paddingBottom: `${(fullHeight / fullWidth) * 100}%` }}
+          >
+            <svg className={classes.svg} id="bar" />
+          </div>
         </div>
       );
     }
