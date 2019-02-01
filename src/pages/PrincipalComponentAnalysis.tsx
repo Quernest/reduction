@@ -14,7 +14,11 @@ import isEmpty from "lodash/isEmpty";
 import map from "lodash/map";
 import * as math from "mathjs";
 import * as React from "react";
-import { Bar, Biplot } from "src/components/PrincipalComponentAnalysis";
+import {
+  Bar,
+  Biplot,
+  SelectComponent
+} from "src/components/PrincipalComponentAnalysis";
 import { IVector } from "src/models/chart.model";
 import { IPCACalculations } from "src/models/pca.model";
 import { getMatrixColumn } from "src/utils/numbers";
@@ -47,7 +51,7 @@ const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
       margin: spacing.unit
     },
     btnVisualize: {
-      marginBottom: spacing.unit * 2
+      // marginBottom: spacing.unit * 2
     },
     rightIcon: {
       marginLeft: spacing.unit
@@ -79,6 +83,11 @@ interface IState {
   uploading: boolean;
   uploaded: boolean;
   error?: string;
+  // for SelectComponent children element
+  x: number;
+  y: number;
+  // for select component (dynamic property)
+  [x: number]: number;
 }
 
 export const PrincipalComponentAnalysisPage = withStyles(styles)(
@@ -110,7 +119,9 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
       calculated: false,
       uploading: false,
       uploaded: false,
-      error: ""
+      error: "",
+      x: 0,
+      y: 1
     };
 
     /**
@@ -288,6 +299,14 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
       this.calculateWorker = new CalculateWorker();
     };
 
+    private onSelectChange = (event: any): void => {
+      const { name, value } = event.target;
+
+      this.setState({
+        [name]: Number(value)
+      });
+    };
+
     public render() {
       const { classes } = this.props;
       const {
@@ -299,7 +318,9 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
         selectedFile,
         dataset,
         calculations,
-        error
+        error,
+        x,
+        y
       } = this.state;
       const {
         linearCombinations,
@@ -330,23 +351,14 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                 }
 
                 if (visualize) {
-                  // TODO: select component
-                  // selected values from future select component
-
-                  // first selected value
-                  const fst: number = 0;
-
-                  // second selected value
-                  const scd: number = 1;
-
                   // collection of x2 values
-                  const x2s: number[] = getMatrixColumn(eigens.E.x, fst);
+                  const x2s: number[] = getMatrixColumn(eigens.E.x, x);
 
                   // collection of x1 values
                   const x1s: number[] = Array(x2s.length).fill(0);
 
                   // collection of y2 values
-                  const y2s: number[] = getMatrixColumn(eigens.E.x, scd);
+                  const y2s: number[] = getMatrixColumn(eigens.E.x, y);
 
                   // collection of y1 values
                   const y1s: number[] = Array(y2s.length).fill(0);
@@ -359,10 +371,20 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
 
                   return (
                     <>
+                      <Grid container={true} alignItems="center">
+                        <SelectComponent
+                          analysis={analysis}
+                          onChange={this.onSelectChange}
+                          x={x}
+                          y={y}
+                        />
+                      </Grid>
                       <Biplot
                         title="Biplot of score variables"
                         eigenvectors={eigenvectors}
                         names={names}
+                        xAxisLabel={`Principal Component ${x + 1}`}
+                        yAxisLabel={`Principal Component ${y + 1}`}
                         points={points}
                       />
                       <Bar
@@ -387,21 +409,29 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                           Calculations is ready. Press on the visualize button
                           if you want represent the dataset.
                         </Typography>
-                        <Typography variant="body2">
+                        {/* <Typography variant="body2">
                           Count of observations: {dataset.length}
                         </Typography>
                         <Typography variant="body2" paragraph={true}>
                           Count of factors: {names.length}
-                        </Typography>
+                        </Typography> */}
                       </Grid>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={this.onVisualize}
-                        className={classes.btnVisualize}
-                      >
-                        Visualize
-                      </Button>
+                      <Grid container={true} alignItems="center">
+                        <SelectComponent
+                          analysis={analysis}
+                          onChange={this.onSelectChange}
+                          x={x}
+                          y={y}
+                        />
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={this.onVisualize}
+                          className={classes.btnVisualize}
+                        >
+                          Visualize
+                        </Button>
+                      </Grid>
                       <Grid className={classes.tableBox} item={true} xs={12}>
                         <Typography variant="title">
                           Original dataset

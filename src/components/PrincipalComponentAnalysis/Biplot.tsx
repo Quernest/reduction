@@ -29,13 +29,24 @@ interface IProps {
   eigenvectors: IVector[];
   names: string[];
   classes?: any;
+  xAxisLabel: string;
+  yAxisLabel: string;
+}
+
+interface IState {
+  k: number;
 }
 
 /**
  * Biplot of score variables
  */
 export const Biplot = withStyles(styles)(
-  class extends React.Component<IProps, IChart> {
+  class extends React.Component<IProps, IChart & IState> {
+    public static readonly defaultProps = {
+      xAxisLabel: "x",
+      yAxisLabel: "y"
+    };
+
     public readonly state = {
       margin: {
         top: 50,
@@ -50,7 +61,8 @@ export const Biplot = withStyles(styles)(
       },
       get height() {
         return this.fullHeight - this.margin.top - this.margin.bottom;
-      }
+      },
+      k: 1
     };
 
     /**
@@ -97,18 +109,49 @@ export const Biplot = withStyles(styles)(
     private gAxisRight: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
     public componentDidMount() {
-      const { points, eigenvectors, names } = this.props;
+      const {
+        points,
+        eigenvectors,
+        names,
+        xAxisLabel,
+        yAxisLabel
+      } = this.props;
 
       this.selectSVGElement();
       this.createDefs();
-      this.drawAxes(points);
+      this.drawAxes(points, xAxisLabel, yAxisLabel);
       this.drawPoints(points);
       this.drawVectors(eigenvectors, names);
+    }
+
+    public componentDidUpdate(props: IProps) {
+      if (this.props.eigenvectors !== props.eigenvectors) {
+        const { eigenvectors, names, xAxisLabel, yAxisLabel } = this.props;
+
+        // remove vectors
+        this.view.selectAll("line.vector").remove();
+        this.view.selectAll("text.variable").remove();
+
+        // remove labels
+        this.svg.select("text.axis-x-label").remove();
+        this.svg.select("text.axis-y-label").remove();
+
+        // redraw vectors
+        this.drawVectors(eigenvectors, names);
+
+        // redraw labels
+        this.drawAxesLabels(xAxisLabel, yAxisLabel);
+      }
     }
 
     private onZoom = () => {
       const { eigenvectors, names, points } = this.props;
       const { transform } = d3.event;
+
+      // update state
+      this.setState({
+        k: transform.k
+      });
 
       // update view
       this.view.attr("transform", transform);
@@ -127,8 +170,8 @@ export const Biplot = withStyles(styles)(
       this.view.selectAll("circle.point").remove();
 
       // redraw elemenets
-      this.drawPoints(points, transform.k);
-      this.drawVectors(eigenvectors, names, transform.k);
+      this.drawPoints(points);
+      this.drawVectors(eigenvectors, names);
     };
 
     private selectSVGElement(): void {
@@ -187,8 +230,12 @@ export const Biplot = withStyles(styles)(
         .attr("height", height);
     }
 
-    private drawAxes(points: IPoint[]): void {
-      const { width, height, margin } = this.state;
+    private drawAxes(
+      points: IPoint[],
+      xAxisLabel: string,
+      yAxisLabel: string
+    ): void {
+      const { width, height } = this.state;
 
       // x scale
       this.x = d3
@@ -244,34 +291,43 @@ export const Biplot = withStyles(styles)(
         .attr("transform", `translate(0, ${height})`)
         .call(this.axisBottom);
 
+      this.drawAxesLabels(xAxisLabel, yAxisLabel);
+    }
+
+    private drawAxesLabels(xAxisLabel: string, yAxisLabel: string): void {
+      const { width, height, margin } = this.state;
+
+      // bottom label
+      this.svg
+        .append("text")
+        .attr("class", "axis-x-label")
+        .attr("x", width / 2)
+        .attr("y", height + margin.bottom)
+        .attr("dy", "-0.75em")
+        .style("font-size", "12px")
+        .style("text-anchor", "middle")
+        .text(xAxisLabel);
+
       // left label
       this.svg
         .append("text")
-        .text("Component 2")
+        .attr("class", "axis-y-label")
         .attr("x", 0 - height / 2)
         .attr("y", 0 - margin.left)
         .attr("dy", "1em")
         .style("font-size", "12px")
         .style("text-anchor", "middle")
-        .attr("transform", "rotate(-90)");
-
-      // bottom label
-      this.svg
-        .append("text")
-        .text("Component 1")
-        .attr("x", width / 2)
-        .attr("y", height + margin.bottom)
-        .attr("dy", "-0.75em")
-        .style("font-size", "12px")
-        .style("text-anchor", "middle");
+        .attr("transform", "rotate(-90)")
+        .text(yAxisLabel);
     }
 
     /**
      * draw points on 2d scatter
      * @param points points for scatter plot
-     * @param k zooming coeff
      */
-    private drawPoints(points: IPoint[], k: number = 1): void {
+    private drawPoints(points: IPoint[]): void {
+      const { k } = this.state;
+
       this.view
         .selectAll("circle.point")
         .data(points)
@@ -288,13 +344,10 @@ export const Biplot = withStyles(styles)(
      * draw eigenvectors (component loadings)
      * @param eigenvectors array of eigenvectors
      * @param names factor names
-     * @param k zooming coeff
      */
-    private drawVectors(
-      eigenvectors: IVector[],
-      names: string[],
-      k: number = 1
-    ): void {
+    private drawVectors(eigenvectors: IVector[], names: string[]): void {
+      const { k } = this.state;
+
       this.view
         .selectAll("line.vector")
         .data(eigenvectors)
