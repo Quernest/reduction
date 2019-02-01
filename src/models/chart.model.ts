@@ -15,3 +15,15 @@ export interface IChart {
     left: number;
   };
 }
+
+export interface IPoint {
+  x: number;
+  y: number;
+}
+
+export interface IVector {
+  x1: number;
+  x2: number;
+  y1: number;
+  y2: number;
+}

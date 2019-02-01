@@ -1,9 +1,8 @@
 import { createStyles, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
-import size from "lodash/size";
 import * as React from "react";
-import { IChart } from "src/models/chart.model";
+import { IChart, IPoint, IVector } from "src/models/chart.model";
 
 const styles = createStyles({
   root: {
@@ -24,15 +23,10 @@ const styles = createStyles({
   }
 });
 
-interface IPoint {
-  x: number;
-  y: number;
-}
-
 interface IProps {
   title?: string;
   points: IPoint[];
-  eigenvectors: number[][];
+  eigenvectors: IVector[];
   names: string[];
   classes?: any;
 }
@@ -113,7 +107,7 @@ export const Biplot = withStyles(styles)(
     }
 
     private onZoom = () => {
-      const { eigenvectors, names } = this.props;
+      const { eigenvectors, names, points } = this.props;
       const { transform } = d3.event;
 
       // update view
@@ -127,11 +121,13 @@ export const Biplot = withStyles(styles)(
       this.gAxisLeft.call(this.axisLeft.scale(transform.rescaleY(this.y)));
       this.gAxisRight.call(this.axisRight.scale(transform.rescaleY(this.y)));
 
-      // remove previous created elements
-      this.svg.selectAll("line.vector").remove();
-      this.svg.selectAll("text.variable").remove();
+      // remove created elements
+      this.view.selectAll("line.vector").remove();
+      this.view.selectAll("text.variable").remove();
+      this.view.selectAll("circle.point").remove();
 
       // redraw elemenets
+      this.drawPoints(points, transform.k);
       this.drawVectors(eigenvectors, names, transform.k);
     };
 
@@ -295,77 +291,56 @@ export const Biplot = withStyles(styles)(
      * @param k zooming coeff
      */
     private drawVectors(
-      eigenvectors: number[][],
+      eigenvectors: IVector[],
       names: string[],
       k: number = 1
     ): void {
-      const getColumn = (arr: number[][], n: number) => arr.map(x => x[n]);
-      /**
-       * collection of x values
-       */
-      const xs: number[] = getColumn(eigenvectors, 0);
+      this.view
+        .selectAll("line.vector")
+        .data(eigenvectors)
+        .enter()
+        .append("line")
+        .attr("class", "vector")
+        .style("stroke", "#000")
+        .style("stroke-width", 1.5)
+        .attr("x1", (d: IVector): any => this.x(d.x1 * k))
+        .attr("y1", (d: IVector): any => this.y(d.y1 * k))
+        .attr("x2", (d: IVector): any => this.x(d.x2 * k))
+        .attr("y2", (d: IVector): any => this.y(d.y2 * k))
+        .attr("marker-end", "url(#arrow)");
 
-      /**
-       * collection of y values
-       */
-      const ys: number[] = getColumn(eigenvectors, 1);
+      this.view
+        .selectAll("text.variable")
+        .data(eigenvectors)
+        .enter()
+        .append("text")
+        .attr("class", "variable")
+        .attr("text-anchor", "middle")
+        .style("font-size", "12px")
+        .attr(
+          "transform",
+          (d: IVector): any => {
+            /**
+             * angle of current vector
+             */
+            const angle: number =
+              (Math.atan2(
+                this.y(d.y2 * k) - this.y(d.y1),
+                this.x(d.x2 * k) - this.x(d.x1)
+              ) *
+                180) /
+              Math.PI;
 
-      // if xs and ys are the same length
-      if (size(xs) === size(ys)) {
-        // plot the eigenvectors
-        xs.forEach((value: number, i: number) => {
-          /**
-           * current x value
-           */
-          const x: number = value;
+            /**
+             * distance from the end of arrow to the text (variable)
+             */
+            const dev: number = angle >= 0 ? 12 : -6;
 
-          /**
-           * current y value
-           */
-          const y: number = ys[i];
-
-          /**
-           * current variable
-           */
-          const variable: string = names[i];
-
-          /**
-           * angle of current vector
-           */
-          const angle: number =
-            (Math.atan2(this.y(y * k) - this.y(0), this.x(x * k) - this.x(0)) *
-              180) /
-            Math.PI;
-
-          /**
-           * distance from the end of arrow to the text (variable)
-           */
-          const deviation: number = angle >= 0 ? 12 : -6;
-
-          // plot the vector
-          this.view
-            .append("line")
-            .attr("class", "vector")
-            .style("stroke", "#000")
-            .style("stroke-width", 1.5)
-            .attr("x1", this.x(0))
-            .attr("y1", this.y(0))
-            .attr("x2", this.x(x * k))
-            .attr("y2", this.y(y * k))
-            .attr("marker-end", "url(#arrow)");
-
-          this.view
-            .append("text")
-            .attr("class", "variable")
-            .attr("text-anchor", "middle")
-            .style("font-size", "12px")
-            .attr(
-              "transform",
-              `translate(${this.x(x * k)},${this.y(y * k) + deviation})`
-            )
-            .text(variable);
-        });
-      }
+            // translate text position
+            return `translate(${this.x(d.x2 * k)},${this.y(d.y2 * k) + dev})`;
+          }
+        )
+        .text((d: IVector, i: number): string => names[i]);
     }
 
     public render() {

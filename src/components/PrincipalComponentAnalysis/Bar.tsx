@@ -95,9 +95,11 @@ export const Bar = withStyles(styles)(
        * formatted data which represents a collection of objects
        * with provided keys and eigenvalues
        */
-      const data = from2D<IBarData>(combinedData, keys).sort(
-        (a, b) => b.comulative - a.comulative
-      );
+      const data = from2D<IBarData>(combinedData, keys);
+
+      // data.sort(
+      //   (a, b) => b.comulative - a.comulative
+      // );
 
       this.selectSVGElement();
       this.drawAxes(data);

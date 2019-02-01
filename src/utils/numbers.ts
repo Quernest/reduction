@@ -13,3 +13,6 @@ export const opposite = (value: any[] | number): any[] | number => {
 
   return -value;
 };
+
+export const getMatrixColumn = (matrix: number[][], n: number) =>
+  map(matrix, (x: number[]) => x[n]);

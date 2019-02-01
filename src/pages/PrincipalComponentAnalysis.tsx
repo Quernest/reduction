@@ -15,7 +15,10 @@ import map from "lodash/map";
 import * as math from "mathjs";
 import * as React from "react";
 import { Bar, Biplot } from "src/components/PrincipalComponentAnalysis";
+import { IVector } from "src/models/chart.model";
 import { IPCACalculations } from "src/models/pca.model";
+import { getMatrixColumn } from "src/utils/numbers";
+import { from2D } from "src/utils/transformations";
 import CalculateWorker from "worker-loader!src/components/PrincipalComponentAnalysis/calculate.worker";
 import UploadWorker from "worker-loader!src/components/PrincipalComponentAnalysis/upload.worker";
 import { OutputTable } from "../components/Tables";
@@ -327,11 +330,38 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                 }
 
                 if (visualize) {
+                  // TODO: select component
+                  // selected values from future select component
+
+                  // first selected value
+                  const fst: number = 0;
+
+                  // second selected value
+                  const scd: number = 1;
+
+                  // collection of x2 values
+                  const x2s: number[] = getMatrixColumn(eigens.E.x, fst);
+
+                  // collection of x1 values
+                  const x1s: number[] = Array(x2s.length).fill(0);
+
+                  // collection of y2 values
+                  const y2s: number[] = getMatrixColumn(eigens.E.x, scd);
+
+                  // collection of y1 values
+                  const y1s: number[] = Array(y2s.length).fill(0);
+
+                  // collection of eigenvectors
+                  const eigenvectors: IVector[] = from2D<IVector>(
+                    [x1s, x2s, y1s, y2s],
+                    ["x1", "x2", "y1", "y2"]
+                  );
+
                   return (
                     <>
                       <Biplot
                         title="Biplot of score variables"
-                        eigenvectors={eigens.E.x}
+                        eigenvectors={eigenvectors}
                         names={names}
                         points={points}
                       />
