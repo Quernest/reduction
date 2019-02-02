@@ -4,8 +4,9 @@
   "private": true,
   "homepage": "https://quernest.github.io/reduction",
   "dependencies": {
-    "@material-ui/core": "^3.8.1",
+    "@material-ui/core": "^3.9.1",
     "@material-ui/icons": "^3.0.1",
+    "@material-ui/styles": "^3.0.0-alpha.9",
     "compute-covariance": "^1.0.1",
     "d3": "^5.7.0",
     "lodash": "^4.17.11",

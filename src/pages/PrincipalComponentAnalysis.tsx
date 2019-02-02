@@ -409,12 +409,6 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                           Calculations is ready. Press on the visualize button
                           if you want represent the dataset.
                         </Typography>
-                        {/* <Typography variant="body2">
-                          Count of observations: {dataset.length}
-                        </Typography>
-                        <Typography variant="body2" paragraph={true}>
-                          Count of factors: {names.length}
-                        </Typography> */}
                       </Grid>
                       <Grid container={true} alignItems="center">
                         <SelectComponent
