@@ -12,7 +12,7 @@ import Typography from "@material-ui/core/Typography";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import isEmpty from "lodash/isEmpty";
 import map from "lodash/map";
-// import * as math from "mathjs";
+import * as math from "mathjs";
 import * as React from "react";
 import {
   Bar,
@@ -115,7 +115,6 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
           }
         },
         linearCombinations: [],
-        names: [],
         analysis: []
       },
       visualize: false,
@@ -332,7 +331,6 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
         covariance,
         points,
         eigens,
-        names,
         analysis
       } = calculations;
 
@@ -386,7 +384,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                       <Biplot
                         title="Biplot of score variables"
                         eigenvectors={eigenvectors}
-                        names={names}
+                        names={parsedCSV.headers}
                         xAxisLabel={`Principal Component ${x + 1}`}
                         yAxisLabel={`Principal Component ${y + 1}`}
                         points={points}
@@ -394,7 +392,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                       <Bar
                         title="Scree plot of eigenvalues"
                         eigenvalues={eigens.lambda.x}
-                        names={names}
+                        names={parsedCSV.headers}
                         analysis={analysis}
                       />
                     </>
@@ -443,13 +441,19 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                         <Typography variant="title">
                           Adjusted dataset
                         </Typography>
-                        <OutputTable rows={adjustedDataset} columns={names} />
+                        <OutputTable
+                          rows={adjustedDataset}
+                          columns={parsedCSV.headers}
+                        />
                       </Grid>
                       <Grid className={classes.tableBox} item={true} xs={12}>
                         <Typography variant="title">
                           Covariation Matrix
                         </Typography>
-                        <OutputTable rows={covariance} columns={names} />
+                        <OutputTable
+                          rows={covariance}
+                          columns={parsedCSV.headers}
+                        />
                       </Grid>
                       <Grid className={classes.tableBox} item={true} xs={12}>
                         <Typography variant="title" className={classes.h5}>
@@ -466,9 +470,12 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                           Eigenvectors (component loadings)
                         </Typography>
                         <OutputTable
-                          rows={[names, eigens.E.x]}
+                          rows={[
+                            parsedCSV.headers,
+                            ...(math.transpose(eigens.E.x) as number[][])
+                          ]}
                           columns={map(
-                            ["Loadings", ...names],
+                            ["Loadings", ...parsedCSV.headers],
                             (name: string, index: number): string => {
                               if (index === 0) {
                                 return "Loadings";
@@ -486,7 +493,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                         <OutputTable
                           rows={linearCombinations}
                           columns={map(
-                            names,
+                            parsedCSV.headers,
                             (name: string, index: number): string =>
                               `PC${index + 1} (${name})`
                           )}

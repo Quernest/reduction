@@ -44,7 +44,6 @@ interface IProps {
   rows: any[][];
 }
 
-// todo: useMemo
 export const OutputTable = ({
   enumerate,
   enumerateSymbol,

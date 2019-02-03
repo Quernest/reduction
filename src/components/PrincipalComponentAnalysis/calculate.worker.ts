@@ -5,10 +5,10 @@ const ctx: Worker = self as any;
 
 ctx.addEventListener(
   "message",
-  event => {
-    const { data } = event;
+  (event: MessageEvent) => {
+    const { data, headers } = event.data;
 
-    const pca: IPCA = new PCA(data);
+    const pca: IPCA = new PCA(data, headers);
 
     const {
       dataset,
@@ -17,8 +17,7 @@ ctx.addEventListener(
       points,
       eigens,
       linearCombinations,
-      adjustedDataset,
-      names
+      adjustedDataset
     } = pca;
 
     const calculations: IPCACalculations = {
@@ -28,8 +27,7 @@ ctx.addEventListener(
       points,
       eigens,
       linearCombinations,
-      adjustedDataset,
-      names
+      adjustedDataset
     };
 
     ctx.postMessage(calculations);

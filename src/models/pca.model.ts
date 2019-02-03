@@ -1,6 +1,4 @@
 export interface IPCA {
-  names: string[];
-
   dataset: number[][];
 
   adjustedDataset: number[][];
@@ -69,8 +67,6 @@ export interface IPCA {
 }
 
 export interface IPCACalculations {
-  names: string[];
-
   dataset: number[][];
 
   adjustedDataset: number[][];

@@ -9,11 +9,9 @@ import numeric from "numeric";
 
 // utility library delivering modularity, performance & extras.
 // import assign from "lodash/assign";
-import head from "lodash/head";
 import isArray from "lodash/isArray";
 import isEmpty from "lodash/isEmpty";
 import isUndefined from "lodash/isUndefined";
-import keys from "lodash/keys";
 import map from "lodash/map";
 import reduce from "lodash/reduce";
 import round from "lodash/round";
@@ -24,7 +22,7 @@ import { IPCA } from "src/models/pca.model";
 
 // helpers
 // import { opposite } from "../../utils/numbers";
-import { from2D, to2D } from "../../utils/transformations";
+import { from2D } from "../../utils/transformations";
 
 try {
   math.import(numeric, { wrap: true, silent: true });
@@ -37,8 +35,6 @@ try {
  * @see https://en.wikipedia.org/wiki/Principal_component_analysis
  */
 export class PCA implements IPCA {
-  public names: string[];
-
   public dataset: number[][];
 
   public adjustedDataset: number[][];
@@ -62,7 +58,7 @@ export class PCA implements IPCA {
 
   public points: Array<{ x: number; y: number }>;
 
-  constructor(dataset: object[] | number[][]) {
+  constructor(dataset: number[][], variables: string[]) {
     // handle if the dataset is empty
     if (isEmpty(dataset)) {
       throw new Error("no dataset found");
@@ -73,22 +69,8 @@ export class PCA implements IPCA {
       throw new Error("the dataset must be an array type");
     }
 
-    const instance: object | number[] | undefined = head(dataset);
-
-    /**
-     * check whether the transferred data to the required type
-     * if not, transform into a two-dimensional array.
-     */
-    if (!isArray(instance)) {
-      // and get factor names
-      this.names = keys(instance);
-
-      // if it's object, transform to the two-dimensional array
-      this.dataset = to2D(dataset);
-    }
-
     // step 1
-    this.adjustedDataset = this.adjustDataset(this.dataset);
+    this.adjustedDataset = this.adjustDataset(dataset);
 
     // step 2
     this.covariance = this.computeCovariance(this.adjustedDataset);
@@ -106,6 +88,7 @@ export class PCA implements IPCA {
     this.analysis = this.analyze(this.eigens.lambda.x);
 
     /**
+     * TODO: remove from2D transforming
      * step 7
      * additional calculations
      * get scatter points of the dataset for plotting the scatter
