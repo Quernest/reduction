@@ -8,12 +8,7 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import {
-  createStyles,
-  StyleRules,
-  Theme,
-  withStyles
-} from "@material-ui/core/styles";
+import { Theme } from "@material-ui/core/styles";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -21,37 +16,35 @@ import DashboardIcon from "@material-ui/icons/Dashboard";
 import HomeIcon from "@material-ui/icons/Home";
 import MenuIcon from "@material-ui/icons/Menu";
 import TimeLineIcon from "@material-ui/icons/Timeline";
+import { makeStyles } from "@material-ui/styles";
 import * as React from "react";
 import { redirectTo } from "src/utils/redirectTo";
 
-const styles = ({ breakpoints }: Theme): StyleRules =>
-  createStyles({
-    root: {
-      flexGrow: 1
-    },
-    grow: {
-      flexGrow: 1
-    },
-    wrap: {
-      width: "100%",
-      maxWidth: breakpoints.values.md,
-      marginLeft: "auto",
-      marginRight: "auto"
-    },
-    menuButton: {
-      marginLeft: -12,
-      marginRight: 20
-    },
-    list: {
-      width: 250
-    }
-  });
+const useStyles = makeStyles(({ breakpoints }: Theme) => ({
+  root: {
+    flexGrow: 1
+  },
+  grow: {
+    flexGrow: 1
+  },
+  wrap: {
+    width: "100%",
+    maxWidth: breakpoints.values.md,
+    marginLeft: "auto",
+    marginRight: "auto"
+  },
+  menuButton: {
+    marginLeft: -12,
+    marginRight: 20
+  },
+  list: {
+    width: 250
+  }
+}));
 
-interface IProps {
-  classes?: any;
-}
+export const Header = () => {
+  const classes = useStyles();
 
-export const Header = withStyles(styles)(({ classes }: IProps) => {
   const [state, setState] = React.useState({
     isOpenDrawer: false
   });
@@ -59,32 +52,6 @@ export const Header = withStyles(styles)(({ classes }: IProps) => {
   const toggleDrawer = (open: boolean) => () => {
     setState({ ...state, isOpenDrawer: open });
   };
-
-  const sideList = (
-    <div className={classes.list}>
-      <List>
-        <ListItem {...redirectTo("/")} button={true}>
-          <ListItemIcon>
-            <HomeIcon />
-          </ListItemIcon>
-          <ListItemText primary="Home" />
-        </ListItem>
-        <ListItem {...redirectTo("/pca")} button={true}>
-          <ListItemIcon>
-            <TimeLineIcon />
-          </ListItemIcon>
-          <ListItemText primary="PCA" />
-        </ListItem>
-        <ListItem {...redirectTo("/som")} button={true}>
-          <ListItemIcon>
-            <DashboardIcon />
-          </ListItemIcon>
-          <ListItemText primary="SOM" />
-        </ListItem>
-      </List>
-      <Divider />
-    </div>
-  );
 
   return (
     <header className={classes.root}>
@@ -132,10 +99,34 @@ export const Header = withStyles(styles)(({ classes }: IProps) => {
             onClick={toggleDrawer(false)}
             onKeyDown={toggleDrawer(false)}
           >
-            {sideList}
+            {
+              <div className={classes.list}>
+                <List>
+                  <ListItem {...redirectTo("/")} button={true}>
+                    <ListItemIcon>
+                      <HomeIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Home" />
+                  </ListItem>
+                  <ListItem {...redirectTo("/pca")} button={true}>
+                    <ListItemIcon>
+                      <TimeLineIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="PCA" />
+                  </ListItem>
+                  <ListItem {...redirectTo("/som")} button={true}>
+                    <ListItemIcon>
+                      <DashboardIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="SOM" />
+                  </ListItem>
+                </List>
+                <Divider />
+              </div>
+            }
           </div>
         </SwipeableDrawer>
       </Hidden>
     </header>
   );
-});
+};
