@@ -1,31 +1,36 @@
-export interface IObject {
-  [key: string]: string | number;
+import forEach from "lodash/forEach";
+import split from "lodash/split";
+
+export interface IParsedCSV {
+  headers: string[];
+  data: number[][];
 }
 
-export function parseCSV(csv: string): IObject[] {
-  const lines: string[] = csv.split("\n");
-  const result: IObject[] = [];
-  const headers: string[] = lines[0].split(",");
+export const parseCSV = (csv: string): IParsedCSV => {
+  const lines = split(csv, "\n");
+  const data: number[][] = [];
+  const headers = split(lines[0], ",");
 
-  lines.map((line: string, indexLine: number) => {
+  forEach(lines, (line: string, indexLine: number) => {
     if (indexLine < 1) {
-      return; // Jump header line
+      return;
     }
 
-    const obj: IObject = {};
-    const currentLine: string[] = line.split(",");
+    const currentLine = split(line, ",");
 
-    headers.map((header: string, indexHeader: number) => {
-      // remove double quotes from the object key and convert string to the number
-      obj[header.trim()] = parseFloat(currentLine[indexHeader]);
+    forEach(headers, (header: string, indexHeader: number) => {
+      if (!data[indexHeader]) {
+        data[indexHeader] = [];
+      }
 
-      return obj[header];
+      if (currentLine[indexHeader]) {
+        data[indexHeader].push(parseFloat(currentLine[indexHeader]));
+      }
     });
-
-    result.push(obj);
   });
 
-  result.pop(); // remove the last item because undefined values
-
-  return result;
-}
+  return {
+    headers,
+    data
+  };
+};

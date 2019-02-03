@@ -12,7 +12,7 @@ import Typography from "@material-ui/core/Typography";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import isEmpty from "lodash/isEmpty";
 import map from "lodash/map";
-import * as math from "mathjs";
+// import * as math from "mathjs";
 import * as React from "react";
 import {
   Bar,
@@ -21,6 +21,7 @@ import {
 } from "src/components/PrincipalComponentAnalysis";
 import { IVector } from "src/models/chart.model";
 import { IPCACalculations } from "src/models/pca.model";
+import { IParsedCSV } from "src/utils/csv";
 import { getMatrixColumn } from "src/utils/numbers";
 import { from2D } from "src/utils/transformations";
 import CalculateWorker from "worker-loader!src/components/PrincipalComponentAnalysis/calculate.worker";
@@ -75,7 +76,7 @@ interface IProps {
 
 interface IState {
   selectedFile: null | File;
-  dataset: object[];
+  parsedCSV: IParsedCSV;
   calculations: IPCACalculations;
   visualize: boolean;
   calculating: boolean;
@@ -94,7 +95,10 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
   class extends React.Component<IProps, IState> {
     public readonly state = {
       selectedFile: null,
-      dataset: [],
+      parsedCSV: {
+        headers: [] as string[],
+        data: [] as number[][]
+      },
       calculations: {
         points: [],
         dataset: [],
@@ -144,7 +148,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
     }
 
     private onCalculate = (): void => {
-      const { dataset } = this.state;
+      const { parsedCSV } = this.state;
 
       this.setState({
         calculating: true,
@@ -176,8 +180,8 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
       });
 
       // TODO: add timeout function (stop calculations if too long)
-      // send the dataset to the worker
-      this.calculateWorker.postMessage(dataset);
+      // send the parsedCSV to the worker
+      this.calculateWorker.postMessage(parsedCSV);
     };
 
     private onFileSelectInputChange = (
@@ -206,7 +210,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
         // return the error if it's not accepted extension
         if (acceptedExtensions.indexOf(currentFileExtension) < 0) {
           this.setState({
-            error: `Invalid file selected, valid files are of ${acceptedExtensions.toString()} types.`
+            error: `Invalid file selected, valid files are of [${acceptedExtensions.toString()}] types.`
           });
 
           return;
@@ -247,7 +251,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
           this.setState({
             uploaded: true,
             uploading: false,
-            dataset: event.data
+            parsedCSV: event.data
           });
         },
         false
@@ -316,7 +320,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
         calculated,
         visualize,
         selectedFile,
-        dataset,
+        parsedCSV,
         calculations,
         error,
         x,
@@ -430,7 +434,10 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                         <Typography variant="title">
                           Original dataset
                         </Typography>
-                        <OutputTable rows={dataset} columns={names} />
+                        <OutputTable
+                          rows={parsedCSV.data}
+                          columns={parsedCSV.headers}
+                        />
                       </Grid>
                       <Grid className={classes.tableBox} item={true} xs={12}>
                         <Typography variant="title">
@@ -459,10 +466,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                           Eigenvectors (component loadings)
                         </Typography>
                         <OutputTable
-                          rows={[
-                            names,
-                            ...(math.transpose(eigens.E.x) as number[][])
-                          ]}
+                          rows={[names, eigens.E.x]}
                           columns={map(
                             ["Loadings", ...names],
                             (name: string, index: number): string => {
@@ -514,7 +518,10 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                       </Button>
                       <Grid className={classes.tableBox} item={true} xs={12}>
                         <Typography variant="h6">Your dataset</Typography>
-                        <OutputTable rows={dataset} />
+                        <OutputTable
+                          rows={parsedCSV.data}
+                          columns={parsedCSV.headers}
+                        />
                       </Grid>
                     </React.Fragment>
                   );
