@@ -76,7 +76,7 @@ export const Biplot = withStyles(styles)(
     /**
      * main svg element
      */
-    private svg: any;
+    private svg: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
     /**
      * zoom listener
