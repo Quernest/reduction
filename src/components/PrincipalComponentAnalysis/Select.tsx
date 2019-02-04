@@ -24,28 +24,34 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
 interface IProps {
   analysis: number[];
   onChange: (event: any) => void;
-  // todo: change this variables to ComponentX and ComponentY
-  x: number;
-  y: number;
+  // index of selected component X
+  selectedComponentX: number;
+  // index of selected component Y
+  selectedComponentY: number;
 }
 
-export const SelectComponent = ({ analysis, onChange, x, y }: IProps) => {
+export const SelectComponent = ({
+  analysis,
+  onChange,
+  selectedComponentX,
+  selectedComponentY
+}: IProps) => {
   const classes = useStyles();
 
   return (
     <form className={classes.root} autoComplete="off">
       <FormControl className={classes.formControl}>
-        <InputLabel htmlFor="x">Component X</InputLabel>
+        <InputLabel htmlFor="selectedComponentX">Component X</InputLabel>
         <Select
-          value={x}
+          value={selectedComponentX}
           onChange={onChange}
           inputProps={{
-            name: "x",
-            id: "x"
+            name: "selectedComponentX",
+            id: "selectedComponentX"
           }}
         >
           {map(analysis, (value: number, index: number) => {
-            if (index !== y) {
+            if (index !== selectedComponentY) {
               return (
                 <MenuItem key={index} value={index}>
                   PC {index + 1} {value}%
@@ -58,17 +64,17 @@ export const SelectComponent = ({ analysis, onChange, x, y }: IProps) => {
         </Select>
       </FormControl>
       <FormControl className={classes.formControl}>
-        <InputLabel htmlFor="y">Component Y</InputLabel>
+        <InputLabel htmlFor="selectedComponentY">Component Y</InputLabel>
         <Select
-          value={y}
+          value={selectedComponentY}
           onChange={onChange}
           inputProps={{
-            name: "y",
-            id: "y"
+            name: "selectedComponentY",
+            id: "selectedComponentY"
           }}
         >
           {map(analysis, (value: number, index: number) => {
-            if (index !== x) {
+            if (index !== selectedComponentX) {
               return (
                 <MenuItem key={index} value={index}>
                   PC {index + 1} {value}%
@@ -85,6 +91,6 @@ export const SelectComponent = ({ analysis, onChange, x, y }: IProps) => {
 };
 
 SelectComponent.defaultProps = {
-  x: 0,
-  y: 1
+  selectedComponentX: 0,
+  selectedComponentY: 1
 };

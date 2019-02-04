@@ -16,14 +16,32 @@ export interface IChart {
   };
 }
 
-export interface IPoint {
-  x: number;
-  y: number;
-}
+// list of values
+export type PointList = number[];
 
-export interface IVector {
-  x1: number;
-  x2: number;
-  y1: number;
-  y2: number;
-}
+/**
+ * collection of vectors with next structure:
+ * [x, y]
+ */
+export type Points = [
+  // array of X values
+  PointList,
+  // array of Y values
+  PointList
+];
+
+/**
+ * collection of vectors with next structure:
+ * [x1, y1, x2, y2]
+ * use destructuring
+ */
+export type Vectors = [
+  // array of x1 values
+  PointList,
+  // array of y1 values
+  PointList,
+  // array of x2 values
+  PointList,
+  // array of y2 values
+  PointList
+];

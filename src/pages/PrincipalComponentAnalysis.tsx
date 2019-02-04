@@ -10,6 +10,7 @@ import {
 } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+// import { makeStyles } from "@material-ui/styles";
 import isEmpty from "lodash/isEmpty";
 import map from "lodash/map";
 import * as math from "mathjs";
@@ -19,14 +20,71 @@ import {
   Biplot,
   SelectComponent
 } from "src/components/PrincipalComponentAnalysis";
-import { IVector } from "src/models/chart.model";
+import { Points, Vectors } from "src/models/chart.model";
 import { IPCACalculations } from "src/models/pca.model";
 import { IParsedCSV } from "src/utils/csv";
 import { getMatrixColumn } from "src/utils/numbers";
-import { from2D } from "src/utils/transformations";
 import CalculateWorker from "worker-loader!src/components/PrincipalComponentAnalysis/calculate.worker";
 import UploadWorker from "worker-loader!src/components/PrincipalComponentAnalysis/upload.worker";
 import { OutputTable } from "../components/Tables";
+
+// const useStyles = makeStyles(({ spacing, breakpoints }: Theme) => ({
+//   root: {
+//     flexGrow: 1,
+//     padding: spacing.unit * 2,
+//     [breakpoints.up("sm")]: {
+//       padding: spacing.unit * 3
+//     }
+//   },
+//   wrap: {
+//     width: "100%",
+//     maxWidth: breakpoints.values.md,
+//     marginLeft: "auto",
+//     marginRight: "auto"
+//   },
+//   grid: {
+//     [breakpoints.up("md")]: {
+//       width: breakpoints.values.md
+//     }
+//   },
+//   button: {
+//     margin: spacing.unit
+//   },
+//   btnVisualize: {
+//     // marginBottom: spacing.unit * 2
+//   },
+//   rightIcon: {
+//     marginLeft: spacing.unit
+//   },
+//   chip: {
+//     marginTop: spacing.unit,
+//     marginBottom: spacing.unit
+//   },
+//   tableBox: {
+//     marginTop: spacing.unit * 2,
+//     marginBottom: spacing.unit * 2
+//   },
+//   h5: {
+//     marginTop: spacing.unit * 2
+//   }
+// }));
+
+// const uploadWorker: Worker = new UploadWorker();
+// const calculateWorker: Worker = new CalculateWorker();
+
+// export const Refactoring = (): JSX.Element => {
+//   const classes = useStyles();
+
+//   const fileInput: React.RefObject<HTMLInputElement> = React.createRef();
+
+//   return <div className={classes.root} />;
+// };
+
+/**
+ * ======================
+ * OLD CODE
+ * ======================
+ */
 
 const styles = ({ spacing, breakpoints }: Theme): StyleRules =>
   createStyles({
@@ -84,9 +142,8 @@ interface IState {
   uploading: boolean;
   uploaded: boolean;
   error?: string;
-  // for SelectComponent children element
-  x: number;
-  y: number;
+  selectedComponentX: number;
+  selectedComponentY: number;
   // for select component (dynamic property)
   [x: number]: number;
 }
@@ -100,7 +157,6 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
         data: [] as number[][]
       },
       calculations: {
-        points: [],
         dataset: [],
         adjustedDataset: [],
         covariance: [],
@@ -123,8 +179,8 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
       uploading: false,
       uploaded: false,
       error: "",
-      x: 0,
-      y: 1
+      selectedComponentX: 0,
+      selectedComponentY: 1
     };
 
     /**
@@ -302,7 +358,7 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
       this.calculateWorker = new CalculateWorker();
     };
 
-    private onSelectChange = (event: any): void => {
+    private onSelectComponentChange = (event: any): void => {
       const { name, value } = event.target;
 
       this.setState({
@@ -322,14 +378,13 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
         parsedCSV,
         calculations,
         error,
-        x,
-        y
+        selectedComponentX,
+        selectedComponentY
       } = this.state;
       const {
         linearCombinations,
         adjustedDataset,
         covariance,
-        points,
         eigens,
         analysis
       } = calculations;
@@ -353,40 +408,49 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                 }
 
                 if (visualize) {
+                  // scatter points
+                  const points: Points = [
+                    adjustedDataset[selectedComponentX],
+                    adjustedDataset[selectedComponentY]
+                  ];
+
                   // collection of x2 values
-                  const x2s: number[] = getMatrixColumn(eigens.E.x, x);
+                  const x2s: number[] = getMatrixColumn(
+                    eigens.E.x,
+                    selectedComponentX
+                  );
+
+                  // collection of y2 values
+                  const y2s: number[] = getMatrixColumn(
+                    eigens.E.x,
+                    selectedComponentY
+                  );
 
                   // collection of x1 values
                   const x1s: number[] = Array(x2s.length).fill(0);
 
-                  // collection of y2 values
-                  const y2s: number[] = getMatrixColumn(eigens.E.x, y);
-
                   // collection of y1 values
                   const y1s: number[] = Array(y2s.length).fill(0);
 
-                  // collection of eigenvectors
-                  const eigenvectors: IVector[] = from2D<IVector>(
-                    [x1s, x2s, y1s, y2s],
-                    ["x1", "x2", "y1", "y2"]
-                  );
+                  // vectors
+                  const eigenvectors: Vectors = [x1s, y1s, x2s, y2s];
 
                   return (
                     <>
                       <Grid container={true} alignItems="center">
                         <SelectComponent
                           analysis={analysis}
-                          onChange={this.onSelectChange}
-                          x={x}
-                          y={y}
+                          onChange={this.onSelectComponentChange}
+                          selectedComponentX={selectedComponentX}
+                          selectedComponentY={selectedComponentY}
                         />
                       </Grid>
                       <Biplot
                         title="Biplot of score variables"
                         eigenvectors={eigenvectors}
                         names={parsedCSV.headers}
-                        xAxisLabel={`Principal Component ${x + 1}`}
-                        yAxisLabel={`Principal Component ${y + 1}`}
+                        xAxisLabel={`Component ${selectedComponentX + 1}`}
+                        yAxisLabel={`Component ${selectedComponentY + 1}`}
                         points={points}
                       />
                       <Bar
@@ -415,9 +479,9 @@ export const PrincipalComponentAnalysisPage = withStyles(styles)(
                       <Grid container={true} alignItems="center">
                         <SelectComponent
                           analysis={analysis}
-                          onChange={this.onSelectChange}
-                          x={x}
-                          y={y}
+                          onChange={this.onSelectComponentChange}
+                          selectedComponentX={selectedComponentX}
+                          selectedComponentY={selectedComponentY}
                         />
                         <Button
                           variant="contained"

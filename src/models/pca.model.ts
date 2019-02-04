@@ -20,8 +20,6 @@ export interface IPCA {
 
   analysis: number[];
 
-  points: Array<{ x: number; y: number }>;
-
   /**
    * get mean-adjusted data - PCA (maximizing variance)
    */
@@ -87,6 +85,4 @@ export interface IPCACalculations {
   linearCombinations: number[][];
 
   analysis: number[];
-
-  points: Array<{ x: number; y: number }>;
 }

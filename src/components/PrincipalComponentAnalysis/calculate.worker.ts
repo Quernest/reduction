@@ -14,7 +14,6 @@ ctx.addEventListener(
       dataset,
       covariance,
       analysis,
-      points,
       eigens,
       linearCombinations,
       adjustedDataset
@@ -24,7 +23,6 @@ ctx.addEventListener(
       dataset,
       analysis,
       covariance,
-      points,
       eigens,
       linearCombinations,
       adjustedDataset
@@ -34,6 +32,3 @@ ctx.addEventListener(
   },
   false
 );
-
-// Expose the right type when imported via worker-loader.
-// export default {} as typeof Worker & { new (): Worker };

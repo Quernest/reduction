@@ -22,7 +22,7 @@ import { IPCA } from "src/models/pca.model";
 
 // helpers
 // import { opposite } from "../../utils/numbers";
-import { from2D } from "../../utils/transformations";
+// import { from2D } from "../../utils/transformations";
 
 try {
   math.import(numeric, { wrap: true, silent: true });
@@ -56,8 +56,6 @@ export class PCA implements IPCA {
 
   public analysis: number[];
 
-  public points: Array<{ x: number; y: number }>;
-
   constructor(dataset: number[][], variables: string[]) {
     // handle if the dataset is empty
     if (isEmpty(dataset)) {
@@ -86,14 +84,6 @@ export class PCA implements IPCA {
 
     // step 6
     this.analysis = this.analyze(this.eigens.lambda.x);
-
-    /**
-     * TODO: remove from2D transforming
-     * step 7
-     * additional calculations
-     * get scatter points of the dataset for plotting the scatter
-     */
-    this.points = from2D(this.adjustedDataset, ["x", "y"]);
   }
 
   /**

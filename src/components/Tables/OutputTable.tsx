@@ -40,7 +40,6 @@ interface IProps {
   enumerateSymbol: string;
   // array of column names in the top of the table
   columns: string[];
-  // collection of objects or two-dimensional array (matrix)
   rows: any[][];
 }
 
