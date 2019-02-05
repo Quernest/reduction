@@ -25,8 +25,8 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
 interface IProps {
   file?: File;
   onChange: (chosenFile?: File, error?: string) => void;
-  onUpload: (event: any) => void;
-  onCancel: (event: any) => void;
+  onUpload: () => void;
+  onCancel: () => void;
 }
 
 export const UploadControls = (props: IProps): JSX.Element => {

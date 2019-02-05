@@ -11,35 +11,38 @@ ctx.addEventListener("message", (event: MessageEvent) => {
   fr.readAsText(event.data);
 
   fr.onload = () => {
-    const { result } = fr;
-
-    let parsedCSV: IParsedCSV;
-
-    if (isString(result)) {
-      parsedCSV = parseCSV(result);
-    } else {
-      throw new Error("data reading error");
-    }
-
-    const { headers, data } = parsedCSV;
-
-    if (headers.length < 2) {
-      throw new Error(
-        "the object of dataset must contain more than 2 factors."
-      );
-    }
-
-    const validate = (value: number) => {
-      if (isNaN(value)) {
-        throw new Error("the dataset has some wrong values");
-      }
+    let parsedCSV: IParsedCSV = {
+      headers: [],
+      data: []
     };
 
-    forEach(data, (element: number[]) => {
-      forEach(element, (value: number) => validate(value));
-    });
+    try {
+      if (isString(fr.result)) {
+        parsedCSV = parseCSV(fr.result);
+      } else {
+        throw new Error("data reading error");
+      }
 
-    ctx.postMessage(parsedCSV);
+      const { headers, data } = parsedCSV;
+
+      if (headers.length < 2) {
+        throw new Error(
+          "the object of dataset must contain more than 2 factors."
+        );
+      }
+
+      forEach(data, (element: number[]) => {
+        forEach(element, (value: number) => {
+          if (isNaN(value)) {
+            throw new Error("the dataset has some wrong values");
+          }
+        });
+      });
+
+      ctx.postMessage({ parsedCSV });
+    } catch (error) {
+      ctx.postMessage({ error: error.message });
+    }
   };
 
   fr.onerror = error => ctx.postMessage(error);

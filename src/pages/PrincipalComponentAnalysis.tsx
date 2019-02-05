@@ -2,8 +2,11 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
+import has from "lodash/has";
 import * as React from "react";
 import { UploadControls } from "src/components/UploadControls";
+import { IParsedCSV } from "src/utils/csv";
+// import { IPCACalculations } from 'src/models/pca.model';
 // import CalculateWorker from "worker-loader!src/components/PrincipalComponentAnalysis/calculate.worker";
 import UploadWorker from "worker-loader!src/components/PrincipalComponentAnalysis/upload.worker";
 
@@ -45,38 +48,35 @@ const initialState: IState = {
 export const PrincipalComponentAnalysisPage = (): JSX.Element => {
   const classes = useStyles();
 
-  // initialize state
   const [file, setFile] = React.useState<File | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const [state, setState] = React.useState<IState>(initialState);
+  // @ts-ignore
+  const [parsedCSV, setParsedCSV] = React.useState<IParsedCSV>({
+    headers: [],
+    data: []
+  });
 
-  // declare workers
   let uploadWorker: Worker;
-  // let calculateWorker: Worker;
 
-  const initWorkers = (): void => {
+  function cleanErrors() {
+    setError(undefined);
+  }
+
+  function initWorkers() {
     uploadWorker = new UploadWorker();
-    // calculateWorker = new CalculateWorker();
 
-    // init upload worker message listener
-    uploadWorker.addEventListener(
-      "message",
-      (event: MessageEvent) => {
-        // const { data } = event;
-
-        setState({ uploaded: true, uploading: false });
-        // setParsedCSV(data) todo
-      },
-      false
-    );
-
-    uploadWorker.addEventListener("error", (event: ErrorEvent) => {
-      const { message } = event;
-
-      setState({ uploaded: false, uploading: false });
-      setError(message);
+    uploadWorker.addEventListener("message", (event: MessageEvent) => {
+      if (has(event.data, "error")) {
+        setState({ ...state, uploaded: false, uploading: false });
+        setError(event.data.error);
+      } else {
+        setState({ ...state, uploaded: true, uploading: false });
+        setParsedCSV(event.data.parsedCSV);
+        cleanErrors();
+      }
     });
-  };
+  }
 
   // init workers on component did mount
   React.useEffect(initWorkers);
@@ -84,24 +84,21 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
   const onChangeFile = (chosenFile?: File, err?: string): void => {
     if (err) {
       setError(err);
-      return;
+    } else {
+      cleanErrors();
+      setFile(chosenFile);
     }
-
-    setFile(chosenFile);
   };
 
   const onUploadFile = (): void => {
-    // clean error variable
-    setError(undefined);
-
-    // update page state
-    setState({ uploaded: false, uploading: true });
-
-    // communicate with upload worker
+    setState({ ...state, uploading: true });
     uploadWorker.postMessage(file);
   };
 
-  const onCancelFile = (): void => setFile(undefined);
+  const onCancelFile = (): void => {
+    cleanErrors();
+    setFile(undefined);
+  };
 
   const { uploading, uploaded, calculating } = state;
 
@@ -125,7 +122,11 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
           />
         )}
         {uploaded && <div>uploaded controls component and datasets</div>}
-        {error && <div>{error}</div>}
+        {error && (
+          <Typography variant="body2" color="error">
+            {error}
+          </Typography>
+        )}
       </div>
     </div>
   );
