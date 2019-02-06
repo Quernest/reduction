@@ -1,6 +1,7 @@
 import { createStyles, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
+import round from "lodash/round";
 import * as React from "react";
 import { IChart } from "src/models/chart.model";
 import { from2D } from "../../utils/transformations";
@@ -98,7 +99,7 @@ export const Bar = withStyles(styles)(
       const data = from2D<IBarData>(combinedData, keys);
 
       // data.sort(
-      //   (a, b) => b.comulative - a.comulative
+      //   (a, b) => b.comulative - a.comulative or b.eigenvalue - a.eigenvalue
       // );
 
       this.selectSVGElement();
@@ -126,11 +127,12 @@ export const Bar = withStyles(styles)(
         .scaleBand()
         .range([0, width])
         .padding(0.25)
-        .domain(data.map((d: IBarData): any => d.component));
+        .domain(data.map((d: IBarData, i: number): any => `PC ${i + 1}`));
+
       this.y = d3
         .scaleLinear()
         .range([height, 0])
-        .domain([0, 100]);
+        .domain([0, d3.max(data, (d: IBarData): any => d.eigenvalue)]);
 
       this.svg
         .append("g")
@@ -142,7 +144,7 @@ export const Bar = withStyles(styles)(
       // y axis label
       this.svg
         .append("text")
-        .text("Comulative, %")
+        .text("Variances")
         .attr("transform", "rotate(-90)")
         .attr("x", 0 - height / 2)
         .attr("y", 0 - margin.left)
@@ -151,14 +153,14 @@ export const Bar = withStyles(styles)(
         .style("text-anchor", "middle");
 
       // x axis label
-      // this.svg
-      //   .append("text")
-      //   .text("Dimensions")
-      //   .attr("x", width / 2)
-      //   .attr("y", height + margin.bottom)
-      //   .attr("dy", "1em")
-      //   .style("font-size", "12px")
-      //   .style("text-anchor", "middle");
+      this.svg
+        .append("text")
+        .text("Components")
+        .attr("x", width / 2)
+        .attr("y", height + margin.bottom)
+        .attr("dy", "-0.5em")
+        .style("font-size", "12px")
+        .style("text-anchor", "middle");
     }
 
     private drawBars(data: IBarData[]): void {
@@ -172,10 +174,10 @@ export const Bar = withStyles(styles)(
         .append("rect")
         .attr("class", "bar")
         .attr("fill", "#3F51B5")
-        .attr("x", (d: IBarData): any => this.x(d.component))
+        .attr("x", (d: IBarData, i: number): any => this.x(`PC ${i + 1}`))
         .attr("width", this.x.bandwidth())
-        .attr("y", (d: IBarData): any => this.y(d.comulative))
-        .attr("height", (d: IBarData) => height - this.y(d.comulative));
+        .attr("y", (d: IBarData): any => this.y(d.eigenvalue))
+        .attr("height", (d: IBarData) => height - this.y(d.eigenvalue));
 
       /**
        * the line based on the bar data
@@ -183,8 +185,8 @@ export const Bar = withStyles(styles)(
       const line: d3.Line<IBarData> = d3
         .line<IBarData>()
         .x(
-          (d: IBarData): number => {
-            const x = this.x(d.component);
+          (d: IBarData, i: number): number => {
+            const x = this.x(`PC ${i + 1}`);
             const bandWidth = this.x.bandwidth();
 
             if (x && bandWidth) {
@@ -194,7 +196,7 @@ export const Bar = withStyles(styles)(
             return 0;
           }
         )
-        .y((d: IBarData): number => this.y(d.comulative))
+        .y((d: IBarData): number => this.y(d.eigenvalue))
         .curve(d3.curveMonotoneX);
 
       // draw the path based on created line
@@ -218,8 +220,8 @@ export const Bar = withStyles(styles)(
         .attr("r", 3.5)
         .attr(
           "cx",
-          (d: IBarData): number => {
-            const x = this.x(d.component);
+          (d: IBarData, i: number): number => {
+            const x = this.x(`PC ${i + 1}`);
             const bandWidth = this.x.bandwidth();
 
             if (x && bandWidth) {
@@ -229,11 +231,11 @@ export const Bar = withStyles(styles)(
             return 0;
           }
         )
-        .attr("cy", (d: IBarData): number => this.y(d.comulative));
+        .attr("cy", (d: IBarData): number => this.y(d.eigenvalue));
 
       /**
        * create the text labels at the top of each bar
-       * the label is current component comulative value
+       * the label is current component eigen value
        */
       this.svg
         .selectAll(".text")
@@ -243,8 +245,8 @@ export const Bar = withStyles(styles)(
         .attr("class", "label")
         .attr(
           "x",
-          (d: IBarData): number => {
-            const x = this.x(d.component);
+          (d: IBarData, i: number): number => {
+            const x = this.x(`PC ${i + 1}`);
             const bandWidth = this.x.bandwidth();
 
             if (x && bandWidth) {
@@ -254,7 +256,7 @@ export const Bar = withStyles(styles)(
             return 0;
           }
         )
-        .attr("y", (d: IBarData): number => this.y(d.comulative) - 16)
+        .attr("y", (d: IBarData): number => this.y(d.eigenvalue) - 16)
         .attr("dy", ".75em")
         .style("text-anchor", "start")
         .style(
@@ -272,8 +274,7 @@ export const Bar = withStyles(styles)(
             return `${md}px`;
           }
         )
-        // display percentage
-        .text((d: IBarData): string => `${d.comulative}%`);
+        .text((d: IBarData): string => `${round(d.eigenvalue, 2)}`);
     }
 
     public render(): React.ReactNode {

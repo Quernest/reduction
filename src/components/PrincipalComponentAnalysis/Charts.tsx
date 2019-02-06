@@ -1,3 +1,4 @@
+import Typography from "@material-ui/core/Typography";
 import * as React from "react";
 import { Points, Vectors } from "src/models/chart.model";
 import { IPCACalculations } from "src/models/pca.model";
@@ -30,16 +31,9 @@ export const Charts = ({
   ]) as Points;
 
   const vectors = React.useMemo(() => {
-    // collection of x2 values
     const x2s: number[] = getMatrixColumn(eigens.E.x, x);
-
-    // collection of y2 values
     const y2s: number[] = getMatrixColumn(eigens.E.x, y);
-
-    // collection of x1 values
     const x1s: number[] = Array(x2s.length).fill(0);
-
-    // collection of y1 values
     const y1s: number[] = Array(y2s.length).fill(0);
 
     // return vectors
@@ -48,6 +42,9 @@ export const Charts = ({
 
   return (
     <>
+      <Typography variant="body1">
+        You can select components what you want to see below
+      </Typography>
       <SelectComponents
         analysis={analysis}
         onChange={onChangeSelectComponents}

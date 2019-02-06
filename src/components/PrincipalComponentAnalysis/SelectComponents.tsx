@@ -10,10 +10,12 @@ import React from "react";
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
     display: "flex",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
+    marginBottom: spacing.unit,
+    marginTop: spacing.unit
   },
   formControl: {
-    margin: spacing.unit,
+    marginRight: spacing.unit,
     minWidth: 120
   },
   selectEmpty: {

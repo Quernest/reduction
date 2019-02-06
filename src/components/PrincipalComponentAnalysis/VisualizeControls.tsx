@@ -9,6 +9,10 @@ import { SelectComponents } from "src/components";
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
     flexGrow: 1
+  },
+  button: {
+    marginTop: spacing.unit,
+    marginBottom: spacing.unit
   }
 }));
 
@@ -33,16 +37,21 @@ export const VisualizeControls = ({
   return (
     <div className={classes.root}>
       <Typography variant="body1" paragraph={true}>
-        Calculations is ready. Press on the visualize button if you want
-        represent the dataset.
+        Calculations is ready. Choose components and press on the visualize
+        button if you want represent the dataset.
       </Typography>
-      <Grid container={true} alignItems="center">
+      <Grid container={true} alignItems="flex-end">
         <SelectComponents
           analysis={analysis}
           onChange={onChangeSelectComponents}
           components={components}
         />
-        <Button variant="contained" color="primary" onClick={onVisualize}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={onVisualize}
+          className={classes.button}
+        >
           Visualize
         </Button>
       </Grid>
