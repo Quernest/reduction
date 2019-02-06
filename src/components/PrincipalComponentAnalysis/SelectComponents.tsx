@@ -23,38 +23,43 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
 
 interface IProps {
   analysis: number[];
-  onChange: (event: any) => void;
-  // index of selected component X
-  selectedComponentX: number;
-  // index of selected component Y
-  selectedComponentY: number;
+  components: {
+    x: number;
+    y: number;
+  };
+  onChange: (newComponents: { x: number; y: number }) => void;
 }
 
-export const SelectComponent = ({
+export const SelectComponents = ({
   analysis,
   onChange,
-  selectedComponentX,
-  selectedComponentY
+  components
 }: IProps) => {
   const classes = useStyles();
+
+  const onChangeSelect = (event: any) => {
+    const { name, value } = event.target;
+
+    onChange({ ...components, [name]: value });
+  };
 
   return (
     <form className={classes.root} autoComplete="off">
       <FormControl className={classes.formControl}>
-        <InputLabel htmlFor="selectedComponentX">Component X</InputLabel>
+        <InputLabel htmlFor="x">Component X</InputLabel>
         <Select
-          value={selectedComponentX}
-          onChange={onChange}
+          value={components.x}
+          onChange={onChangeSelect}
           inputProps={{
-            name: "selectedComponentX",
-            id: "selectedComponentX"
+            name: "x",
+            id: "x"
           }}
         >
-          {map(analysis, (value: number, index: number) => {
-            if (index !== selectedComponentY) {
+          {map(analysis, (value: number, i: number) => {
+            if (i !== components.y) {
               return (
-                <MenuItem key={index} value={index}>
-                  PC {index + 1} {value}%
+                <MenuItem key={i} value={i}>
+                  PC {i + 1} {value}%
                 </MenuItem>
               );
             }
@@ -64,20 +69,20 @@ export const SelectComponent = ({
         </Select>
       </FormControl>
       <FormControl className={classes.formControl}>
-        <InputLabel htmlFor="selectedComponentY">Component Y</InputLabel>
+        <InputLabel htmlFor="y">Component Y</InputLabel>
         <Select
-          value={selectedComponentY}
-          onChange={onChange}
+          value={components.y}
+          onChange={onChangeSelect}
           inputProps={{
-            name: "selectedComponentY",
-            id: "selectedComponentY"
+            name: "y",
+            id: "y"
           }}
         >
-          {map(analysis, (value: number, index: number) => {
-            if (index !== selectedComponentX) {
+          {map(analysis, (value: number, i: number) => {
+            if (i !== components.x) {
               return (
-                <MenuItem key={index} value={index}>
-                  PC {index + 1} {value}%
+                <MenuItem key={i} value={i}>
+                  PC {i + 1} {value}%
                 </MenuItem>
               );
             }
@@ -90,7 +95,9 @@ export const SelectComponent = ({
   );
 };
 
-SelectComponent.defaultProps = {
-  selectedComponentX: 0,
-  selectedComponentY: 1
+SelectComponents.defaultProps = {
+  components: {
+    x: 0,
+    y: 1
+  }
 };

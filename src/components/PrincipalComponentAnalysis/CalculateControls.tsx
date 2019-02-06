@@ -36,11 +36,6 @@ export const CalculateControls = ({ parsedFile, onCalculate }: IProps) => {
   if (headers && data) {
     return (
       <div className={classes.root}>
-        <Grid item={true} xs={12}>
-          <Typography variant="body1" paragraph={true}>
-            The dataset is uploaded. Use calculate button for analysing.
-          </Typography>
-        </Grid>
         <Button
           className={classes.button}
           variant="contained"
