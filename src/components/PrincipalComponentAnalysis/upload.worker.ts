@@ -11,19 +11,19 @@ ctx.addEventListener("message", (event: MessageEvent) => {
   fr.readAsText(event.data);
 
   fr.onload = () => {
-    let parsedCSV: IParsedCSV = {
+    let parsedFile: IParsedCSV = {
       headers: [],
       data: []
     };
 
     try {
       if (isString(fr.result)) {
-        parsedCSV = parseCSV(fr.result);
+        parsedFile = parseCSV(fr.result);
       } else {
         throw new Error("data reading error");
       }
 
-      const { headers, data } = parsedCSV;
+      const { headers, data } = parsedFile;
 
       if (headers.length < 2) {
         throw new Error(
@@ -39,7 +39,7 @@ ctx.addEventListener("message", (event: MessageEvent) => {
         });
       });
 
-      ctx.postMessage({ parsedCSV });
+      ctx.postMessage({ parsedFile });
     } catch (error) {
       ctx.postMessage({ error: error.message });
     }

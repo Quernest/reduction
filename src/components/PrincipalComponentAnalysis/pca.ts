@@ -67,8 +67,10 @@ export class PCA implements IPCA {
       throw new Error("the dataset must be an array type");
     }
 
+    this.dataset = dataset;
+
     // step 1
-    this.adjustedDataset = this.adjustDataset(dataset);
+    this.adjustedDataset = this.adjustDataset(this.dataset);
 
     // step 2
     this.covariance = this.computeCovariance(this.adjustedDataset);

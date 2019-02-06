@@ -18,8 +18,8 @@ import { CustomTableCell, TablePaginationActions } from "./";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
-    width: "100%",
-    marginTop: spacing.unit * 2
+    width: "100%"
+    // marginTop: spacing.unit * 2
   },
   table: {
     minWidth: 500

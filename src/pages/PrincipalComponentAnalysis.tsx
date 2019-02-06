@@ -2,12 +2,13 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
+import debounce from "lodash/debounce";
 import has from "lodash/has";
 import * as React from "react";
-import { UploadControls } from "src/components/UploadControls";
+import { CalculateControls, ErrorBox, UploadControls } from "src/components";
+import { IPCACalculations } from "src/models/pca.model";
 import { IParsedCSV } from "src/utils/csv";
-// import { IPCACalculations } from 'src/models/pca.model';
-// import CalculateWorker from "worker-loader!src/components/PrincipalComponentAnalysis/calculate.worker";
+import CalculateWorker from "worker-loader!src/components/PrincipalComponentAnalysis/calculate.worker";
 import UploadWorker from "worker-loader!src/components/PrincipalComponentAnalysis/upload.worker";
 
 const useStyles = makeStyles(({ spacing, breakpoints }: Theme) => ({
@@ -51,13 +52,32 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
   const [file, setFile] = React.useState<File | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const [state, setState] = React.useState<IState>(initialState);
-  // @ts-ignore
-  const [parsedCSV, setParsedCSV] = React.useState<IParsedCSV>({
+  const [parsedFile, setParsedFile] = React.useState<IParsedCSV>({
     headers: [],
     data: []
   });
+  const [calculations, setCalculations] = React.useState<IPCACalculations>({
+    dataset: [],
+    adjustedDataset: [],
+    covariance: [],
+    eigens: {
+      E: {
+        y: [],
+        x: []
+      },
+      lambda: {
+        x: [],
+        y: []
+      }
+    },
+    linearCombinations: [],
+    analysis: []
+  });
+
+  const debounceTime: number = 1000;
 
   let uploadWorker: Worker;
+  let calculateWorker: Worker;
 
   function cleanErrors() {
     setError(undefined);
@@ -65,17 +85,29 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
 
   function initWorkers() {
     uploadWorker = new UploadWorker();
+    calculateWorker = new CalculateWorker();
 
-    uploadWorker.addEventListener("message", (event: MessageEvent) => {
-      if (has(event.data, "error")) {
-        setState({ ...state, uploaded: false, uploading: false });
-        setError(event.data.error);
-      } else {
-        setState({ ...state, uploaded: true, uploading: false });
-        setParsedCSV(event.data.parsedCSV);
-        cleanErrors();
-      }
-    });
+    uploadWorker.addEventListener(
+      "message",
+      debounce((event: MessageEvent) => {
+        if (has(event.data, "error")) {
+          setState({ ...state, uploaded: false, uploading: false });
+          setError(event.data.error);
+        } else {
+          setState({ ...state, uploaded: true, uploading: false });
+          setParsedFile(event.data.parsedFile);
+          cleanErrors();
+        }
+      }, debounceTime)
+    );
+
+    calculateWorker.addEventListener(
+      "message",
+      debounce((event: MessageEvent) => {
+        setState({ ...state, calculated: true, calculating: false });
+        setCalculations(event.data);
+      }, debounceTime)
+    );
   }
 
   // init workers on component did mount
@@ -100,7 +132,14 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
     setFile(undefined);
   };
 
-  const { uploading, uploaded, calculating } = state;
+  const onCalculate = (): void => {
+    setState({ ...state, calculating: true });
+    calculateWorker.postMessage(parsedFile);
+  };
+
+  const { uploading, uploaded, calculated, calculating } = state;
+
+  const isLoading = uploading || calculating;
 
   return (
     <div className={classes.root}>
@@ -108,12 +147,12 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
         <Typography variant="h6" paragraph={true}>
           Principal Component Analysis
         </Typography>
-        {(uploading || calculating) && (
+        {isLoading && (
           <div className={classes.progress}>
             <LinearProgress />
           </div>
         )}
-        {!(uploaded || uploading) && (
+        {!isLoading && !uploaded && (
           <UploadControls
             file={file}
             onUpload={onUploadFile}
@@ -121,12 +160,14 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
             onCancel={onCancelFile}
           />
         )}
-        {uploaded && <div>uploaded controls component and datasets</div>}
-        {error && (
-          <Typography variant="body2" color="error">
-            {error}
-          </Typography>
+        {!isLoading && !calculated && uploaded && (
+          <CalculateControls
+            parsedFile={parsedFile}
+            onCalculate={onCalculate}
+          />
         )}
+        {!isLoading && calculated && <div>{String(calculations)}</div>}
+        <ErrorBox message={error} />
       </div>
     </div>
   );
@@ -659,36 +700,36 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
 //                   );
 //                 }
 
-//                 if (uploaded) {
-//                   return (
-//                     <React.Fragment>
-//                       <Grid item={true} xs={12}>
-//                         <Typography
-//                           variant="body2"
-//                           color="textSecondary"
-//                           paragraph={true}
-//                         >
-//                           The dataset is uploaded. Use calculate button for
-//                           analysing.
-//                         </Typography>
-//                       </Grid>
-//                       <Button
-//                         variant="contained"
-//                         color="primary"
-//                         onClick={this.onCalculate}
-//                       >
-//                         Calculate
-//                       </Button>
-//                       <Grid className={classes.tableBox} item={true} xs={12}>
-//                         <Typography variant="h6">Your dataset</Typography>
-//                         <OutputTable
-//                           rows={parsedCSV.data}
-//                           columns={parsedCSV.headers}
-//                         />
-//                       </Grid>
-//                     </React.Fragment>
-//                   );
-//                 }
+// if (uploaded) {
+//   return (
+// <React.Fragment>
+//   <Grid item={true} xs={12}>
+//     <Typography
+//       variant="body2"
+//       color="textSecondary"
+//       paragraph={true}
+//     >
+//       The dataset is uploaded. Use calculate button for
+//       analysing.
+//     </Typography>
+//   </Grid>
+//   <Button
+//     variant="contained"
+//     color="primary"
+//     onClick={this.onCalculate}
+//   >
+//     Calculate
+//   </Button>
+//   <Grid className={classes.tableBox} item={true} xs={12}>
+//     <Typography variant="h6">Your dataset</Typography>
+//     <OutputTable
+//       rows={parsedCSV.data}
+//       columns={parsedCSV.headers}
+//     />
+//   </Grid>
+// </React.Fragment>
+//   );
+// }
 
 // return (
 //   <React.Fragment>
