@@ -167,52 +167,67 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
   const { analysis } = calculations;
   const { uploading, uploaded, calculated, calculating, visualized } = state;
 
-  const isLoading = uploading || calculating;
-
   return (
     <div className={classes.root}>
       <div className={classes.wrap}>
         <Typography variant="h6" paragraph={true}>
           Principal Component Analysis
         </Typography>
-        {isLoading && (
-          <div className={classes.progress}>
-            <LinearProgress />
-          </div>
-        )}
-        {!isLoading && !uploaded && (
-          <UploadControls
-            file={file}
-            onUpload={onUploadFile}
-            onChange={onChangeFile}
-            onCancel={onCancelFile}
-          />
-        )}
-        {!isLoading && !calculated && uploaded && (
-          <CalculateControls
-            parsedFile={parsedFile}
-            onCalculate={onCalculate}
-          />
-        )}
-        {!isLoading && calculated && !visualized && (
-          <>
-            <VisualizeControls
-              analysis={analysis}
-              onVisualize={onVisualize}
-              onChangeSelectComponents={onChangeSelectComponents}
-              components={components}
+        {(() => {
+          if (uploading || calculating) {
+            return (
+              <div className={classes.progress}>
+                <LinearProgress />
+              </div>
+            );
+          }
+
+          if (visualized) {
+            return (
+              <Charts
+                onChangeSelectComponents={onChangeSelectComponents}
+                parsedFile={parsedFile}
+                calculations={calculations}
+                components={components}
+              />
+            );
+          }
+
+          if (calculated) {
+            return (
+              <>
+                <VisualizeControls
+                  analysis={analysis}
+                  onVisualize={onVisualize}
+                  onChangeSelectComponents={onChangeSelectComponents}
+                  components={components}
+                />
+                <Calculations
+                  parsedFile={parsedFile}
+                  calculations={calculations}
+                />
+              </>
+            );
+          }
+
+          if (uploaded) {
+            return (
+              <CalculateControls
+                parsedFile={parsedFile}
+                onCalculate={onCalculate}
+              />
+            );
+          }
+
+          return (
+            <UploadControls
+              file={file}
+              onUpload={onUploadFile}
+              onChange={onChangeFile}
+              onCancel={onCancelFile}
             />
-            <Calculations parsedFile={parsedFile} calculations={calculations} />
-          </>
-        )}
-        {!isLoading && visualized && (
-          <Charts
-            onChangeSelectComponents={onChangeSelectComponents}
-            parsedFile={parsedFile}
-            calculations={calculations}
-            components={components}
-          />
-        )}
+          );
+        })()}
         <ErrorBox message={error} />
       </div>
     </div>
