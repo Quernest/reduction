@@ -1,8 +1,10 @@
 import FormControl from "@material-ui/core/FormControl";
+import IconButton from "@material-ui/core/IconButton";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { Theme } from "@material-ui/core/styles";
+import ThreeSixtyIcon from "@material-ui/icons/ThreeSixty";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
 import React from "react";
@@ -11,6 +13,7 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
+    alignItems: "flex-end",
     marginBottom: spacing.unit,
     marginTop: spacing.unit
   },
@@ -20,6 +23,13 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
   },
   selectEmpty: {
     marginTop: spacing.unit * 2
+  },
+  iconButton: {
+    padding: spacing.unit,
+    marginRight: spacing.unit
+  },
+  icon: {
+    fontSize: 24
   }
 }));
 
@@ -45,6 +55,13 @@ export const SelectComponents = ({
     onChange({ ...components, [name]: value });
   };
 
+  const onSwap = (event: any) => {
+    const x: number = components.y;
+    const y: number = components.x;
+
+    onChange({ x, y });
+  };
+
   return (
     <form className={classes.root} autoComplete="off">
       <FormControl className={classes.formControl}>
@@ -52,22 +69,21 @@ export const SelectComponents = ({
         <Select
           value={components.x}
           onChange={onChangeSelect}
+          disabled={analysis.length === 2}
           inputProps={{
             name: "x",
             id: "x"
           }}
         >
-          {map(analysis, (value: number, i: number) => {
-            if (i !== components.y) {
-              return (
+          {map(
+            analysis,
+            (value: number, i: number) =>
+              i !== components.y && (
                 <MenuItem key={i} value={i}>
-                  PC {i + 1} {value}%
+                  PC{i + 1} ({value}%)
                 </MenuItem>
-              );
-            }
-
-            return null;
-          })}
+              )
+          )}
         </Select>
       </FormControl>
       <FormControl className={classes.formControl}>
@@ -75,24 +91,30 @@ export const SelectComponents = ({
         <Select
           value={components.y}
           onChange={onChangeSelect}
+          disabled={analysis.length === 2}
           inputProps={{
             name: "y",
             id: "y"
           }}
         >
-          {map(analysis, (value: number, i: number) => {
-            if (i !== components.x) {
-              return (
+          {map(
+            analysis,
+            (value: number, i: number) =>
+              i !== components.x && (
                 <MenuItem key={i} value={i}>
-                  PC {i + 1} {value}%
+                  PC{i + 1} ({value}%)
                 </MenuItem>
-              );
-            }
-
-            return null;
-          })}
+              )
+          )}
         </Select>
       </FormControl>
+      <IconButton
+        aria-label="Swap"
+        onClick={onSwap}
+        className={classes.iconButton}
+      >
+        <ThreeSixtyIcon className={classes.icon} />
+      </IconButton>
     </form>
   );
 };

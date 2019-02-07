@@ -27,7 +27,7 @@ ctx.addEventListener("message", (event: MessageEvent) => {
 
       if (headers.length < 2) {
         throw new Error(
-          "the object of dataset must contain more than 2 factors."
+          "the dataset must contain more than 2 variables"
         );
       }
 

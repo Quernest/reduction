@@ -87,6 +87,7 @@ export const UploadControls = (props: IProps): JSX.Element => {
         type="file"
         multiple={false}
         hidden={true}
+        accept=".csv, .txt"
       />
       <Button variant="contained" color="primary" onClick={onChoose}>
         choose a file
