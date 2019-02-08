@@ -175,6 +175,7 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
     return () => {
       if (!isUndefined(uploadWorker)) {
         uploadWorker.removeEventListener("message", onUploadWorkerMsg, false);
+        uploadWorker.terminate();
       }
 
       if (!isUndefined(calculateWorker)) {
@@ -183,9 +184,10 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
           onCalculateWorkerMsg,
           false
         );
+        calculateWorker.terminate();
       }
     };
-  });
+  }, [uploadWorker, calculateWorker]);
 
   const onChangeFile = (chosenFile?: File, err?: string): void => {
     if (err) {
