@@ -92,10 +92,6 @@ export const Bar = withStyles(styles)(
        */
       const data = from2D<IBarData>(combinedData, keys);
 
-      // data.sort(
-      //   (a, b) => b.eigenvalue - a.eigenvalue
-      // );
-
       this.selectSVGElement();
       this.drawAxes(data);
       this.drawBars(data);

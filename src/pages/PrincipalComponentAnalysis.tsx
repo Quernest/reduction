@@ -4,6 +4,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import debounce from "lodash/debounce";
 import has from "lodash/has";
+import isUndefined from "lodash/isUndefined";
 import * as React from "react";
 import {
   CalculateControls,
@@ -57,13 +58,33 @@ const initialState: IState = {
 export const PrincipalComponentAnalysisPage = (): JSX.Element => {
   const classes = useStyles();
 
+  /**
+   * original file (.csv or .txt)
+   */
   const [file, setFile] = React.useState<File | undefined>(undefined);
+
+  /**
+   * error string, component to display at the bottom of the page
+   */
   const [error, setError] = React.useState<string | undefined>(undefined);
+
+  /**
+   * current page state
+   */
   const [state, setState] = React.useState<IState>(initialState);
+
+  /**
+   * processed file
+   */
   const [parsedFile, setParsedFile] = React.useState<IParsedCSV>({
     headers: [],
     data: []
   });
+
+  /**
+   * object with the results of calculations
+   * of the principal component method
+   */
   const [calculations, setCalculations] = React.useState<IPCACalculations>({
     dataset: [],
     adjustedDataset: [],
@@ -87,6 +108,23 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
   });
 
   /**
+   * which handles the downloaded
+   * csv file in the background process
+   */
+  const [uploadWorker, createUploadWorker] = React.useState<Worker | undefined>(
+    undefined
+  );
+
+  /**
+   * calculate worker which performs the calculations
+   * of the principal component method
+   * in the background process
+   */
+  const [calculateWorker, createCalculateWorker] = React.useState<
+    Worker | undefined
+  >(undefined);
+
+  /**
    * selected components.
    * contains selected x and y axes of principal components
    */
@@ -95,44 +133,59 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
     y: 1
   });
 
-  const debounceTime: number = 1000;
-
-  let uploadWorker: Worker;
-  let calculateWorker: Worker;
+  const { analysis } = calculations;
+  const { uploading, uploaded, calculated, calculating, visualized } = state;
 
   function cleanErrors() {
     setError(undefined);
   }
 
-  function initWorkers() {
-    uploadWorker = new UploadWorker();
-    calculateWorker = new CalculateWorker();
+  // create workers on componentDidMount
+  React.useEffect(() => {
+    const debounceTime: number = 1000;
 
-    uploadWorker.addEventListener(
-      "message",
-      debounce((event: MessageEvent) => {
-        if (has(event.data, "error")) {
-          setError(event.data.error);
-          setState({ ...state, uploaded: false, uploading: false });
-        } else {
-          cleanErrors();
-          setParsedFile(event.data.parsedFile);
-          setState({ ...state, uploaded: true, uploading: false });
-        }
-      }, debounceTime)
-    );
+    const onUploadWorkerMsg = debounce((event: MessageEvent) => {
+      if (has(event.data, "error")) {
+        setError(event.data.error);
+        setState({ ...state, uploaded: false, uploading: false });
+      } else {
+        cleanErrors();
+        setParsedFile(event.data.parsedFile);
+        setState({ ...state, uploaded: true, uploading: false });
+      }
+    }, debounceTime);
 
-    calculateWorker.addEventListener(
-      "message",
-      debounce((event: MessageEvent) => {
-        setCalculations(event.data);
-        setState({ ...state, calculated: true, calculating: false });
-      }, debounceTime)
-    );
-  }
+    const onCalculateWorkerMsg = debounce((event: MessageEvent) => {
+      setCalculations(event.data);
+      setState({ ...state, calculated: true, calculating: false });
+    }, debounceTime);
 
-  // init workers on component did mount
-  React.useEffect(initWorkers);
+    if (isUndefined(uploadWorker)) {
+      createUploadWorker(new UploadWorker());
+    } else {
+      uploadWorker.addEventListener("message", onUploadWorkerMsg, false);
+    }
+
+    if (isUndefined(calculateWorker)) {
+      createCalculateWorker(new CalculateWorker());
+    } else {
+      calculateWorker.addEventListener("message", onCalculateWorkerMsg, false);
+    }
+
+    return () => {
+      if (!isUndefined(uploadWorker)) {
+        uploadWorker.removeEventListener("message", onUploadWorkerMsg, false);
+      }
+
+      if (!isUndefined(calculateWorker)) {
+        calculateWorker.removeEventListener(
+          "message",
+          onCalculateWorkerMsg,
+          false
+        );
+      }
+    };
+  });
 
   const onChangeFile = (chosenFile?: File, err?: string): void => {
     if (err) {
@@ -144,8 +197,10 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
   };
 
   const onUploadFile = (): void => {
-    setState({ ...state, uploading: true });
-    uploadWorker.postMessage(file);
+    if (!isUndefined(uploadWorker)) {
+      setState({ ...state, uploading: true });
+      uploadWorker.postMessage(file);
+    }
   };
 
   const onCancelFile = (): void => {
@@ -154,8 +209,10 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
   };
 
   const onCalculate = (): void => {
-    setState({ ...state, calculating: true });
-    calculateWorker.postMessage(parsedFile);
+    if (!isUndefined(calculateWorker)) {
+      setState({ ...state, calculating: true });
+      calculateWorker.postMessage(parsedFile);
+    }
   };
 
   const onVisualize = (): void => {
@@ -168,9 +225,6 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
   }): void => {
     setComponents({ ...components, ...newComponents });
   };
-
-  const { analysis } = calculations;
-  const { uploading, uploaded, calculated, calculating, visualized } = state;
 
   return (
     <div className={classes.root}>
