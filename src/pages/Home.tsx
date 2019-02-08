@@ -33,7 +33,7 @@ export const Home = () => {
             <Typography variant="h6" paragraph={true}>
               Principal Component Analysis
             </Typography>
-            <Typography variant="body2" color="textSecondary" paragraph={true}>
+            <Typography variant="body2" paragraph={true}>
               Principal component analysis (PCA) is a statistical procedure that
               uses an orthogonal transformation to convert a set of observations
               of possibly correlated variables (entities each of which takes on
@@ -48,7 +48,7 @@ export const Home = () => {
             <Typography variant="h6" paragraph={true}>
               Self-Organizing Map
             </Typography>
-            <Typography variant="body2" color="textSecondary" paragraph={true}>
+            <Typography variant="body2" paragraph={true}>
               A self-organizing map (SOM) or self-organizing feature map (SOFM)
               is a type of artificial neural network (ANN) that is trained using
               unsupervised learning to produce a low-dimensional (typically

@@ -26,6 +26,7 @@ export const Info = (): JSX.Element => {
         This calculator is designed to process two-dimensional data arrays using
         the principal component analysis algorithm.
       </Typography>
+      <Divider className={classes.divider} />
       <Typography variant="body1">
         To use the calculator you need to do next steps:
       </Typography>
@@ -69,13 +70,13 @@ export const Info = (): JSX.Element => {
       </List>
       <Divider className={classes.divider} />
       <Typography variant="body1" paragraph={true}>
-        Download the{" "}
+        Download one of the{" "}
         <Link
-          href="https://www.dropbox.com/s/pw0lq6adggjo5sy/gsp.csv?dl=0"
+          href="https://www.dropbox.com/sh/9r60z7yu8u61bo9/AACv3-4qRYQy0dibBrBvNscGa?dl=0"
           variant="inherit"
           color="primary"
         >
-          example dataset
+          example datasets
         </Link>{" "}
         and try it now
       </Typography>
