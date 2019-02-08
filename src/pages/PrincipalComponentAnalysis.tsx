@@ -10,6 +10,7 @@ import {
   Calculations,
   Charts,
   ErrorBox,
+  Info,
   UploadControls,
   VisualizeControls
 } from "src/components";
@@ -224,12 +225,15 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
           }
 
           return (
-            <UploadControls
-              file={file}
-              onUpload={onUploadFile}
-              onChange={onChangeFile}
-              onCancel={onCancelFile}
-            />
+            <>
+              <Info />
+              <UploadControls
+                file={file}
+                onUpload={onUploadFile}
+                onChange={onChangeFile}
+                onCancel={onCancelFile}
+              />
+            </>
           );
         })()}
         <ErrorBox message={error} />

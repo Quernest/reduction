@@ -36,6 +36,9 @@ export const CalculateControls = ({ parsedFile, onCalculate }: IProps) => {
   if (headers && data) {
     return (
       <div className={classes.root}>
+        <Typography variant="body1" paragraph={true}>
+          The dataset is processed. Press on the calculate button
+        </Typography>
         <Button
           className={classes.button}
           variant="contained"
