@@ -18,7 +18,7 @@ import round from "lodash/round";
 import sum from "lodash/sum";
 
 // models
-import { IPCA } from "src/models/pca.model";
+import { IEigenAnalysis, IEigens, IPCA } from "src/models/pca.model";
 
 // helpers
 // import { opposite } from "../../utils/numbers";
@@ -41,20 +41,11 @@ export class PCA implements IPCA {
 
   public covariance: number[][];
 
-  public eigens: {
-    E: {
-      y: number[][];
-      x: number[][];
-    };
-    lambda: {
-      x: number[];
-      y: number[];
-    };
-  };
+  public eigens: IEigens;
 
   public linearCombinations: number[][];
 
-  public analysis: number[];
+  public analysis: IEigenAnalysis;
 
   constructor(dataset: number[][], variables: string[]) {
     // handle if the dataset is empty
@@ -132,14 +123,6 @@ export class PCA implements IPCA {
     const eigens = math.eval(`eig(${matrix.toString()})`);
 
     return eigens;
-
-    // you can opposite eigenvectors direction if they are wrong
-    // return assign(eigens, {
-    //   E: {
-    //     x: opposite(eigens.E.x),
-    //     y: opposite(eigens.E.y)
-    //   }
-    // });
   }
 
   /**
@@ -174,7 +157,7 @@ export class PCA implements IPCA {
         sum
       );
 
-      // push to the accamulator
+      // push to the accumulator
       if (!isUndefined(accumulator)) {
         accumulator.push(linearCombination);
       }
@@ -189,12 +172,57 @@ export class PCA implements IPCA {
    * analyze eigenvalues (compute PCs proportion in %)
    * describes how much {PC1, PC2 ... PCn} accounts of the total variation around the PCs.
    */
-  public analyze(eigenvalues: number[]): number[] {
+  public analyze(eigenvalues: number[]): IEigenAnalysis {
     const summary: number = math.sum(eigenvalues);
 
-    return map(
+    /**
+     * Proportion of variance explained
+     */
+    const proportion: number[] = map(
       eigenvalues,
       (lambda: number): number => round((lambda / summary) * 100, 2)
     );
+
+    /**
+     * Cumulative proportion of variance explained
+     */
+    const cumulative: number[] = reduce(
+      proportion,
+      (accumulator: number[], currentValue: number, i: number) => {
+        if (i < 1) {
+          accumulator[i] = currentValue;
+        } else {
+          accumulator[i] = round(accumulator[i - 1] + currentValue, 2);
+        }
+
+        return accumulator;
+      },
+      []
+    );
+
+    /**
+     * difference b/n eigenvalues
+     */
+    const differences: number[] = reduce(
+      eigenvalues,
+      (accumulator: number[], current: number, i: number, list: number[]) => {
+        const next: number = list[i + 1];
+
+        if (next) {
+          accumulator[i] = round(current - next, 2);
+        } else {
+          accumulator[i] = 0;
+        }
+
+        return accumulator;
+      },
+      []
+    );
+
+    return {
+      proportion,
+      cumulative,
+      differences
+    };
   }
 }

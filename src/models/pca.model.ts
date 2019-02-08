@@ -1,3 +1,20 @@
+export interface IEigenAnalysis {
+  proportion: number[];
+  cumulative: number[];
+  differences: number[];
+}
+
+export interface IEigens {
+  E: {
+    y: number[][];
+    x: number[][];
+  };
+  lambda: {
+    x: number[];
+    y: number[];
+  };
+}
+
 export interface IPCA {
   dataset: number[][];
 
@@ -5,20 +22,11 @@ export interface IPCA {
 
   covariance: number[][];
 
-  eigens: {
-    E: {
-      y: number[][];
-      x: number[][];
-    };
-    lambda: {
-      x: number[];
-      y: number[];
-    };
-  };
+  eigens: IEigens;
 
   linearCombinations: number[][];
 
-  analysis: number[];
+  analysis: IEigenAnalysis;
 
   /**
    * get mean-adjusted data - PCA (maximizing variance)
@@ -35,18 +43,7 @@ export interface IPCA {
    * get the eigenvectors and eigenvalues of the covariance matrix
    * @see https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors
    */
-  getEigens(
-    covariance: number[][]
-  ): {
-    E: {
-      y: number[][];
-      x: number[][];
-    };
-    lambda: {
-      x: number[];
-      y: number[];
-    };
-  };
+  getEigens(covariance: number[][]): IEigens;
 
   /**
    * get linear combinations of eigenvectors
@@ -61,7 +58,7 @@ export interface IPCA {
    * analyze eigenvalues (compute PCs proportion in %)
    * describes how much {PC1, PC2 ... PCn} accounts of the total variation around the PCs.
    */
-  analyze(eigenvalues: number[]): number[];
+  analyze(eigenvalues: number[]): IEigenAnalysis;
 }
 
 export interface IPCACalculations {
@@ -71,18 +68,9 @@ export interface IPCACalculations {
 
   covariance: number[][];
 
-  eigens: {
-    E: {
-      y: number[][];
-      x: number[][];
-    };
-    lambda: {
-      x: number[];
-      y: number[];
-    };
-  };
+  eigens: IEigens;
 
   linearCombinations: number[][];
 
-  analysis: number[];
+  analysis: IEigenAnalysis;
 }

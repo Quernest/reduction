@@ -28,14 +28,12 @@ const styles = createStyles({
 interface IBarData {
   component: string;
   eigenvalue: number;
-  comulative: number;
 }
 
 interface IProps {
   title?: string;
   eigenvalues: number[];
   names: string[];
-  analysis: number[];
   classes?: any;
 }
 
@@ -74,23 +72,19 @@ export const Bar = withStyles(styles)(
     };
 
     public componentDidMount() {
-      const { eigenvalues, names, analysis } = this.props;
+      const { eigenvalues, names } = this.props;
 
       /**
        * array of combined eigenvalues ​​that we display in bar columns
        */
-      const combinedData: [string[], number[], number[]] = [
-        names,
-        eigenvalues,
-        analysis
-      ];
+      const combinedData: [string[], number[]] = [names, eigenvalues];
 
       /**
        * keys of this eigenvalues
        * by default describes:
-       * component name, eigenvalue, comulative percentage
+       * component name, eigenvalue
        */
-      const keys: string[] = ["component", "eigenvalue", "comulative"];
+      const keys: string[] = ["component", "eigenvalue"];
 
       /**
        * formatted data which represents a collection of objects
@@ -99,7 +93,7 @@ export const Bar = withStyles(styles)(
       const data = from2D<IBarData>(combinedData, keys);
 
       // data.sort(
-      //   (a, b) => b.comulative - a.comulative or b.eigenvalue - a.eigenvalue
+      //   (a, b) => b.eigenvalue - a.eigenvalue
       // );
 
       this.selectSVGElement();

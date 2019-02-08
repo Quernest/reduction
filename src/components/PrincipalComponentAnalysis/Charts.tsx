@@ -62,7 +62,6 @@ export const Charts = ({
         title="Scree plot of eigenvalues"
         eigenvalues={eigens.lambda.x}
         names={headers}
-        analysis={analysis}
       />
     </>
   );

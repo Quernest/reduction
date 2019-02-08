@@ -8,6 +8,7 @@ import ThreeSixtyIcon from "@material-ui/icons/ThreeSixty";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
 import React from "react";
+import { IEigenAnalysis } from "src/models/pca.model";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
@@ -34,7 +35,7 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
 }));
 
 interface IProps {
-  analysis: number[];
+  analysis: IEigenAnalysis;
   components: {
     x: number;
     y: number;
@@ -62,6 +63,8 @@ export const SelectComponents = ({
     onChange({ x, y });
   };
 
+  const { proportion } = analysis;
+
   return (
     <form className={classes.root} autoComplete="off">
       <FormControl className={classes.formControl}>
@@ -69,14 +72,14 @@ export const SelectComponents = ({
         <Select
           value={components.x}
           onChange={onChangeSelect}
-          disabled={analysis.length === 2}
+          disabled={proportion.length === 2}
           inputProps={{
             name: "x",
             id: "x"
           }}
         >
           {map(
-            analysis,
+            proportion,
             (value: number, i: number) =>
               i !== components.y && (
                 <MenuItem key={i} value={i}>
@@ -91,14 +94,14 @@ export const SelectComponents = ({
         <Select
           value={components.y}
           onChange={onChangeSelect}
-          disabled={analysis.length === 2}
+          disabled={proportion.length === 2}
           inputProps={{
             name: "y",
             id: "y"
           }}
         >
           {map(
-            analysis,
+            proportion,
             (value: number, i: number) =>
               i !== components.x && (
                 <MenuItem key={i} value={i}>

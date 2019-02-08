@@ -71,8 +71,18 @@ export const Calculations = ({
           </Typography>
           <OutputTable
             enumerateSymbol="Component"
-            rows={[eigens.lambda.x, analysis]}
-            columns={["Eigenvalue", "Proportion, %"]}
+            rows={[
+              eigens.lambda.x,
+              analysis.differences,
+              analysis.proportion,
+              analysis.cumulative
+            ]}
+            columns={[
+              "Eigenvalue",
+              "Difference b/n eigenvalues",
+              "Proportion of variance explained",
+              "Cumulative proportion of variance explained"
+            ]}
           />
         </div>
         <div className={classes.tableBox}>

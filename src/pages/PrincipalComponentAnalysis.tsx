@@ -78,7 +78,11 @@ export const PrincipalComponentAnalysisPage = (): JSX.Element => {
       }
     },
     linearCombinations: [],
-    analysis: []
+    analysis: {
+      proportion: [],
+      cumulative: [],
+      differences: []
+    }
   });
 
   /**

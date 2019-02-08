@@ -5,6 +5,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import * as React from "react";
 import { SelectComponents } from "src/components";
+import { IEigenAnalysis } from "src/models/pca.model";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
@@ -17,7 +18,7 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
 }));
 
 interface IProps {
-  analysis: number[];
+  analysis: IEigenAnalysis;
   components: {
     x: number;
     y: number;
