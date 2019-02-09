@@ -54,7 +54,7 @@ export const OutputTable = ({
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
 
   /**
-   * Formatted rows for correct rendering rows.
+   * Formatted rows for correct rendering.
    * Recomputes the memoized value when one of the inputs has changed.
    * This optimization helps to avoid
    * expensive calculations on every render.
