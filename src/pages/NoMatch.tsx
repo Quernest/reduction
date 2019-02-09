@@ -23,7 +23,7 @@ interface IProps {
   location: Location;
 }
 
-export function Page404({ location }: IProps): JSX.Element {
+export function NoMatch({ location }: IProps): JSX.Element {
   const classes = useStyles();
 
   return (

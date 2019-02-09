@@ -1,4 +1,3 @@
-// don't add unnecessary state properties here. It's only chart interface
 export interface IChart {
   // total chart width and height
   fullWidth: number;

@@ -171,7 +171,7 @@ export const OutputTable = ({
                 rowsPerPage={rowsPerPage}
                 page={page}
                 SelectProps={{
-                  native: true
+                  native: false
                 }}
                 onChangePage={handleChangePage}
                 onChangeRowsPerPage={handleChangeRowsPerPage}

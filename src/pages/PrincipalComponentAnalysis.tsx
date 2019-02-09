@@ -55,7 +55,7 @@ const initialState: IState = {
   visualized: false
 };
 
-export const PrincipalComponentAnalysisPage = (): JSX.Element => {
+export const PrincipalComponentAnalysis = (): JSX.Element => {
   const classes = useStyles();
 
   /**

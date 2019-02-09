@@ -1,3 +1,3 @@
-export * from "./404";
+export * from "./NoMatch";
 export * from "./Home";
 export * from "./PrincipalComponentAnalysis";
