@@ -53,8 +53,8 @@ export const Biplot = withStyles(styles)(
 
     public readonly state = {
       margin: {
-        top: 50,
-        right: 50,
+        top: 25,
+        right: 25,
         bottom: 50,
         left: 50
       },

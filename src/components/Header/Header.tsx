@@ -29,7 +29,7 @@ const useStyles = makeStyles(({ breakpoints }: Theme) => ({
   },
   wrap: {
     width: "100%",
-    maxWidth: breakpoints.values.md,
+    maxWidth: breakpoints.values.lg,
     marginLeft: "auto",
     marginRight: "auto"
   },
