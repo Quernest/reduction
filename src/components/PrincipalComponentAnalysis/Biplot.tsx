@@ -208,8 +208,8 @@ export const Biplot = withStyles(styles)(
       this.zoom = d3
         .zoom()
         // zoom only with pressed shift key
-        .filter(() => d3.event.shiftKey)
-        .scaleExtent([1 / 2, 4])
+        // .filter(() => d3.event.shiftKey)
+        .scaleExtent([1, 4])
         // .translateExtent([[0, 0], [this.state.width, this.state.height]])
         // .extent([[0, 0], [this.state.width, this.state.height]])
         .on("zoom", this.onZoom);
@@ -455,7 +455,7 @@ export const Biplot = withStyles(styles)(
           )}
           <Hidden smDown={true}>
             <Typography align="center" variant="body1" color="textSecondary">
-              Use shift + scroll to zoom the biplot
+              Use mouse scroll to zoom the biplot
             </Typography>
           </Hidden>
           <div
