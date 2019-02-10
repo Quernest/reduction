@@ -1,7 +1,7 @@
 import * as React from "react";
 import { HashRouter as Router, Route, Switch } from "react-router-dom";
 import { Header } from "./components";
-import { Home, NoMatch, PrincipalComponentAnalysis } from "./pages";
+import { Home, NoMatch, PrincipalComponentAnalysis, SOM } from "./pages";
 
 /**
  * AppRouter is component which contains all page routes
@@ -16,6 +16,7 @@ export const AppRouter = (props: any): JSX.Element => {
         <Switch>
           <Route path="/" exact={true} component={Home} />
           <Route path="/pca" component={PrincipalComponentAnalysis} />
+          <Route path="/som" component={SOM} />
           <Route component={NoMatch} />
         </Switch>
       </>
