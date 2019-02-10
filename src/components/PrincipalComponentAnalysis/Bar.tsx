@@ -10,6 +10,9 @@ const styles = createStyles({
   root: {
     width: "100%"
   },
+  title: {
+    marginTop: 16
+  },
   svgContainer: {
     position: "relative",
     height: 0,
@@ -274,7 +277,7 @@ export const Bar = withStyles(styles)(
       return (
         <div className={classes.root}>
           {title && (
-            <Typography variant="h6" paragraph={true}>
+            <Typography className={classes.title} align="center" variant="h6">
               {title}
             </Typography>
           )}

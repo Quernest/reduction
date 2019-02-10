@@ -43,7 +43,7 @@ export const Charts = ({
   return (
     <>
       <Typography variant="body1">
-        You can select components what you want to see below
+        You can select and switch components what you want to see below
       </Typography>
       <SelectComponents
         analysis={analysis}

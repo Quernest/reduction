@@ -1,3 +1,4 @@
+import Hidden from "@material-ui/core/Hidden";
 import { createStyles, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
@@ -7,6 +8,9 @@ import { IChart, Points, Vectors } from "src/models/chart.model";
 const styles = createStyles({
   root: {
     width: "100%"
+  },
+  title: {
+    marginTop: 16
   },
   svgContainer: {
     position: "relative",
@@ -203,6 +207,8 @@ export const Biplot = withStyles(styles)(
 
       this.zoom = d3
         .zoom()
+        // zoom only with pressed shift key
+        .filter(() => d3.event.shiftKey)
         .scaleExtent([1 / 2, 4])
         // .translateExtent([[0, 0], [this.state.width, this.state.height]])
         // .extent([[0, 0], [this.state.width, this.state.height]])
@@ -443,10 +449,15 @@ export const Biplot = withStyles(styles)(
       return (
         <div className={classes.root}>
           {title && (
-            <Typography variant="h6" paragraph={true}>
+            <Typography align="center" className={classes.title} variant="h6">
               {title}
             </Typography>
           )}
+          <Hidden smDown={true}>
+            <Typography align="center" variant="body1" color="textSecondary">
+              Use shift + scroll to zoom the biplot
+            </Typography>
+          </Hidden>
           <div
             className={classes.svgContainer}
             style={{ paddingBottom: `${(fullHeight / fullWidth) * 100}%` }}
