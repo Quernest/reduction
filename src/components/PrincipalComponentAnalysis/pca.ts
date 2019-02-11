@@ -8,7 +8,6 @@ import cov from "compute-covariance";
 import numeric from "numeric";
 
 // utility library delivering modularity, performance & extras.
-// import assign from "lodash/assign";
 import isArray from "lodash/isArray";
 import isEmpty from "lodash/isEmpty";
 import isUndefined from "lodash/isUndefined";
@@ -19,10 +18,6 @@ import sum from "lodash/sum";
 
 // models
 import { IEigenAnalysis, IEigens, IPCA } from "src/models/pca.model";
-
-// helpers
-// import { opposite } from "../../utils/numbers";
-// import { from2D } from "../../utils/transformations";
 
 try {
   math.import(numeric, { wrap: true, silent: true });
@@ -35,19 +30,14 @@ try {
  * @see https://en.wikipedia.org/wiki/Principal_component_analysis
  */
 export class PCA implements IPCA {
-  public dataset: number[][];
+  public readonly dataset: number[][];
+  public readonly adjustedDataset: number[][];
+  public readonly covariance: number[][];
+  public readonly eigens: IEigens;
+  public readonly linearCombinations: number[][];
+  public readonly analysis: IEigenAnalysis;
 
-  public adjustedDataset: number[][];
-
-  public covariance: number[][];
-
-  public eigens: IEigens;
-
-  public linearCombinations: number[][];
-
-  public analysis: IEigenAnalysis;
-
-  constructor(dataset: number[][], variables: string[]) {
+  public constructor(dataset: number[][], variables: string[]) {
     // handle if the dataset is empty
     if (isEmpty(dataset)) {
       throw new Error("no dataset found");
@@ -58,6 +48,7 @@ export class PCA implements IPCA {
       throw new Error("the dataset must be an array type");
     }
 
+    // copy the dataset
     this.dataset = dataset;
 
     // step 1

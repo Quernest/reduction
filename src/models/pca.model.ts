@@ -17,15 +17,10 @@ export interface IEigens {
 
 export interface IPCA {
   dataset: number[][];
-
   adjustedDataset: number[][];
-
   covariance: number[][];
-
   eigens: IEigens;
-
   linearCombinations: number[][];
-
   analysis: IEigenAnalysis;
 
   /**
@@ -63,14 +58,9 @@ export interface IPCA {
 
 export interface IPCACalculations {
   dataset: number[][];
-
   adjustedDataset: number[][];
-
   covariance: number[][];
-
   eigens: IEigens;
-
   linearCombinations: number[][];
-
   analysis: IEigenAnalysis;
 }
