@@ -1,4 +1,4 @@
-import { createStyles, withStyles } from "@material-ui/core/styles";
+import { createStyles, Theme, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
 import round from "lodash/round";
@@ -38,9 +38,10 @@ interface IProps {
   eigenvalues: number[];
   names: string[];
   classes?: any;
+  theme: Theme;
 }
 
-export const Bar = withStyles(styles)(
+export const Bar = withStyles(styles, { withTheme: true })(
   class extends React.Component<IProps, IChart> {
     /**
      * main svg element
@@ -157,6 +158,7 @@ export const Bar = withStyles(styles)(
     }
 
     private drawBars(data: IBarData[]): void {
+      const { theme } = this.props;
       const { height } = this.state;
 
       // draw bars based on data
@@ -166,7 +168,7 @@ export const Bar = withStyles(styles)(
         .enter()
         .append("rect")
         .attr("class", "bar")
-        .attr("fill", "#3F51B5")
+        .attr("fill", theme.palette.primary.main)
         .attr("x", (d: IBarData, i: number): any => this.x(`PC ${i + 1}`))
         .attr("width", this.x.bandwidth())
         .attr("y", (d: IBarData): any => this.y(d.eigenvalue))
