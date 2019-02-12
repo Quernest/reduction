@@ -94,10 +94,8 @@ export const Calculations = ({
               tailedVariables,
               ...(math.transpose(eigens.E.x) as number[][])
             ]}
-            columns={map(
-              ["Loadings", ...tailedVariables],
-              (_: string, i: number): string =>
-                i === 0 ? "Loadings" : `PC${i}`
+            columns={map(["Loadings", ...tailedVariables], (_, i) =>
+              i === 0 ? "Loadings" : `PC${i}`
             )}
           />
         </div>
@@ -107,7 +105,7 @@ export const Calculations = ({
           </Typography>
           <OutputTable
             rows={linearCombinations}
-            columns={map(tailedVariables, (_, i): string => `PC${i + 1}`)}
+            columns={map(tailedVariables, (_, i) => `PC${i + 1}`)}
           />
         </div>
       </div>
