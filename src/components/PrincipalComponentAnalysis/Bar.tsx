@@ -36,7 +36,7 @@ interface IBarData {
 interface IProps {
   title?: string;
   eigenvalues: number[];
-  names: string[];
+  variables: string[];
   classes?: any;
   theme: Theme;
 }
@@ -76,12 +76,12 @@ export const Bar = withStyles(styles, { withTheme: true })(
     };
 
     public componentDidMount() {
-      const { eigenvalues, names } = this.props;
+      const { eigenvalues, variables } = this.props;
 
       /**
        * array of combined eigenvalues ​​that we display in bar columns
        */
-      const combinedData: [string[], number[]] = [names, eigenvalues];
+      const combinedData: [string[], number[]] = [variables, eigenvalues];
 
       /**
        * keys of this eigenvalues

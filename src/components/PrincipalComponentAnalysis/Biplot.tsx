@@ -31,7 +31,7 @@ interface IProps {
   title?: string;
   points: Points;
   eigenvectors: Vectors;
-  names: string[];
+  variables: string[];
   classes?: any;
   xAxisLabel: string;
   yAxisLabel: string;
@@ -124,7 +124,7 @@ export const Biplot = withStyles(styles)(
       const {
         points,
         eigenvectors,
-        names,
+        variables,
         xAxisLabel,
         yAxisLabel
       } = this.props;
@@ -133,7 +133,7 @@ export const Biplot = withStyles(styles)(
       this.createDefs();
       this.drawAxes(points, xAxisLabel, yAxisLabel);
       this.drawPoints(points);
-      this.drawVectors(eigenvectors, names);
+      this.drawVectors(eigenvectors, variables);
     }
 
     public componentDidUpdate(props: IProps) {
@@ -168,7 +168,7 @@ export const Biplot = withStyles(styles)(
     }
 
     private onZoom = () => {
-      const { eigenvectors, names, points } = this.props;
+      const { eigenvectors, variables, points } = this.props;
       const { transform } = d3.event;
 
       const newX = transform.rescaleX(this.x);
@@ -199,7 +199,7 @@ export const Biplot = withStyles(styles)(
       this.drawPoints(points);
 
       // redraw vectors
-      this.drawVectors(eigenvectors, names);
+      this.drawVectors(eigenvectors, variables);
     };
 
     private selectSVGElement(): void {
@@ -385,9 +385,9 @@ export const Biplot = withStyles(styles)(
     /**
      * draw eigenvectors (component loadings)
      * @param eigenvectors array of eigenvectors
-     * @param names factor names
+     * @param variables factor variables
      */
-    private drawVectors(eigenvectors: Vectors, names: string[]): void {
+    private drawVectors(eigenvectors: Vectors, variables: string[]): void {
       const { k } = this.state.transform;
       // the length of each points collection is equal
       const [x1Points, y1Points, x2Points, y2Points] = eigenvectors;
@@ -439,7 +439,7 @@ export const Biplot = withStyles(styles)(
             ) + dev})`;
           }
         )
-        .text((d: number, i: number): string => names[i]);
+        .text((d: number, i: number): string => variables[i]);
     }
 
     public render() {

@@ -77,8 +77,10 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
    * processed file
    */
   const [parsedFile, setParsedFile] = React.useState<IParsedCSV>({
-    headers: [],
-    data: []
+    variables: [],
+    tailedVariables: [],
+    observations: [],
+    values: []
   });
 
   /**

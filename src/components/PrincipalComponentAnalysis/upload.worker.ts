@@ -12,8 +12,10 @@ ctx.addEventListener("message", (event: MessageEvent) => {
 
   fr.onload = () => {
     let parsedFile: IParsedCSV = {
-      headers: [],
-      data: []
+      variables: [],
+      tailedVariables: [],
+      observations: [],
+      values: []
     };
 
     try {
@@ -23,17 +25,24 @@ ctx.addEventListener("message", (event: MessageEvent) => {
         throw new Error("data reading error");
       }
 
-      const { headers, data } = parsedFile;
+      const { variables, values, observations } = parsedFile;
 
-      if (headers.length < 2) {
+      if (observations.length === 0) {
         throw new Error(
-          "the dataset must contain more than 2 variables"
+          `no observation names.
+          Make sure that all names and meanings of observations are completed.
+          The names of the observers must be only strings.
+          `
         );
       }
 
-      forEach(data, (element: number[]) => {
-        forEach(element, (value: number) => {
-          if (isNaN(value)) {
+      if (variables.length < 2) {
+        throw new Error("the dataset must contain more than 2 variables");
+      }
+
+      forEach(values, value => {
+        forEach(value, x => {
+          if (isNaN(x)) {
             throw new Error("the dataset has some wrong values");
           }
         });

@@ -6,9 +6,9 @@ const ctx: Worker = self as any;
 ctx.addEventListener(
   "message",
   (event: MessageEvent) => {
-    const { data, headers } = event.data;
+    const { values, variables } = event.data;
 
-    const pca: IPCA = new PCA(data, headers);
+    const pca: IPCA = new PCA(values, variables);
 
     const {
       dataset,

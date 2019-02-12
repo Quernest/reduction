@@ -21,7 +21,7 @@ export const Charts = ({
   parsedFile
 }: IProps) => {
   const { adjustedDataset, eigens, analysis } = calculations;
-  const { headers } = parsedFile;
+  const { tailedVariables } = parsedFile;
   const { x, y } = components;
 
   const points = React.useMemo(() => [adjustedDataset[x], adjustedDataset[y]], [
@@ -53,7 +53,7 @@ export const Charts = ({
       <Biplot
         title="Biplot of score variables"
         eigenvectors={vectors}
-        names={headers}
+        variables={tailedVariables}
         xAxisLabel={`Component ${x + 1}`}
         yAxisLabel={`Component ${y + 1}`}
         points={points}
@@ -61,7 +61,7 @@ export const Charts = ({
       <Bar
         title="Scree plot of eigenvalues"
         eigenvalues={eigens.lambda.x}
-        names={headers}
+        variables={tailedVariables}
       />
     </>
   );

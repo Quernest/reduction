@@ -23,17 +23,17 @@ interface IProps {
 
 export const CalculateControls = ({ parsedFile, onCalculate }: IProps) => {
   const classes = useStyles();
-  const { headers, data } = parsedFile;
+  const { variables, observations, values } = parsedFile;
 
   /**
    * memoized table for preventing unnecessary re-renders
    */
   const table = React.useMemo(
-    () => <OutputTable rows={data} columns={headers} />,
-    [data, headers]
+    () => <OutputTable rows={[observations, ...values]} columns={variables} />,
+    [parsedFile]
   );
 
-  if (headers && data) {
+  if (variables && observations && values) {
     return (
       <div className={classes.root}>
         <Typography variant="body1" paragraph={true}>

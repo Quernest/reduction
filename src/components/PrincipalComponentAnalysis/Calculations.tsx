@@ -42,7 +42,7 @@ export const Calculations = ({
     analysis,
     linearCombinations
   } = calculations;
-  const { data, headers } = parsedFile;
+  const { tailedVariables, variables, observations, values } = parsedFile;
 
   const tables = React.useMemo(
     () => (
@@ -51,19 +51,19 @@ export const Calculations = ({
           <Typography className={classes.tableTitle} variant="button">
             dataset
           </Typography>
-          <OutputTable rows={data} columns={headers} />
+          <OutputTable rows={[observations, ...values]} columns={variables} />
         </div>
         <div className={classes.tableBox}>
           <Typography className={classes.tableTitle} variant="button">
             adjusted dataset
           </Typography>
-          <OutputTable rows={adjustedDataset} columns={headers} />
+          <OutputTable rows={adjustedDataset} columns={tailedVariables} />
         </div>
         <div className={classes.tableBox}>
           <Typography className={classes.tableTitle} variant="button">
             covariation matrix
           </Typography>
-          <OutputTable rows={covariance} columns={headers} />
+          <OutputTable rows={covariance} columns={tailedVariables} />
         </div>
         <div className={classes.tableBox}>
           <Typography className={classes.tableTitle} variant="button">
@@ -90,9 +90,12 @@ export const Calculations = ({
             Eigenvectors (component loadings)
           </Typography>
           <OutputTable
-            rows={[headers, ...(math.transpose(eigens.E.x) as number[][])]}
+            rows={[
+              tailedVariables,
+              ...(math.transpose(eigens.E.x) as number[][])
+            ]}
             columns={map(
-              ["Loadings", ...headers],
+              ["Loadings", ...tailedVariables],
               (_: string, i: number): string =>
                 i === 0 ? "Loadings" : `PC${i}`
             )}
@@ -104,10 +107,7 @@ export const Calculations = ({
           </Typography>
           <OutputTable
             rows={linearCombinations}
-            columns={map(
-              headers,
-              (n: string, i: number): string => `PC${i + 1} (${n})`
-            )}
+            columns={map(tailedVariables, (_, i): string => `PC${i + 1}`)}
           />
         </div>
       </div>
