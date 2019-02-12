@@ -65,8 +65,8 @@ export const Bar = withStyles(styles, { withTheme: true })(
         bottom: 50,
         left: 50
       },
-      fullWidth: 960,
-      fullHeight: 425,
+      fullWidth: 1280,
+      fullHeight: 440,
       get width() {
         return this.fullWidth - this.margin.left - this.margin.right;
       },

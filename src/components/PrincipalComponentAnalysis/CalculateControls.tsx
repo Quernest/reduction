@@ -13,6 +13,9 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
   },
   button: {
     marginBottom: spacing.unit * 2
+  },
+  tableTitle: {
+    marginBottom: spacing.unit
   }
 }));
 
@@ -48,7 +51,9 @@ export const CalculateControls = ({ parsedFile, onCalculate }: IProps) => {
           Calculate
         </Button>
         <Grid item={true} xs={12}>
-          <Typography variant="button">dataset</Typography>
+          <Typography variant="button" className={classes.tableTitle}>
+            dataset
+          </Typography>
           {table}
         </Grid>
       </div>

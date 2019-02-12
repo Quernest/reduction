@@ -144,7 +144,7 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
 
   // create workers on componentDidMount
   React.useEffect(() => {
-    const debounceTime: number = 1000;
+    const debounceTime: number = 700;
 
     const onUploadWorkerMsg = debounce((event: MessageEvent) => {
       if (has(event.data, "error")) {

@@ -62,8 +62,8 @@ export const Biplot = withStyles(styles)(
         bottom: 50,
         left: 50
       },
-      fullWidth: 960,
-      fullHeight: 625,
+      fullWidth: 1280,
+      fullHeight: 740,
       get width() {
         return this.fullWidth - this.margin.left - this.margin.right;
       },
