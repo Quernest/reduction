@@ -6,27 +6,58 @@ import * as React from "react";
 import { IChart } from "src/models/chart.model";
 import { from2D } from "../../utils/transformations";
 
-const styles = createStyles({
-  root: {
-    width: "100%"
-  },
-  title: {
-    marginTop: 16
-  },
-  svgContainer: {
-    position: "relative",
-    height: 0,
-    width: "100%",
-    padding: 0 // reset
-  },
-  svg: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%"
-  }
-});
+const styles = ({ palette }: Theme) =>
+  createStyles({
+    root: {
+      width: "100%"
+    },
+    title: {
+      marginTop: 16
+    },
+    svgContainer: {
+      position: "relative",
+      height: 0,
+      width: "100%",
+      padding: 0 // reset
+    },
+    svg: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%"
+    },
+    axis: {
+      fontSize: 16,
+      fontFamily: "Roboto, sans-serif"
+    },
+    axisLabel: {
+      fontSize: 16,
+      fontFamily: "Roboto, sans-serif"
+    },
+    bar: {
+      fill: palette.primary.main
+    },
+    barValue: {
+      fontSize: 16,
+      fontFamily: "Roboto, sans-serif"
+    },
+    line: {
+      fill: "none",
+      stroke: "red",
+      strokeWidth: 3,
+      strokeLinejoin: "round",
+      strokeLinecap: "round"
+    },
+    dot: {
+      fill: "red"
+    },
+    label: {
+      textAnchor: "start",
+      fontSize: 16,
+      fontFamily: "Roboto, sans-serif"
+    }
+  });
 
 interface IBarData {
   component: string;
@@ -38,10 +69,9 @@ interface IProps {
   eigenvalues: number[];
   variables: string[];
   classes?: any;
-  theme: Theme;
 }
 
-export const Bar = withStyles(styles, { withTheme: true })(
+export const Bar = withStyles(styles)(
   class extends React.Component<IProps, IChart> {
     /**
      * main svg element
@@ -60,13 +90,13 @@ export const Bar = withStyles(styles, { withTheme: true })(
 
     public readonly state = {
       margin: {
-        top: 25,
-        right: 25,
-        bottom: 50,
-        left: 50
+        top: 35,
+        right: 35,
+        bottom: 60,
+        left: 60
       },
       fullWidth: 1280,
-      fullHeight: 440,
+      fullHeight: 560,
       get width() {
         return this.fullWidth - this.margin.left - this.margin.right;
       },
@@ -115,6 +145,7 @@ export const Bar = withStyles(styles, { withTheme: true })(
     }
 
     private drawAxes(data: IBarData[]): void {
+      const { classes } = this.props;
       const { width, height, margin } = this.state;
 
       this.x = d3
@@ -130,10 +161,14 @@ export const Bar = withStyles(styles, { withTheme: true })(
 
       this.svg
         .append("g")
+        .attr("class", classes.axis)
         .attr("transform", `translate(0, ${height})`)
         .call(d3.axisBottom(this.x));
 
-      this.svg.append("g").call(d3.axisLeft(this.y));
+      this.svg
+        .append("g")
+        .attr("class", classes.axis)
+        .call(d3.axisLeft(this.y));
 
       // y axis label
       this.svg
@@ -143,7 +178,7 @@ export const Bar = withStyles(styles, { withTheme: true })(
         .attr("x", 0 - height / 2)
         .attr("y", 0 - margin.left)
         .attr("dy", "1em")
-        .style("font-size", "12px")
+        .attr("class", classes.axisLabel)
         .style("text-anchor", "middle");
 
       // x axis label
@@ -153,22 +188,21 @@ export const Bar = withStyles(styles, { withTheme: true })(
         .attr("x", width / 2)
         .attr("y", height + margin.bottom)
         .attr("dy", "-0.5em")
-        .style("font-size", "12px")
+        .attr("class", classes.axisLabel)
         .style("text-anchor", "middle");
     }
 
     private drawBars(data: IBarData[]): void {
-      const { theme } = this.props;
+      const { classes } = this.props;
       const { height } = this.state;
 
       // draw bars based on data
       this.svg
-        .selectAll(".bar")
+        .selectAll(classes.bar)
         .data(data)
         .enter()
         .append("rect")
-        .attr("class", "bar")
-        .attr("fill", theme.palette.primary.main)
+        .attr("class", classes.bar)
         .attr("x", (d: IBarData, i: number): any => this.x(`PC ${i + 1}`))
         .attr("width", this.x.bandwidth())
         .attr("y", (d: IBarData): any => this.y(d.eigenvalue))
@@ -198,21 +232,17 @@ export const Bar = withStyles(styles, { withTheme: true })(
       this.svg
         .append("path")
         .data([data])
-        .attr("fill", "none")
-        .attr("stroke", "red")
-        .attr("stroke-width", 2)
-        .attr("stroke-linejoin", "round")
-        .attr("stroke-linecap", "round")
+        .attr("class", classes.line)
         .attr("d", line);
 
       // add the scatterplot
       this.svg
-        .selectAll("dot")
+        .selectAll(classes.dot)
         .data(data)
         .enter()
         .append("circle")
-        .attr("fill", "red")
-        .attr("r", 3.5)
+        .attr("class", classes.dot)
+        .attr("r", 4)
         .attr(
           "cx",
           (d: IBarData, i: number): number => {
@@ -233,11 +263,12 @@ export const Bar = withStyles(styles, { withTheme: true })(
        * the label is current component eigen value
        */
       this.svg
-        .selectAll(".text")
+        .selectAll(classes.label)
         .data(data)
         .enter()
         .append("text")
-        .attr("class", "label")
+        .attr("dy", "0.65em")
+        .attr("class", classes.label)
         .attr(
           "x",
           (d: IBarData, i: number): number => {
@@ -252,23 +283,6 @@ export const Bar = withStyles(styles, { withTheme: true })(
           }
         )
         .attr("y", (d: IBarData): number => this.y(d.eigenvalue) - 16)
-        .attr("dy", ".75em")
-        .style("text-anchor", "start")
-        .style(
-          "font-size",
-          (): string => {
-            const bp: number = 15;
-            const sm: number = 10;
-            const md: number = 12;
-
-            // change font size depending on the data length
-            if (data.length > bp) {
-              return `${sm}px`;
-            }
-
-            return `${md}px`;
-          }
-        )
         .text((d: IBarData): string => `${round(d.eigenvalue, 2)}`);
     }
 

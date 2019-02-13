@@ -24,6 +24,28 @@ const styles = createStyles({
     left: 0,
     width: "100%",
     height: "100%"
+  },
+  axis: {
+    fontSize: 16,
+    fontFamily: "Roboto, sans-serif"
+  },
+  axisLabel: {
+    fontSize: 16,
+    fontFamily: "Roboto, sans-serif",
+    textAnchor: "middle"
+  },
+  variable: {
+    fontSize: 16,
+    fontFamily: "Roboto, sans-serif",
+    textAnchor: "middle"
+  },
+  vector: {
+    stroke: "#000",
+    strokeWidth: 1.5,
+    markerEnd: "url(#arrow)"
+  },
+  point: {
+    fill: "red"
   }
 });
 
@@ -57,10 +79,10 @@ export const Biplot = withStyles(styles)(
 
     public readonly state = {
       margin: {
-        top: 25,
-        right: 25,
-        bottom: 50,
-        left: 50
+        top: 35,
+        right: 35,
+        bottom: 60,
+        left: 60
       },
       fullWidth: 1280,
       fullHeight: 740,
@@ -145,8 +167,8 @@ export const Biplot = withStyles(styles)(
         const { xAxisLabel, yAxisLabel, points } = this.props;
 
         // remove labels
-        this.svg.select("text.axis-x-label").remove();
-        this.svg.select("text.axis-y-label").remove();
+        this.svg.select(`text#axis-x-label`).remove();
+        this.svg.select(`text#axis-y-label`).remove();
 
         // remove axes
         this.gAxisLeft.remove();
@@ -168,7 +190,7 @@ export const Biplot = withStyles(styles)(
     }
 
     private onZoom = () => {
-      const { eigenvectors, variables, points } = this.props;
+      const { eigenvectors, variables, points, classes } = this.props;
       const { transform } = d3.event;
 
       const newX = transform.rescaleX(this.x);
@@ -191,9 +213,9 @@ export const Biplot = withStyles(styles)(
       this.gAxisRight.call(this.axisRight.scale(newY));
 
       // remove created elements
-      this.view.selectAll("line.vector").remove();
-      this.view.selectAll("text.variable").remove();
-      this.view.selectAll("circle.point").remove();
+      this.view.selectAll(`line.${classes.vector}`).remove();
+      this.view.selectAll(`text.${classes.variable}`).remove();
+      this.view.selectAll(`circle.${classes.point}`).remove();
 
       // redraw points
       this.drawPoints(points);
@@ -265,6 +287,7 @@ export const Biplot = withStyles(styles)(
       xAxisLabel: string,
       yAxisLabel: string
     ): void {
+      const { classes } = this.props;
       const { width, height } = this.state;
       const [xPoints, yPoints] = points;
 
@@ -296,6 +319,7 @@ export const Biplot = withStyles(styles)(
       // svg element of left axis
       this.gAxisLeft = this.svg
         .append("g")
+        .attr("class", classes.axis)
         .attr("transform", `translate(0, 0)`)
         .call(this.axisLeft);
 
@@ -305,6 +329,7 @@ export const Biplot = withStyles(styles)(
       // svg element of top axis
       this.gAxisTop = this.svg
         .append("g")
+        .attr("class", classes.axis)
         .attr("transform", `translate(0, 0)`)
         .call(this.axisTop);
 
@@ -314,6 +339,7 @@ export const Biplot = withStyles(styles)(
       // svg element of right axis
       this.gAxisRight = this.svg
         .append("g")
+        .attr("class", classes.axis)
         .attr("transform", `translate(${width}, 0)`)
         .call(this.axisRight);
 
@@ -323,6 +349,7 @@ export const Biplot = withStyles(styles)(
       // svg element of bottom axis
       this.gAxisBottom = this.svg
         .append("g")
+        .attr("class", classes.axis)
         .attr("transform", `translate(0, ${height})`)
         .call(this.axisBottom);
 
@@ -330,28 +357,27 @@ export const Biplot = withStyles(styles)(
     }
 
     private drawAxesLabels(xAxisLabel: string, yAxisLabel: string): void {
+      const { classes } = this.props;
       const { width, height, margin } = this.state;
 
       // bottom label
       this.svg
         .append("text")
-        .attr("class", "axis-x-label")
         .attr("x", width / 2)
         .attr("y", height + margin.bottom)
         .attr("dy", "-0.75em")
-        .style("font-size", "12px")
-        .style("text-anchor", "middle")
+        .attr("class", classes.axisLabel)
+        .attr("id", "axis-x-label")
         .text(xAxisLabel);
 
       // left label
       this.svg
         .append("text")
-        .attr("class", "axis-y-label")
         .attr("x", 0 - height / 2)
         .attr("y", 0 - margin.left)
         .attr("dy", "1em")
-        .style("font-size", "12px")
-        .style("text-anchor", "middle")
+        .attr("class", classes.axisLabel)
+        .attr("id", "axis-y-label")
         .attr("transform", "rotate(-90)")
         .text(yAxisLabel);
     }
@@ -361,6 +387,7 @@ export const Biplot = withStyles(styles)(
      * @param points points for scatter plot
      */
     private drawPoints(points: Points): void {
+      const { classes } = this.props;
       const { k } = this.state.transform;
 
       /**
@@ -371,15 +398,14 @@ export const Biplot = withStyles(styles)(
       const [xPoints, yPoints] = points;
 
       this.view
-        .selectAll("circle.point")
+        .selectAll(`circle.${classes.point}`)
         .data(xPoints)
         .enter()
         .append("circle")
-        .attr("class", "point")
+        .attr("class", classes.point)
         .attr("cx", (_: number, i: number): number => this.x(xPoints[i] * k))
         .attr("cy", (_: number, i: number): number => this.y(yPoints[i] * k))
-        .attr("r", 2)
-        .attr("fill", "red");
+        .attr("r", 4);
     }
 
     /**
@@ -388,32 +414,28 @@ export const Biplot = withStyles(styles)(
      * @param variables factor variables
      */
     private drawVectors(eigenvectors: Vectors, variables: string[]): void {
+      const { classes } = this.props;
       const { k } = this.state.transform;
       // the length of each points collection is equal
       const [x1Points, y1Points, x2Points, y2Points] = eigenvectors;
 
       this.view
-        .selectAll("line.vector")
+        .selectAll(`line.${classes.vector}`)
         .data(x1Points)
         .enter()
         .append("line")
-        .attr("class", "vector")
-        .style("stroke", "#000")
-        .style("stroke-width", 1.5)
+        .attr("class", classes.vector)
         .attr("x1", (_: number, i: number): any => this.x(x1Points[i] * k))
         .attr("y1", (_: number, i: number): any => this.y(y1Points[i] * k))
         .attr("x2", (_: number, i: number): any => this.x(x2Points[i] * k))
-        .attr("y2", (_: number, i: number): any => this.y(y2Points[i] * k))
-        .attr("marker-end", "url(#arrow)");
+        .attr("y2", (_: number, i: number): any => this.y(y2Points[i] * k));
 
       this.view
-        .selectAll("text.variable")
+        .selectAll(`text.${classes.variable}`)
         .data(x1Points)
         .enter()
         .append("text")
-        .attr("class", "variable")
-        .attr("text-anchor", "middle")
-        .style("font-size", "12px")
+        .attr("class", classes.variable)
         .attr(
           "transform",
           (_: number, i: number): any => {
@@ -431,7 +453,7 @@ export const Biplot = withStyles(styles)(
             /**
              * distance from the end of arrow to the text (variable)
              */
-            const dev: number = angle >= 0 ? 12 : -6;
+            const dev: number = angle >= 0 ? 16 : -8;
 
             // translate text position
             return `translate(${this.x(x2Points[i] * k)},${this.y(
