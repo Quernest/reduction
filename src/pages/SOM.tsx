@@ -29,11 +29,11 @@ export const SOM = (): JSX.Element => {
   return (
     <div className={classes.root}>
       <div className={classes.wrap}>
-        <Typography variant="h6" paragraph={true}>
+        <Typography variant="h5" paragraph={true}>
           Self-Organizing Map
         </Typography>
-        <Typography variant="body1" color="secondary" paragraph={true}>
-          In development.
+        <Typography variant="body2" color="textSecondary" paragraph={true}>
+          In development
         </Typography>
       </div>
     </div>

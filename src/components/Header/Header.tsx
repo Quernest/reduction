@@ -1,6 +1,7 @@
 import AppBar from "@material-ui/core/AppBar";
 import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
+import Drawer from "@material-ui/core/Drawer";
 import Grid from "@material-ui/core/Grid";
 import Hidden from "@material-ui/core/Hidden";
 import IconButton from "@material-ui/core/IconButton";
@@ -9,7 +10,6 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import { Theme } from "@material-ui/core/styles";
-import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import DashboardIcon from "@material-ui/icons/Dashboard";
@@ -17,7 +17,7 @@ import HomeIcon from "@material-ui/icons/Home";
 import MenuIcon from "@material-ui/icons/Menu";
 import TimeLineIcon from "@material-ui/icons/Timeline";
 import { makeStyles } from "@material-ui/styles";
-import * as React from "react";
+import React from "react";
 import { redirectTo } from "src/utils/redirectTo";
 
 const useStyles = makeStyles(({ breakpoints }: Theme) => ({
@@ -88,11 +88,7 @@ export const Header = () => {
         </Toolbar>
       </AppBar>
       <Hidden mdUp={true}>
-        <SwipeableDrawer
-          open={state.isOpenDrawer}
-          onClose={toggleDrawer(false)}
-          onOpen={toggleDrawer(true)}
-        >
+        <Drawer open={state.isOpenDrawer} onClose={toggleDrawer(false)}>
           <div
             tabIndex={0}
             role="button"
@@ -125,7 +121,7 @@ export const Header = () => {
               </div>
             }
           </div>
-        </SwipeableDrawer>
+        </Drawer>
       </Hidden>
     </header>
   );

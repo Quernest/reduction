@@ -233,7 +233,7 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
   return (
     <div className={classes.root}>
       <div className={classes.wrap}>
-        <Typography variant="h6" paragraph={true}>
+        <Typography variant="h5" paragraph={true}>
           Principal Component Analysis
         </Typography>
         {(() => {

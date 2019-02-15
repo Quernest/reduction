@@ -23,12 +23,12 @@ export const Info = (): JSX.Element => {
     <div className={classes.root}>
       <Divider className={classes.divider} />
       <Typography variant="body1" paragraph={true}>
-        This calculator is designed to process two-dimensional data arrays using
-        the principal component analysis algorithm.
+        This application is designed to process two-dimensional data arrays
+        using the principal component analysis algorithm.
       </Typography>
       <Divider className={classes.divider} />
       <Typography variant="body1">
-        To use the calculator you need to do next steps:
+        To use the application you need to do next steps:
       </Typography>
       <List>
         <ListItem disableGutters={true}>
@@ -37,7 +37,8 @@ export const Info = (): JSX.Element => {
               1) Choose and upload your .csv or .txt dataset file
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Note: the dataset must contain more than 2 factors
+              Note: the first column is reserved under the names of observations
+              and the dataset must contain more than 2 variables.
             </Typography>
           </ListItemText>
         </ListItem>
