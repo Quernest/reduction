@@ -6,7 +6,7 @@ import { Neuron } from "@seracio/kohonen/dist/types";
 import debounce from "lodash/debounce";
 import isUndefined from "lodash/isUndefined";
 import React, { useEffect } from "react";
-import { HexagonsMap } from "src/components";
+import { HexagonsMap, SOMControls } from "src/components";
 import CalculateWorker from "worker-loader!src/components/SelfOrganizingMaps/calculate.worker";
 
 const useStyles = makeStyles(({ spacing, breakpoints }: Theme) => ({
@@ -151,11 +151,14 @@ export const SelfOrganizingMaps = (): JSX.Element => {
 
           if (calculated) {
             return (
-              <HexagonsMap
-                title="Hexagonal heatmap"
-                neurons={neurons}
-                hexagonSize={hexagonSize}
-              />
+              <>
+                <SOMControls />
+                <HexagonsMap
+                  title="Hexagonal heatmap"
+                  neurons={neurons}
+                  hexagonSize={hexagonSize}
+                />
+              </>
             );
           }
 

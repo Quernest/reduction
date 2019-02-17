@@ -1,4 +1,4 @@
-import { createStyles, withStyles } from "@material-ui/core/styles";
+import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
 import { range } from "d3-array";
@@ -15,6 +15,10 @@ const styles = createStyles({
   root: {
     flexGrow: 1
   },
+  title: {
+    marginTop: 16,
+    marginBottom: 8
+  },
   svgContainer: {
     position: "relative",
     height: 0,
@@ -30,9 +34,8 @@ const styles = createStyles({
   }
 });
 
-interface IProps {
+interface IProps extends WithStyles<typeof styles> {
   title?: string;
-  classes?: any;
   neurons: Neuron[];
   hexagonSize: number;
 }
@@ -144,7 +147,11 @@ export const HexagonsMap = withStyles(styles)(
 
       return (
         <div className={classes.root}>
-          <Typography variant="body2" color="textSecondary" paragraph={true}>
+          <Typography
+            variant="body1"
+            color="textSecondary"
+            className={classes.title}
+          >
             {title}
           </Typography>
           <div
