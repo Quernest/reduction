@@ -119,10 +119,10 @@
     prop-types "^15.6.0"
     react-is "^16.6.3"
 
-"@seracio/kohonen@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@seracio/kohonen/-/kohonen-1.2.0.tgz#3bbd3001ee66991a4b601d0a8258ed808d558ddc"
-  integrity sha512-4uxeODNA00SLOAAjnaqe4Dpp8B1wNqwlX50tL1CigcpyWI/4Z/Xe6d2/LN+yMeUhHPoPG2FYFJlMgPZqB3ZYUA==
+"@seracio/kohonen@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@seracio/kohonen/-/kohonen-2.0.0.tgz#984fd155ff11284d5753f081dac7265e34550603"
+  integrity sha512-aoxT9hjuEIEM5pDtw49YQpdCEa6A8Psc0qs4jhJKgB8qhTC45IHN40McCLyDByp/lqM6oaAqXQdkWxEf6Qjv7A==
 
 "@types/d3-array@*":
   version "1.2.4"
@@ -211,6 +211,11 @@
   integrity sha512-/IbMHRG9cur+6hkWvBrRg3DnnUWtaSW8Bl6nu1OO1J8K25BxRYyLslyjIBbwlK0kV0haztlAR2LCIRuDc/U2LA==
   dependencies:
     "@types/geojson" "*"
+
+"@types/d3-hexbin@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@types/d3-hexbin/-/d3-hexbin-0.2.3.tgz#75a86a3d2e782ca3070ebcce789abdb88036abda"
+  integrity sha512-R/mmx2FJucHACRvGFoI+6jpr3mOAD6wuU2OjuCixxGRPHdmQNlMtBGBwxTmTs//kJvBzk9/vMhn47QOcY8Afrg==
 
 "@types/d3-hierarchy@*":
   version "1.1.5"
