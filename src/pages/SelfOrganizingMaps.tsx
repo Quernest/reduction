@@ -7,6 +7,7 @@ import {
 } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
+import debounce from "lodash/debounce";
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import compose from "recompose/compose";
@@ -58,6 +59,8 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
   protected calculateWorker: Worker;
   protected gridWorker: Worker;
 
+  private debounceTime: number = 500;
+
   public readonly state: IState = {
     uploading: false,
     uploaded: false,
@@ -107,7 +110,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     }
   };
 
-  private onGetGridWorkerMessage = (event: MessageEvent) => {
+  private onGetGridWorkerMessage = debounce((event: MessageEvent) => {
     const { neurons, dimensions, trainingConfig } = event.data;
 
     this.setState(
@@ -120,11 +123,11 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
       },
       this.onStartCalculations
     );
-  };
+  }, this.debounceTime);
 
-  private onGetCalculateWorkerMessage = (event: MessageEvent) => {
+  private onGetCalculateWorkerMessage = debounce((event: MessageEvent) => {
     this.setState({ calculated: true, calculating: false });
-  };
+  }, this.debounceTime);
 
   private initWorkers() {
     this.gridWorker = new GridWorker();
