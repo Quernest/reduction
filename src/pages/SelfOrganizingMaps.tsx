@@ -53,6 +53,7 @@ interface IState {
   trainingConfig: ITrainingConfig;
   neurons: Neuron[];
   data: number[][];
+  positions: Array<[number, number]>;
 }
 
 class SelfOrganizingMapsPage extends Component<IProps, IState> {
@@ -82,6 +83,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
       maxNeighborhood: 1
     },
     neurons: [],
+    positions: [],
     data: [
       [0, 0, 0],
       [0, 0, 255],
@@ -126,7 +128,16 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
   }, this.debounceTime);
 
   private onGetCalculateWorkerMessage = debounce((event: MessageEvent) => {
-    this.setState({ calculated: true, calculating: false });
+    const { positions } = event.data;
+
+    this.setState({ positions, calculated: true, calculating: false });
+
+    // const { maxStep } = this.state.trainingConfig;
+    // const { step } = event.data;
+
+    // if (step === maxStep) {
+    //   this.setState({ calculated: true, calculating: false });
+    // }
   }, this.debounceTime);
 
   private initWorkers() {

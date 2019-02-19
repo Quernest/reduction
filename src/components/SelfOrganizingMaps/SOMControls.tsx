@@ -165,7 +165,7 @@ export const SOMControls = withStyles(styles)(
 
       return (
         <div className={classes.root}>
-          <form noValidate={true} autoComplete="off" onSubmit={this.onSubmit}>
+          <form autoComplete="off" onSubmit={this.onSubmit}>
             <Grid container={true} spacing={24}>
               <Grid item={true} xs={12}>
                 <Typography variant="body1">Model</Typography>
@@ -297,6 +297,7 @@ export const SOMControls = withStyles(styles)(
                         fullWidth={true}
                         inputRef={this.minLearningCoefInputRef}
                         required={true}
+                        type="number"
                         disabled={loading}
                         classes={{
                           underline: classes.cssUnderline
@@ -322,6 +323,7 @@ export const SOMControls = withStyles(styles)(
                         fullWidth={true}
                         inputRef={this.maxLearningCoefInputRef}
                         required={true}
+                        type="number"
                         disabled={loading}
                         classes={{
                           underline: classes.cssUnderline
@@ -347,6 +349,7 @@ export const SOMControls = withStyles(styles)(
                         fullWidth={true}
                         inputRef={this.minNeighborhoodInputRef}
                         required={true}
+                        type="number"
                         disabled={loading}
                         classes={{
                           underline: classes.cssUnderline
@@ -372,6 +375,7 @@ export const SOMControls = withStyles(styles)(
                         fullWidth={true}
                         inputRef={this.maxNeighborhoodInputRef}
                         required={true}
+                        type="number"
                         disabled={loading}
                         classes={{
                           underline: classes.cssUnderline
