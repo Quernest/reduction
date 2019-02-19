@@ -1,15 +1,11 @@
-import { generateGrid, Kohonen } from "@seracio/kohonen";
+import { Kohonen } from "@seracio/kohonen";
 
 const ctx: Worker = self as any;
 
 ctx.addEventListener("message", (event: MessageEvent) => {
-  const { data, cols, rows } = event.data;
-  const neurons = generateGrid(cols, rows);
-  const k = new Kohonen({ data, neurons });
+  const k = new Kohonen(event.data);
 
-  console.log(k); // tslint:disable-line
+  k.training();
 
-  ctx.postMessage({
-    neurons
-  });
+  ctx.postMessage({ positions: k.mapping() });
 });

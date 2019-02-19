@@ -18,7 +18,8 @@
     "react": "^16.8.0-alpha.1",
     "react-dom": "^16.8.0-alpha.1",
     "react-router-dom": "^4.3.1",
-    "react-scripts-ts": "3.1.0"
+    "react-scripts-ts": "3.1.0",
+    "recompose": "^0.30.0"
   },
   "scripts": {
     "start": "react-scripts-ts start",
@@ -40,6 +41,7 @@
     "@types/react": "^16.7.20",
     "@types/react-dom": "^16.0.11",
     "@types/react-router-dom": "^4.3.1",
+    "@types/recompose": "^0.30.4",
     "gh-pages": "^2.0.1",
     "typescript": "^3.2.4",
     "worker-loader": "^2.0.0"

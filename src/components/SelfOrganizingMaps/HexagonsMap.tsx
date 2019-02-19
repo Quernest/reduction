@@ -10,6 +10,7 @@ import get from "lodash/fp/get";
 import map from "lodash/fp/map";
 import React, { Component } from "react";
 import { IChart } from "src/models/chart.model";
+import { ITrainingConfig } from "src/models/som.model";
 
 const styles = createStyles({
   root: {
@@ -34,16 +35,23 @@ const styles = createStyles({
   }
 });
 
+export interface IDimensions {
+  columns: number;
+  rows: number;
+  hexagonSize: number;
+}
+
 interface IProps extends WithStyles<typeof styles> {
   title?: string;
   neurons: Neuron[];
-  hexagonSize: number;
+  dimensions: IDimensions;
+  trainingConfig: ITrainingConfig;
 }
 
 export const HexagonsMap = withStyles(styles)(
   class extends Component<IProps, IChart> {
     private svg: Selection<d3.BaseType, any, HTMLElement, any>;
-    private gHexagons: any;
+    private gHexagons: Selection<d3.BaseType, any, HTMLElement, any>;
 
     public readonly state = {
       margin: {
@@ -70,9 +78,9 @@ export const HexagonsMap = withStyles(styles)(
     }
 
     public componentDidUpdate(props: IProps) {
-      const { neurons, hexagonSize } = this.props;
+      const { neurons, dimensions } = this.props;
 
-      if (props.neurons !== neurons || props.hexagonSize !== hexagonSize) {
+      if (props.neurons !== neurons || props.dimensions !== dimensions) {
         this.gHexagons.remove();
         this.drawHexagons(neurons);
       }
@@ -91,7 +99,7 @@ export const HexagonsMap = withStyles(styles)(
     }
 
     private drawHexagons(neurons: Neuron[]): void {
-      const { hexagonSize } = this.props;
+      const { hexagonSize } = this.props.dimensions;
 
       // compute the radius of an hexagon
       const radius = hexagonSize / 2 / Math.cos(Math.PI / 6);

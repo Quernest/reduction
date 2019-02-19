@@ -1,170 +1,225 @@
-import LinearProgress from "@material-ui/core/LinearProgress";
-import { Theme } from "@material-ui/core/styles";
+import Divider from "@material-ui/core/Divider";
+import {
+  createStyles,
+  Theme,
+  withStyles,
+  WithStyles
+} from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/styles";
 import { Neuron } from "@seracio/kohonen/dist/types";
-import debounce from "lodash/debounce";
-import isUndefined from "lodash/isUndefined";
-import React, { useEffect } from "react";
-import { HexagonsMap, SOMControls } from "src/components";
+import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
+import compose from "recompose/compose";
+import { HexagonsMap, IDimensions, SOMControls } from "src/components";
+import { ITrainingConfig } from "src/models/som.model";
 import CalculateWorker from "worker-loader!src/components/SelfOrganizingMaps/calculate.worker";
+import GridWorker from "worker-loader!src/components/SelfOrganizingMaps/grid.worker";
 
-const useStyles = makeStyles(({ spacing, breakpoints }: Theme) => ({
-  root: {
-    flexGrow: 1,
-    padding: spacing.unit * 2,
-    [breakpoints.up("sm")]: {
-      padding: spacing.unit * 3
+const styles = ({ spacing, breakpoints }: Theme) =>
+  createStyles({
+    root: {
+      flexGrow: 1,
+      padding: spacing.unit * 2,
+      [breakpoints.up("sm")]: {
+        padding: spacing.unit * 3
+      }
+    },
+    wrap: {
+      width: "100%",
+      maxWidth: breakpoints.values.lg,
+      marginLeft: "auto",
+      marginRight: "auto"
+    },
+    progress: {
+      flexGrow: 1
+    },
+    divider: {
+      marginBottom: spacing.unit * 2
     }
-  },
-  wrap: {
-    width: "100%",
-    maxWidth: breakpoints.values.lg,
-    marginLeft: "auto",
-    marginRight: "auto"
-  },
-  progress: {
-    flexGrow: 1
-  }
-}));
+  });
+
+interface IProps extends WithStyles<typeof styles> {}
 
 interface IState {
-  uploading?: boolean;
-  uploaded?: boolean;
-  calculating?: boolean;
-  calculated?: boolean;
-  visualized?: boolean;
+  uploading: boolean;
+  uploaded: boolean;
+  calculating: boolean;
+  calculated: boolean;
+  plotted: boolean;
+  plotting: boolean;
+  withTraining: boolean;
+  dimensions: IDimensions;
+  trainingConfig: ITrainingConfig;
+  neurons: Neuron[];
+  data: number[][];
 }
 
-const initialState: IState = {
-  uploading: false,
-  uploaded: false,
-  calculating: false,
-  calculated: false,
-  visualized: false
-};
+class SelfOrganizingMapsPage extends Component<IProps, IState> {
+  protected calculateWorker: Worker;
+  protected gridWorker: Worker;
 
-/**
- * self-organizing maps main page
- */
-export const SelfOrganizingMaps = (): JSX.Element => {
-  const classes = useStyles();
+  public readonly state: IState = {
+    uploading: false,
+    uploaded: false,
+    calculating: false,
+    calculated: false,
+    plotted: false,
+    plotting: false,
+    withTraining: false,
+    dimensions: {
+      columns: 25,
+      rows: 12,
+      hexagonSize: 50
+    },
+    trainingConfig: {
+      maxStep: 1000,
+      minLearningCoef: 0.1,
+      maxLearningCoef: 0.4,
+      minNeighborhood: 0.3,
+      maxNeighborhood: 1
+    },
+    neurons: [],
+    data: [
+      [0, 0, 0],
+      [0, 0, 255],
+      [0, 255, 0],
+      [0, 255, 255],
+      [255, 0, 0],
+      [255, 0, 255],
+      [255, 255, 0],
+      [255, 255, 255]
+    ]
+  };
 
-  /**
-   * current page state
-   */
-  const [state, setState] = React.useState<IState>(initialState);
-  const { uploading, calculated, calculating } = state;
+  public componentDidMount() {
+    this.initWorkers();
+  }
 
-  /**
-   * calculate worker for ...
-   */
-  const [calculateWorker, createCalculateWorker] = React.useState<
-    Worker | undefined
-  >(undefined);
+  public componentWillUnmount() {
+    this.destroyWorkers();
+  }
 
-  /**
-   * collection of neurons
-   */
-  const [neurons, setNeurons] = React.useState<Neuron[]>([]);
-
-  /**
-   * count of hexagons per column
-   */
-  const [cols, setCols] = React.useState<number>(25);
-
-  /**
-   * count of hexagons per row
-   */
-  const [rows, setRows] = React.useState<number>(12);
-
-  /**
-   * hexagon size (step x)
-   */
-  const [hexagonSize, setHexagonSize] = React.useState<number>(50);
-
-  /**
-   * tested dataset
-   */
-  const data = [
-    [0, 0, 0],
-    [0, 0, 255],
-    [0, 255, 0],
-    [0, 255, 255],
-    [255, 0, 0],
-    [255, 0, 255],
-    [255, 255, 0],
-    [255, 255, 255]
-  ];
-
-  // @ts-ignore: temporary unused function
-  const onChangeCols = (count: number) => setCols(count);
-
-  // @ts-ignore: temporary unused function
-  const onChangeRows = (count: number) => setRows(count);
-
-  // @ts-ignore: temporary unused function
-  const onChangeHexagonSize = (size: number) => setHexagonSize(size);
-
-  useEffect(() => {
-    const debounceTime: number = 700;
-
-    const onCalculateWorkerMsg = debounce((event: MessageEvent) => {
-      setNeurons(event.data.neurons);
-      setState({ ...state, calculated: true, calculating: false });
-    }, debounceTime);
-
-    if (isUndefined(calculateWorker)) {
-      createCalculateWorker(new CalculateWorker());
-    } else {
-      setState({ ...state, calculating: true });
-      calculateWorker.postMessage({ data, cols, rows });
-      calculateWorker.addEventListener("message", onCalculateWorkerMsg, false);
+  private onStartCalculations = () => {
+    const { withTraining, trainingConfig, neurons, data } = this.state;
+    if (withTraining) {
+      this.setState({ calculating: true });
+      this.calculateWorker.postMessage({ neurons, data, ...trainingConfig });
     }
+  };
 
-    return () => {
-      if (!isUndefined(calculateWorker)) {
-        calculateWorker.removeEventListener(
-          "message",
-          onCalculateWorkerMsg,
-          false
-        );
-        calculateWorker.terminate();
-      }
-    };
-  }, [calculateWorker]);
+  private onGetGridWorkerMessage = (event: MessageEvent) => {
+    const { neurons, dimensions, trainingConfig } = event.data;
 
-  return (
-    <div className={classes.root}>
-      <div className={classes.wrap}>
-        <Typography variant="h5" paragraph={true}>
-          Self-Organizing Maps
-        </Typography>
-        {(() => {
-          if (uploading || calculating) {
-            return (
-              <div className={classes.progress}>
-                <LinearProgress />
-              </div>
-            );
-          }
+    this.setState(
+      {
+        neurons,
+        dimensions,
+        trainingConfig,
+        plotted: true,
+        plotting: false
+      },
+      this.onStartCalculations
+    );
+  };
 
-          if (calculated) {
-            return (
-              <>
-                <SOMControls />
-                <HexagonsMap
-                  title="Hexagonal heatmap"
-                  neurons={neurons}
-                  hexagonSize={hexagonSize}
-                />
-              </>
-            );
-          }
+  private onGetCalculateWorkerMessage = (event: MessageEvent) => {
+    this.setState({ calculated: true, calculating: false });
+  };
 
-          return null;
-        })()}
+  private initWorkers() {
+    this.gridWorker = new GridWorker();
+    this.gridWorker.addEventListener(
+      "message",
+      this.onGetGridWorkerMessage,
+      false
+    );
+
+    this.calculateWorker = new CalculateWorker();
+    this.calculateWorker.addEventListener(
+      "message",
+      this.onGetCalculateWorkerMessage,
+      false
+    );
+  }
+
+  private destroyWorkers() {
+    this.gridWorker.terminate();
+    this.gridWorker.removeEventListener(
+      "message",
+      this.onGetGridWorkerMessage,
+      false
+    );
+    this.calculateWorker.terminate();
+    this.calculateWorker.removeEventListener(
+      "message",
+      this.onGetCalculateWorkerMessage,
+      false
+    );
+  }
+
+  protected onControlsSubmit = (
+    newDimensions: IDimensions,
+    newTrainingConfig: ITrainingConfig
+  ) => {
+    this.setState({
+      calculated: false,
+      plotting: true
+    });
+
+    this.gridWorker.postMessage({
+      dimensions: newDimensions,
+      trainingConfig: newTrainingConfig
+    });
+  };
+
+  protected onSwitchTraining = (checked: boolean) => {
+    this.setState({
+      withTraining: checked
+    });
+  };
+
+  public render(): JSX.Element {
+    const { classes } = this.props;
+    const {
+      calculating,
+      plotting,
+      plotted,
+      dimensions,
+      trainingConfig,
+      withTraining,
+      neurons
+    } = this.state;
+
+    return (
+      <div className={classes.root}>
+        <div className={classes.wrap}>
+          <Typography variant="h5" paragraph={true}>
+            Self-Organizing Maps
+          </Typography>
+          <Divider className={classes.divider} />
+          <SOMControls
+            trainingConfig={trainingConfig}
+            dimensions={dimensions}
+            onSubmit={this.onControlsSubmit}
+            onSwitchTraining={this.onSwitchTraining}
+            withTraining={withTraining}
+            loading={calculating || plotting}
+          />
+          {plotted && (
+            <HexagonsMap
+              title="Hexagonal heatmap"
+              neurons={neurons}
+              dimensions={dimensions}
+              trainingConfig={trainingConfig}
+            />
+          )}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+}
+
+export const SelfOrganizingMaps = compose<IProps, {}>(
+  withRouter,
+  withStyles(styles)
+)(SelfOrganizingMapsPage);
