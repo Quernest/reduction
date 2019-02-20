@@ -3,7 +3,7 @@ import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
 import round from "lodash/round";
 import * as React from "react";
-import { IChart } from "src/models/chart.model";
+import { IChartState } from "src/models/chart.model";
 import { from2D } from "../../utils/transformations";
 
 const styles = ({ palette }: Theme) =>
@@ -72,7 +72,7 @@ interface IProps {
 }
 
 export const Bar = withStyles(styles)(
-  class extends React.Component<IProps, IChart> {
+  class extends React.Component<IProps, IChartState> {
     /**
      * main svg element
      */

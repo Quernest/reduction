@@ -1,16 +1,20 @@
-import { createStyles, withStyles, WithStyles } from "@material-ui/core/styles";
+import { createStyles, withStyles, WithStyles } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
 import { range } from "d3-array";
 import { scaleLinear } from "d3-scale";
-import { select, Selection } from "d3-selection";
+import { interpolateGreys } from "d3-scale-chromatic";
+import { select } from "d3-selection";
 import { line } from "d3-shape";
 import flow from "lodash/fp/flow";
 import get from "lodash/fp/get";
 import map from "lodash/fp/map";
-import React, { Component } from "react";
-import { IChart } from "src/models/chart.model";
-import { ITrainingConfig } from "src/models/som.model";
+import React, { Component, createRef, RefObject } from "react";
+import {
+  IChartState,
+  IHexagonalGridDimensions,
+  IMargin
+} from "src/models/chart.model";
 
 const styles = createStyles({
   root: {
@@ -35,24 +39,15 @@ const styles = createStyles({
   }
 });
 
-export interface IDimensions {
-  columns: number;
-  rows: number;
-  hexagonSize: number;
-}
-
 interface IProps extends WithStyles<typeof styles> {
   title?: string;
   neurons: Neuron[];
-  dimensions: IDimensions;
-  trainingConfig: ITrainingConfig;
+  dimensions: IHexagonalGridDimensions;
+  umatrix: number[];
 }
 
-export const HexagonsMap = withStyles(styles)(
-  class extends Component<IProps, IChart> {
-    private svg: Selection<d3.BaseType, any, HTMLElement, any>;
-    private gHexagons: Selection<d3.BaseType, any, HTMLElement, any>;
-
+export const UMatrixGrid = withStyles(styles)(
+  class extends Component<IProps, IChartState> {
     public readonly state = {
       margin: {
         left: 2,
@@ -70,36 +65,34 @@ export const HexagonsMap = withStyles(styles)(
       }
     };
 
-    public componentDidMount() {
-      const { neurons } = this.props;
+    private ref = createRef<SVGSVGElement>();
+    private ctx: any;
+    private grid: any;
 
-      this.selectSVGElement();
-      this.drawHexagons(neurons);
+    private getContext({ current }: RefObject<SVGSVGElement>) {
+      this.ctx = select(current);
     }
 
-    public componentDidUpdate(props: IProps) {
-      const { neurons, dimensions } = this.props;
-
-      if (props.neurons !== neurons || props.dimensions !== dimensions) {
-        this.gHexagons.remove();
-        this.drawHexagons(neurons);
-      }
-    }
-
-    private selectSVGElement(): void {
-      const { margin, fullWidth, fullHeight } = this.state;
-
-      this.svg = select("#som")
+    private setContextAttributes(
+      width: number,
+      height: number,
+      margin: IMargin
+    ) {
+      this.ctx
         .attr("width", "100%")
         .attr("height", "100%")
-        .attr("viewBox", `0 0 ${fullWidth} ${fullHeight}`)
+        .attr("viewBox", `0 0 ${width} ${height}`)
         .attr("preserveAspectRatio", "xMinYMin meet")
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
     }
 
-    private drawHexagons(neurons: Neuron[]): void {
-      const { hexagonSize } = this.props.dimensions;
+    private drawGrid(
+      dimensions: IHexagonalGridDimensions,
+      neurons: Neuron[],
+      umatrix: number[]
+    ) {
+      const { hexagonSize } = dimensions;
 
       // compute the radius of an hexagon
       const radius = hexagonSize / 2 / Math.cos(Math.PI / 6);
@@ -131,42 +124,77 @@ export const HexagonsMap = withStyles(styles)(
         line()
       );
 
-      this.gHexagons = this.svg
+      this.grid = this.ctx
         .append("g")
         .attr(
           "transform",
           `translate(${-hexagonSize / 2}, ${-hexagonSize + radius})`
-        )
-        .attr("class", "hexagons");
+        );
 
-      this.gHexagons
+      this.grid
         .selectAll(".hexagon")
         .data(neurons)
         .enter()
         .append("path")
-        .style("fill", "#E0E0E0")
+        .style("fill", "#e0e0e0")
+        .transition()
+        .duration(1000)
+        .style(
+          "fill",
+          (d: Neuron, i: number): string => {
+            if (d.v) {
+              return interpolateGreys(umatrix[i]);
+            }
+
+            return "#e0e0e0";
+          }
+        )
         .style("stroke", "fff")
         .attr("d", pathGen);
     }
 
-    public render(): React.ReactNode {
+    public componentDidUpdate(props: IProps) {
+      const { neurons, dimensions, umatrix } = this.props;
+
+      if (
+        props.neurons !== neurons ||
+        props.dimensions !== dimensions ||
+        props.umatrix !== umatrix
+      ) {
+        this.grid.remove();
+        this.drawGrid(dimensions, neurons, umatrix);
+      }
+    }
+
+    public componentDidMount() {
+      const { dimensions, neurons, umatrix } = this.props;
+      const { fullWidth, fullHeight, margin } = this.state;
+
+      this.getContext(this.ref);
+      this.setContextAttributes(fullWidth, fullHeight, margin);
+      this.drawGrid(dimensions, neurons, umatrix);
+    }
+
+    public render(): JSX.Element {
       const { classes, title } = this.props;
       const { fullWidth, fullHeight } = this.state;
 
       return (
         <div className={classes.root}>
-          <Typography
-            variant="body1"
-            color="textSecondary"
-            className={classes.title}
-          >
-            {title}
-          </Typography>
+          {title && (
+            <Typography
+              variant="body1"
+              color="textSecondary"
+              className={classes.title}
+            >
+              {title}
+            </Typography>
+          )}
           <div
             className={classes.svgContainer}
             style={{ paddingBottom: `${(fullHeight / fullWidth) * 100}%` }}
           >
-            <svg className={classes.svg} id="som" />
+            <svg className={classes.svg} ref={this.ref} />
           </div>
         </div>
       );

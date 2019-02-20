@@ -1,2 +1,2 @@
-export * from "./HexagonsMap";
 export * from "./SOMControls";
+export * from "./UMatrixGrid";

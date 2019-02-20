@@ -16,6 +16,7 @@ ctx.addEventListener("message", (event: MessageEvent) => {
   // }
 
   const positions = k.mapping();
+  const umatrix = k.umatrix();
 
-  ctx.postMessage({ positions });
+  ctx.postMessage({ positions, umatrix, neurons: k.neurons });
 });

@@ -11,7 +11,8 @@ import debounce from "lodash/debounce";
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import compose from "recompose/compose";
-import { HexagonsMap, IDimensions, SOMControls } from "src/components";
+import { SOMControls, UMatrixGrid } from "src/components";
+import { IHexagonalGridDimensions } from "src/models/chart.model";
 import { ITrainingConfig } from "src/models/som.model";
 import CalculateWorker from "worker-loader!src/components/SelfOrganizingMaps/calculate.worker";
 import GridWorker from "worker-loader!src/components/SelfOrganizingMaps/grid.worker";
@@ -36,6 +37,10 @@ const styles = ({ spacing, breakpoints }: Theme) =>
     },
     divider: {
       marginBottom: spacing.unit * 2
+    },
+    maps: {
+      marginTop: spacing.unit,
+      marginBottom: spacing.unit
     }
   });
 
@@ -49,11 +54,12 @@ interface IState {
   plotted: boolean;
   plotting: boolean;
   withTraining: boolean;
-  dimensions: IDimensions;
+  dimensions: IHexagonalGridDimensions;
   trainingConfig: ITrainingConfig;
   neurons: Neuron[];
   data: number[][];
   positions: Array<[number, number]>;
+  umatrix: number[];
 }
 
 class SelfOrganizingMapsPage extends Component<IProps, IState> {
@@ -84,16 +90,8 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     },
     neurons: [],
     positions: [],
-    data: [
-      [0, 0, 0],
-      [0, 0, 255],
-      [0, 255, 0],
-      [0, 255, 255],
-      [255, 0, 0],
-      [255, 0, 255],
-      [255, 255, 0],
-      [255, 255, 255]
-    ]
+    umatrix: [],
+    data: [[0, 0, 0], [10, 25, 16], [0, 0, 0]]
   };
 
   public componentDidMount() {
@@ -128,9 +126,15 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
   }, this.debounceTime);
 
   private onGetCalculateWorkerMessage = debounce((event: MessageEvent) => {
-    const { positions } = event.data;
+    const { positions, neurons, umatrix } = event.data;
 
-    this.setState({ positions, calculated: true, calculating: false });
+    this.setState({
+      positions,
+      neurons,
+      umatrix,
+      calculated: true,
+      calculating: false
+    });
 
     // const { maxStep } = this.state.trainingConfig;
     // const { step } = event.data;
@@ -172,7 +176,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
   }
 
   protected onControlsSubmit = (
-    newDimensions: IDimensions,
+    newDimensions: IHexagonalGridDimensions,
     newTrainingConfig: ITrainingConfig
   ) => {
     this.setState({
@@ -201,7 +205,8 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
       dimensions,
       trainingConfig,
       withTraining,
-      neurons
+      neurons,
+      umatrix
     } = this.state;
 
     return (
@@ -220,12 +225,14 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
             loading={calculating || plotting}
           />
           {plotted && (
-            <HexagonsMap
-              title="Hexagonal heatmap"
-              neurons={neurons}
-              dimensions={dimensions}
-              trainingConfig={trainingConfig}
-            />
+            <div className={classes.maps}>
+              <UMatrixGrid
+                title="U-matrix"
+                neurons={neurons}
+                dimensions={dimensions}
+                umatrix={umatrix}
+              />
+            </div>
           )}
         </div>
       </div>

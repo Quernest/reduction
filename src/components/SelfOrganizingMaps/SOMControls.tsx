@@ -10,7 +10,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Switch from "@material-ui/core/Switch";
 import Typography from "@material-ui/core/Typography";
 import React, { Component, createRef } from "react";
-import { IDimensions } from "src/components";
+import { IHexagonalGridDimensions } from "src/models/chart.model";
 import { ITrainingConfig } from "src/models/som.model";
 
 const styles = ({ spacing, palette }: Theme) =>
@@ -57,9 +57,9 @@ const styles = ({ spacing, palette }: Theme) =>
 
 interface IProps extends WithStyles<typeof styles> {
   trainingConfig: ITrainingConfig;
-  dimensions: IDimensions;
+  dimensions: IHexagonalGridDimensions;
   onSubmit: (
-    newDimensions: IDimensions,
+    newDimensions: IHexagonalGridDimensions,
     newTrainingConfig: ITrainingConfig
   ) => void;
   loading?: boolean;
@@ -121,7 +121,7 @@ export const SOMControls = withStyles(styles)(
         this.maxNeighborhoodInputRef
       );
 
-      const newDimensions: IDimensions = {
+      const newDimensions: IHexagonalGridDimensions = {
         columns: columnsInputValue,
         rows: rowsInputValue,
         hexagonSize: hexagonSizeInputValue

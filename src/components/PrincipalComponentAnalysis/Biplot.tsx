@@ -3,7 +3,7 @@ import { createStyles, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
 import * as React from "react";
-import { IChart, Points, Vectors } from "src/models/chart.model";
+import { IChartState, Points, Vectors } from "src/models/chart.model";
 
 const styles = createStyles({
   root: {
@@ -71,7 +71,7 @@ interface IState {
  * Biplot of score variables
  */
 export const Biplot = withStyles(styles)(
-  class extends React.Component<IProps, IChart & IState> {
+  class extends React.Component<IProps, IChartState & IState> {
     public static readonly defaultProps = {
       xAxisLabel: "x",
       yAxisLabel: "y"

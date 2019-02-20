@@ -1,4 +1,11 @@
-export interface IChart {
+export interface IMargin {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
+export interface IChartState {
   // total chart width and height
   fullWidth: number;
   fullHeight: number;
@@ -7,12 +14,13 @@ export interface IChart {
   // get height by this formula -> this.fullHeight - this.margin.top - this.margin.bottom
   readonly height: number;
   // chart margins
-  margin: {
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-  };
+  margin: IMargin;
+}
+
+export interface IHexagonalGridDimensions {
+  columns: number;
+  rows: number;
+  hexagonSize: number;
 }
 
 // list of values
