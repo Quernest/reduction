@@ -91,7 +91,16 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     neurons: [],
     positions: [],
     umatrix: [],
-    data: [[0, 0, 0], [10, 25, 16], [0, 0, 0]]
+    data: [
+      [0, 0, 0],
+      [0, 0, 255],
+      [0, 255, 0],
+      [0, 255, 255],
+      [255, 0, 0],
+      [255, 0, 255],
+      [255, 255, 0],
+      [255, 255, 255]
+    ]
   };
 
   public componentDidMount() {
@@ -104,6 +113,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
 
   private onStartCalculations = () => {
     const { withTraining, trainingConfig, neurons, data } = this.state;
+
     if (withTraining) {
       this.setState({ calculating: true });
       this.calculateWorker.postMessage({ neurons, data, ...trainingConfig });
@@ -115,6 +125,8 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
 
     this.setState(
       {
+        umatrix: [],
+        positions: [],
         neurons,
         dimensions,
         trainingConfig,
@@ -126,21 +138,31 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
   }, this.debounceTime);
 
   private onGetCalculateWorkerMessage = debounce((event: MessageEvent) => {
-    const { positions, neurons, umatrix } = event.data;
+    const { positions, umatrix } = event.data;
 
     this.setState({
       positions,
-      neurons,
       umatrix,
       calculated: true,
       calculating: false
     });
 
     // const { maxStep } = this.state.trainingConfig;
-    // const { step } = event.data;
+    // const { neurons} = event.data;
+
+    // this.setState({
+    //   neurons
+    // });
 
     // if (step === maxStep) {
-    //   this.setState({ calculated: true, calculating: false });
+    //   const { positions, umatrix } = event.data;
+
+    //   this.setState({
+    //     calculated: true,
+    //     calculating: false,
+    //     positions,
+    //     umatrix
+    //   });
     // }
   }, this.debounceTime);
 

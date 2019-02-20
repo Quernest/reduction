@@ -78,7 +78,7 @@ export const UMatrixGrid = withStyles(styles)(
       height: number,
       margin: IMargin
     ) {
-      this.ctx
+      this.ctx = this.ctx
         .attr("width", "100%")
         .attr("height", "100%")
         .attr("viewBox", `0 0 ${width} ${height}`)
@@ -141,13 +141,8 @@ export const UMatrixGrid = withStyles(styles)(
         .duration(1000)
         .style(
           "fill",
-          (d: Neuron, i: number): string => {
-            if (d.v) {
-              return interpolateGreys(umatrix[i]);
-            }
-
-            return "#e0e0e0";
-          }
+          (_: any, i: number): string =>
+            umatrix[i] ? interpolateGreys(umatrix[i]) : "#e0e0e0"
         )
         .style("stroke", "fff")
         .attr("d", pathGen);

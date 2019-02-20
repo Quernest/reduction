@@ -185,6 +185,7 @@ export const SOMControls = withStyles(styles)(
                       <Input
                         id="columns"
                         defaultValue={columns.toString()}
+                        inputProps={{ min: "1", max: "150", step: "1" }}
                         required={true}
                         fullWidth={true}
                         inputRef={this.columnsInputRef}
@@ -211,6 +212,7 @@ export const SOMControls = withStyles(styles)(
                       <Input
                         id="rows"
                         defaultValue={rows.toString()}
+                        inputProps={{ min: "1", max: "150", step: "1" }}
                         fullWidth={true}
                         required={true}
                         inputRef={this.rowsInputRef}
@@ -237,6 +239,7 @@ export const SOMControls = withStyles(styles)(
                       <Input
                         id="hexagonSize"
                         defaultValue={hexagonSize.toString()}
+                        inputProps={{ min: "1", max: "250", step: "1" }}
                         fullWidth={true}
                         required={true}
                         disabled={loading}
@@ -268,6 +271,7 @@ export const SOMControls = withStyles(styles)(
                       <Input
                         id="iterations"
                         defaultValue={maxStep.toString()}
+                        inputProps={{ min: "1", max: "100000", step: "1" }}
                         fullWidth={true}
                         inputRef={this.iterationsInputRef}
                         required={true}
@@ -294,6 +298,7 @@ export const SOMControls = withStyles(styles)(
                       <Input
                         id="minLearningCoeff"
                         defaultValue={minLearningCoef.toString()}
+                        inputProps={{ min: "0.1", max: "1", step: "0.1" }}
                         fullWidth={true}
                         inputRef={this.minLearningCoefInputRef}
                         required={true}
@@ -320,6 +325,7 @@ export const SOMControls = withStyles(styles)(
                       <Input
                         id="maxLearningCoefficient"
                         defaultValue={maxLearningCoef.toString()}
+                        inputProps={{ min: "0.1", max: "1", step: "0.1" }}
                         fullWidth={true}
                         inputRef={this.maxLearningCoefInputRef}
                         required={true}
@@ -346,6 +352,7 @@ export const SOMControls = withStyles(styles)(
                       <Input
                         id="minNeighborhood"
                         defaultValue={minNeighborhood.toString()}
+                        inputProps={{ min: "0.1", max: "1", step: "0.1" }}
                         fullWidth={true}
                         inputRef={this.minNeighborhoodInputRef}
                         required={true}
@@ -372,6 +379,7 @@ export const SOMControls = withStyles(styles)(
                       <Input
                         id="maxNeighborhood"
                         defaultValue={maxNeighborhood.toString()}
+                        inputProps={{ min: "0.1", max: "1", step: "0.1" }}
                         fullWidth={true}
                         inputRef={this.maxNeighborhoodInputRef}
                         required={true}
