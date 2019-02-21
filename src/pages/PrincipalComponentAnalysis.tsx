@@ -1,8 +1,6 @@
-import LinearProgress from "@material-ui/core/LinearProgress";
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
-import debounce from "lodash/debounce";
 import has from "lodash/has";
 import isUndefined from "lodash/isUndefined";
 import * as React from "react";
@@ -144,9 +142,7 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
 
   // create workers on componentDidMount
   React.useEffect(() => {
-    const debounceTime: number = 700;
-
-    const onUploadWorkerMsg = debounce((event: MessageEvent) => {
+    const onUploadWorkerMsg = (event: MessageEvent) => {
       if (has(event.data, "error")) {
         setError(event.data.error);
         setState({ ...state, uploaded: false, uploading: false });
@@ -155,12 +151,12 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
         setParsedFile(event.data.parsedFile);
         setState({ ...state, uploaded: true, uploading: false });
       }
-    }, debounceTime);
+    };
 
-    const onCalculateWorkerMsg = debounce((event: MessageEvent) => {
+    const onCalculateWorkerMsg = (event: MessageEvent) => {
       setCalculations(event.data);
       setState({ ...state, calculated: true, calculating: false });
-    }, debounceTime);
+    };
 
     if (isUndefined(uploadWorker)) {
       createUploadWorker(new UploadWorker());
@@ -237,14 +233,6 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
           Principal Component Analysis
         </Typography>
         {(() => {
-          if (uploading || calculating) {
-            return (
-              <div className={classes.progress}>
-                <LinearProgress />
-              </div>
-            );
-          }
-
           if (visualized) {
             return (
               <Charts
@@ -278,6 +266,7 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
               <CalculateControls
                 parsedFile={parsedFile}
                 onCalculate={onCalculate}
+                calculating={calculating}
               />
             );
           }
@@ -290,6 +279,7 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
                 onUpload={onUploadFile}
                 onChange={onChangeFile}
                 onCancel={onCancelFile}
+                uploading={uploading}
               />
             </>
           );
