@@ -7,11 +7,10 @@ import {
 } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
-import debounce from "lodash/debounce";
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import compose from "recompose/compose";
-import { SOMControls, UMatrixGrid } from "src/components";
+import { HexagonalGrid, SOMControls } from "src/components";
 import { IHexagonalGridDimensions } from "src/models/chart.model";
 import { ITrainingConfig } from "src/models/som.model";
 import CalculateWorker from "worker-loader!src/components/SelfOrganizingMaps/calculate.worker";
@@ -66,8 +65,6 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
   protected calculateWorker: Worker;
   protected gridWorker: Worker;
 
-  private debounceTime: number = 500;
-
   public readonly state: IState = {
     uploading: false,
     uploaded: false,
@@ -120,7 +117,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     }
   };
 
-  private onGetGridWorkerMessage = debounce((event: MessageEvent) => {
+  private onGetGridWorkerMessage = (event: MessageEvent) => {
     const { neurons, dimensions, trainingConfig } = event.data;
 
     this.setState(
@@ -135,9 +132,9 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
       },
       this.onStartCalculations
     );
-  }, this.debounceTime);
+  };
 
-  private onGetCalculateWorkerMessage = debounce((event: MessageEvent) => {
+  private onGetCalculateWorkerMessage = (event: MessageEvent) => {
     const { positions, umatrix } = event.data;
 
     this.setState({
@@ -164,7 +161,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     //     umatrix
     //   });
     // }
-  }, this.debounceTime);
+  };
 
   private initWorkers() {
     this.gridWorker = new GridWorker();
@@ -248,7 +245,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
           />
           {plotted && (
             <div className={classes.maps}>
-              <UMatrixGrid
+              <HexagonalGrid
                 title="U-matrix"
                 neurons={neurons}
                 dimensions={dimensions}

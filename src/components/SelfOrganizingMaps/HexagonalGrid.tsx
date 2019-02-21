@@ -6,9 +6,6 @@ import { scaleLinear } from "d3-scale";
 import { interpolateGreys } from "d3-scale-chromatic";
 import { select } from "d3-selection";
 import { line } from "d3-shape";
-import flow from "lodash/fp/flow";
-import get from "lodash/fp/get";
-import map from "lodash/fp/map";
 import React, { Component, createRef, RefObject } from "react";
 import {
   IChartState,
@@ -43,11 +40,16 @@ interface IProps extends WithStyles<typeof styles> {
   title?: string;
   neurons: Neuron[];
   dimensions: IHexagonalGridDimensions;
-  umatrix: number[];
+  umatrix?: number[];
 }
 
-export const UMatrixGrid = withStyles(styles)(
+export const HexagonalGrid = withStyles(styles)(
   class extends Component<IProps, IChartState> {
+    private ref = createRef<SVGSVGElement>();
+    private ctx: any;
+    private grid: any;
+    private hexagonRadius: number = 0;
+
     public readonly state = {
       margin: {
         left: 2,
@@ -65,9 +67,35 @@ export const UMatrixGrid = withStyles(styles)(
       }
     };
 
-    private ref = createRef<SVGSVGElement>();
-    private ctx: any;
-    private grid: any;
+    public componentDidMount() {
+      const { dimensions, neurons, umatrix } = this.props;
+      const { fullWidth, fullHeight, margin } = this.state;
+
+      this.getContext(this.ref);
+      this.setContextAttributes(fullWidth, fullHeight, margin);
+      this.drawGrid(dimensions, neurons);
+
+      if (umatrix && umatrix.length > 0) {
+        this.drawUMatrix(umatrix);
+      }
+    }
+
+    public componentDidUpdate(props: IProps) {
+      const { neurons, dimensions, umatrix } = this.props;
+
+      if (
+        props.neurons !== neurons ||
+        props.dimensions !== dimensions ||
+        props.umatrix !== umatrix
+      ) {
+        this.grid.remove();
+        this.drawGrid(dimensions, neurons);
+
+        if (umatrix && umatrix.length > 0) {
+          this.drawUMatrix(umatrix);
+        }
+      }
+    }
 
     private getContext({ current }: RefObject<SVGSVGElement>) {
       this.ctx = select(current);
@@ -87,87 +115,84 @@ export const UMatrixGrid = withStyles(styles)(
         .attr("transform", `translate(${margin.left},${margin.top})`);
     }
 
-    private drawGrid(
-      dimensions: IHexagonalGridDimensions,
-      neurons: Neuron[],
-      umatrix: number[]
-    ) {
-      const { hexagonSize } = dimensions;
-
-      // compute the radius of an hexagon
-      const radius = hexagonSize / 2 / Math.cos(Math.PI / 6);
-
-      // generate points of an hexagon
-      const getHexagonPoints = ([x, y]: [number, number]) => {
-        return range(-Math.PI / 2, 2 * Math.PI, (2 * Math.PI) / 6).map(
-          (a: number) => [x + Math.cos(a) * radius, y + Math.sin(a) * radius]
-        );
-      };
-
-      // hexagonData are normalized such as 2 neighbors have a distance of 1
-      // scale them to have this distance equal to 50
-      const scaleGrid = scaleLinear()
+    /**
+     * hexagonData are normalized such as 2 neighbors have a distance of 1
+     * scale them to have this distance
+     */
+    private scaleGrid(hexagonSize: number) {
+      return scaleLinear()
         .domain([0, 1])
         .range([0, hexagonSize]);
+    }
+
+    /**
+     * computes the radius of an hexagon
+     */
+    private computeHexagonRadius(hexagonSize: number) {
+      this.hexagonRadius = hexagonSize / 2 / Math.cos(Math.PI / 6);
+    }
+
+    /**
+     * generates points of an hexagon
+     */
+    private getHexagonPoints([x, y]: [number, number], hexagonRadius: number) {
+      return range(-Math.PI / 2, 2 * Math.PI, (2 * Math.PI) / 6).map<
+        [number, number]
+      >((a: number) => [
+        x + Math.cos(a) * hexagonRadius,
+        y + Math.sin(a) * hexagonRadius
+      ]);
+    }
+
+    /**
+     * draws the grid of hexagons by neurons positions
+     */
+    private drawGrid(
+      { hexagonSize }: IHexagonalGridDimensions,
+      neurons: Neuron[]
+    ) {
+      // compute radius first
+      this.computeHexagonRadius(hexagonSize);
 
       // generate path of an hexagon
-      const pathGen = flow<
-        { pos: [number, number] },
-        [number, number],
-        number[],
-        number[][],
-        any
-      >(
-        get("pos"),
-        map(scaleGrid),
-        getHexagonPoints,
-        line()
-      );
+      const generatePath = ({ pos: [x, y] }: Neuron) => {
+        const sX = this.scaleGrid(hexagonSize)(x);
+        const sY = this.scaleGrid(hexagonSize)(y);
+
+        const points = this.getHexagonPoints([sX, sY], this.hexagonRadius);
+
+        return line()(points);
+      };
 
       this.grid = this.ctx
         .append("g")
         .attr(
           "transform",
-          `translate(${-hexagonSize / 2}, ${-hexagonSize + radius})`
+          `translate(${-hexagonSize / 2}, ${-hexagonSize + this.hexagonRadius})`
         );
 
-      this.grid
+      this.grid = this.grid
         .selectAll(".hexagon")
         .data(neurons)
         .enter()
         .append("path")
         .style("fill", "#e0e0e0")
+        .style("stroke", "fff")
+        .attr("d", generatePath);
+    }
+
+    /**
+     * draws the greyscaled grid of hexagons by umatrix values
+     */
+    private drawUMatrix(umatrix: number[]) {
+      this.grid
         .transition()
-        .duration(1000)
+        .duration(800)
         .style(
           "fill",
           (_: any, i: number): string =>
             umatrix[i] ? interpolateGreys(umatrix[i]) : "#e0e0e0"
-        )
-        .style("stroke", "fff")
-        .attr("d", pathGen);
-    }
-
-    public componentDidUpdate(props: IProps) {
-      const { neurons, dimensions, umatrix } = this.props;
-
-      if (
-        props.neurons !== neurons ||
-        props.dimensions !== dimensions ||
-        props.umatrix !== umatrix
-      ) {
-        this.grid.remove();
-        this.drawGrid(dimensions, neurons, umatrix);
-      }
-    }
-
-    public componentDidMount() {
-      const { dimensions, neurons, umatrix } = this.props;
-      const { fullWidth, fullHeight, margin } = this.state;
-
-      this.getContext(this.ref);
-      this.setContextAttributes(fullWidth, fullHeight, margin);
-      this.drawGrid(dimensions, neurons, umatrix);
+        );
     }
 
     public render(): JSX.Element {
