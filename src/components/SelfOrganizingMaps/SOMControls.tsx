@@ -395,7 +395,7 @@ export const SOMControls = withStyles(styles)(
               </Grid>
               <div className={classes.space}>
                 <Grid container={true} alignItems="center" spacing={16}>
-                  <Grid item={true} xs={12} sm={4} md={2}>
+                  <Grid item={true} xs={6} sm={4} md={2}>
                     <div className={classes.wrapper}>
                       <Button
                         variant="contained"
@@ -414,7 +414,7 @@ export const SOMControls = withStyles(styles)(
                       )}
                     </div>
                   </Grid>
-                  <Grid item={true} xs={12} sm={4} md={2}>
+                  <Grid item={true} xs={6} sm={4} md={2}>
                     <FormGroup row={true}>
                       <FormControlLabel
                         control={

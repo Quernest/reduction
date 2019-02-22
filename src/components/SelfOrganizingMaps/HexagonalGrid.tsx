@@ -89,7 +89,7 @@ export const HexagonalGrid = withStyles(styles)(
 
       // draw only if the heatmap is enabled and neuron have weights (v property)
       if (has(head(neurons), "v") && heatmap) {
-        this.drawHeatmap(1);
+        this.drawHeatmap(0);
       }
 
       if (!isUndefined(umatrix) && !isEmpty(umatrix)) {
@@ -107,7 +107,7 @@ export const HexagonalGrid = withStyles(styles)(
         this.drawGrid(dimensions, neurons);
 
         if (has(head(neurons), "v") && heatmap) {
-          this.drawHeatmap(1);
+          this.drawHeatmap(0);
         }
       }
 
@@ -247,14 +247,19 @@ export const HexagonalGrid = withStyles(styles)(
     }
 
     public render(): JSX.Element {
-      const { classes, title } = this.props;
+      const { classes, title, heatmap } = this.props;
       const { fullWidth, fullHeight } = this.state;
 
       return (
         <div className={classes.root}>
           {title && (
-            <Typography variant="h6" className={classes.title}>
+            <Typography variant="body1" className={classes.title}>
               {title}
+            </Typography>
+          )}
+          {heatmap && (
+            <Typography variant="button" color="textSecondary" paragraph={true}>
+              select variables component will be here
             </Typography>
           )}
           <div
