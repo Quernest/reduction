@@ -82,7 +82,7 @@ export const SOMControls = withStyles(styles)(
       ref: React.RefObject<HTMLInputElement>
     ): number => {
       if (ref && ref.current) {
-        const value = parseInt(ref.current.value, 10);
+        const value = Number(ref.current.value);
 
         return value;
       }

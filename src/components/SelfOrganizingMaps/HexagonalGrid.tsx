@@ -3,9 +3,14 @@ import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
 import { range } from "d3-array";
 import { scaleLinear } from "d3-scale";
-import { interpolateGreys } from "d3-scale-chromatic";
+import { interpolateGreys, interpolateSpectral } from "d3-scale-chromatic";
 import { select } from "d3-selection";
 import { line } from "d3-shape";
+import has from "lodash/has";
+import head from "lodash/head";
+import isEmpty from "lodash/isEmpty";
+import isEqual from "lodash/isEqual";
+import isUndefined from "lodash/isUndefined";
 import React, { Component, createRef, RefObject } from "react";
 import {
   IChartState,
@@ -41,14 +46,16 @@ interface IProps extends WithStyles<typeof styles> {
   neurons: Neuron[];
   dimensions: IHexagonalGridDimensions;
   umatrix?: number[];
+  heatmap?: boolean;
 }
 
 export const HexagonalGrid = withStyles(styles)(
   class extends Component<IProps, IChartState> {
-    private ref = createRef<SVGSVGElement>();
-    private ctx: any;
-    private grid: any;
-    private hexagonRadius: number = 0;
+    protected ref = createRef<SVGSVGElement>();
+    protected ctx: any;
+    protected grid: any;
+    protected hexagons: any;
+    protected hexagonRadius: number = 0;
 
     public readonly state = {
       margin: {
@@ -67,41 +74,55 @@ export const HexagonalGrid = withStyles(styles)(
       }
     };
 
-    public componentDidMount() {
-      const { dimensions, neurons, umatrix } = this.props;
-      const { fullWidth, fullHeight, margin } = this.state;
+    public initContext({ fullWidth, fullHeight, margin }: IChartState) {
+      if (this.ref) {
+        this.getContext(this.ref);
+        this.setContextAttributes(fullWidth, fullHeight, margin);
+      }
+    }
 
-      this.getContext(this.ref);
-      this.setContextAttributes(fullWidth, fullHeight, margin);
+    public componentDidMount() {
+      const { neurons, dimensions, umatrix, heatmap } = this.props;
+
+      this.initContext(this.state);
       this.drawGrid(dimensions, neurons);
 
-      if (umatrix && umatrix.length > 0) {
-        this.drawUMatrix(umatrix);
+      // draw only if the heatmap is enabled and neuron have weights (v property)
+      if (has(head(neurons), "v") && heatmap) {
+        this.drawHeatmap(1);
+      }
+
+      if (!isUndefined(umatrix) && !isEmpty(umatrix)) {
+        this.drawUMatrix(umatrix as number[]);
       }
     }
 
     public componentDidUpdate(props: IProps) {
-      const { neurons, dimensions, umatrix } = this.props;
+      const { neurons, dimensions, umatrix, heatmap } = this.props;
 
       if (
-        props.neurons !== neurons ||
-        props.dimensions !== dimensions ||
-        props.umatrix !== umatrix
+        !isEqual(props.neurons, neurons) ||
+        !isEqual(props.dimensions, dimensions)
       ) {
-        this.grid.remove();
         this.drawGrid(dimensions, neurons);
 
-        if (umatrix && umatrix.length > 0) {
-          this.drawUMatrix(umatrix);
+        if (has(head(neurons), "v") && heatmap) {
+          this.drawHeatmap(1);
+        }
+      }
+
+      if (!isEqual(props.umatrix, umatrix)) {
+        if (!isUndefined(umatrix) && !isEmpty(umatrix)) {
+          this.drawUMatrix(umatrix as number[]);
         }
       }
     }
 
-    private getContext({ current }: RefObject<SVGSVGElement>) {
+    public getContext({ current }: RefObject<SVGSVGElement>) {
       this.ctx = select(current);
     }
 
-    private setContextAttributes(
+    public setContextAttributes(
       width: number,
       height: number,
       margin: IMargin
@@ -119,7 +140,7 @@ export const HexagonalGrid = withStyles(styles)(
      * hexagonData are normalized such as 2 neighbors have a distance of 1
      * scale them to have this distance
      */
-    private scaleGrid(hexagonSize: number) {
+    public scaleGrid(hexagonSize: number) {
       return scaleLinear()
         .domain([0, 1])
         .range([0, hexagonSize]);
@@ -128,14 +149,14 @@ export const HexagonalGrid = withStyles(styles)(
     /**
      * computes the radius of an hexagon
      */
-    private computeHexagonRadius(hexagonSize: number) {
+    public computeHexagonRadius(hexagonSize: number) {
       this.hexagonRadius = hexagonSize / 2 / Math.cos(Math.PI / 6);
     }
 
     /**
      * generates points of an hexagon
      */
-    private getHexagonPoints([x, y]: [number, number], hexagonRadius: number) {
+    public getHexagonPoints([x, y]: [number, number], hexagonRadius: number) {
       return range(-Math.PI / 2, 2 * Math.PI, (2 * Math.PI) / 6).map<
         [number, number]
       >((a: number) => [
@@ -147,12 +168,35 @@ export const HexagonalGrid = withStyles(styles)(
     /**
      * draws the grid of hexagons by neurons positions
      */
-    private drawGrid(
+    public drawGrid(
       { hexagonSize }: IHexagonalGridDimensions,
       neurons: Neuron[]
     ) {
-      // compute radius first
+      if (!isUndefined(this.grid)) {
+        this.grid.exit();
+        this.grid.remove();
+      }
+
       this.computeHexagonRadius(hexagonSize);
+
+      this.grid = this.ctx
+        .append("g")
+        .attr(
+          "transform",
+          `translate(${-hexagonSize / 2}, ${-hexagonSize + this.hexagonRadius})`
+        );
+
+      this.drawHexagons(hexagonSize, neurons);
+    }
+
+    /**
+     * draws hexagons on the grid by neurons positions
+     */
+    public drawHexagons(hexagonSize: number, neurons: Neuron[]) {
+      if (!isUndefined(this.hexagons)) {
+        this.hexagons.exit();
+        this.hexagons.remove();
+      }
 
       // generate path of an hexagon
       const generatePath = ({ pos: [x, y] }: Neuron) => {
@@ -164,15 +208,8 @@ export const HexagonalGrid = withStyles(styles)(
         return line()(points);
       };
 
-      this.grid = this.ctx
-        .append("g")
-        .attr(
-          "transform",
-          `translate(${-hexagonSize / 2}, ${-hexagonSize + this.hexagonRadius})`
-        );
-
-      this.grid = this.grid
-        .selectAll(".hexagon")
+      this.hexagons = this.grid
+        .selectAll()
         .data(neurons)
         .enter()
         .append("path")
@@ -184,14 +221,28 @@ export const HexagonalGrid = withStyles(styles)(
     /**
      * draws the greyscaled grid of hexagons by umatrix values
      */
-    private drawUMatrix(umatrix: number[]) {
-      this.grid
+    public drawUMatrix(umatrix: number[]) {
+      this.hexagons
         .transition()
-        .duration(800)
+        .duration(700)
         .style(
           "fill",
           (_: any, i: number): string =>
             umatrix[i] ? interpolateGreys(umatrix[i]) : "#e0e0e0"
+        );
+    }
+
+    /**
+     * draws the heatmap grid of hexagons by specific variable
+     */
+    public drawHeatmap(variable: number) {
+      this.hexagons
+        .transition()
+        .duration(700)
+        .style(
+          "fill",
+          (d: Neuron, i: number): string =>
+            d.v ? interpolateSpectral(d.v[variable]) : "#e0e0e0"
         );
     }
 
@@ -202,11 +253,7 @@ export const HexagonalGrid = withStyles(styles)(
       return (
         <div className={classes.root}>
           {title && (
-            <Typography
-              variant="body1"
-              color="textSecondary"
-              className={classes.title}
-            >
+            <Typography variant="h6" className={classes.title}>
               {title}
             </Typography>
           )}

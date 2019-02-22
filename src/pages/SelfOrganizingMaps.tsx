@@ -74,15 +74,15 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     plotting: false,
     withTraining: false,
     dimensions: {
-      columns: 25,
-      rows: 12,
-      hexagonSize: 50
+      columns: 50,
+      rows: 24,
+      hexagonSize: 25
     },
     trainingConfig: {
       maxStep: 1000,
-      minLearningCoef: 0.1,
-      maxLearningCoef: 0.4,
-      minNeighborhood: 0.3,
+      minLearningCoef: 0.5,
+      maxLearningCoef: 1,
+      minNeighborhood: 0.4,
       maxNeighborhood: 1
     },
     neurons: [],
@@ -135,11 +135,12 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
   };
 
   private onGetCalculateWorkerMessage = (event: MessageEvent) => {
-    const { positions, umatrix } = event.data;
+    const { positions, umatrix, neurons } = event.data;
 
     this.setState({
       positions,
       umatrix,
+      neurons,
       calculated: true,
       calculating: false
     });
@@ -246,7 +247,13 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
           {plotted && (
             <div className={classes.maps}>
               <HexagonalGrid
-                title="U-matrix"
+                title="Heatmap"
+                neurons={neurons}
+                dimensions={dimensions}
+                heatmap={true}
+              />
+              <HexagonalGrid
+                title="U-matrix (Neighbour Distance)"
                 neurons={neurons}
                 dimensions={dimensions}
                 umatrix={umatrix}
