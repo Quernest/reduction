@@ -12,9 +12,8 @@ import { withRouter } from "react-router-dom";
 import compose from "recompose/compose";
 import { HexagonalGrid, SOMControls } from "src/components";
 import { IHexagonalGridDimensions } from "src/models/chart.model";
-import { ITrainingConfig } from "src/models/som.model";
+import { IOptions } from "src/models/som.model";
 import CalculateWorker from "worker-loader!src/components/SelfOrganizingMaps/calculate.worker";
-import GridWorker from "worker-loader!src/components/SelfOrganizingMaps/grid.worker";
 
 const styles = ({ spacing, breakpoints }: Theme) =>
   createStyles({
@@ -50,11 +49,8 @@ interface IState {
   uploaded: boolean;
   calculating: boolean;
   calculated: boolean;
-  plotted: boolean;
-  plotting: boolean;
-  withTraining: boolean;
   dimensions: IHexagonalGridDimensions;
-  trainingConfig: ITrainingConfig;
+  options: IOptions;
   neurons: Neuron[];
   data: number[][];
   positions: Array<[number, number]>;
@@ -63,22 +59,18 @@ interface IState {
 
 class SelfOrganizingMapsPage extends Component<IProps, IState> {
   protected calculateWorker: Worker;
-  protected gridWorker: Worker;
 
   public readonly state: IState = {
     uploading: false,
     uploaded: false,
     calculating: false,
     calculated: false,
-    plotted: false,
-    plotting: false,
-    withTraining: false,
     dimensions: {
       columns: 50,
       rows: 24,
       hexagonSize: 25
     },
-    trainingConfig: {
+    options: {
       maxStep: 1000,
       minLearningCoef: 0.5,
       maxLearningCoef: 1,
@@ -108,70 +100,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     this.destroyWorkers();
   }
 
-  private onStartCalculations = () => {
-    const { withTraining, trainingConfig, neurons, data } = this.state;
-
-    if (withTraining) {
-      this.setState({ calculating: true });
-      this.calculateWorker.postMessage({ neurons, data, ...trainingConfig });
-    }
-  };
-
-  private onGetGridWorkerMessage = (event: MessageEvent) => {
-    const { neurons, dimensions, trainingConfig } = event.data;
-
-    this.setState(
-      {
-        umatrix: [],
-        positions: [],
-        neurons,
-        dimensions,
-        trainingConfig,
-        plotted: true,
-        plotting: false
-      },
-      this.onStartCalculations
-    );
-  };
-
-  private onGetCalculateWorkerMessage = (event: MessageEvent) => {
-    const { positions, umatrix, neurons } = event.data;
-
-    this.setState({
-      positions,
-      umatrix,
-      neurons,
-      calculated: true,
-      calculating: false
-    });
-
-    // const { maxStep } = this.state.trainingConfig;
-    // const { neurons} = event.data;
-
-    // this.setState({
-    //   neurons
-    // });
-
-    // if (step === maxStep) {
-    //   const { positions, umatrix } = event.data;
-
-    //   this.setState({
-    //     calculated: true,
-    //     calculating: false,
-    //     positions,
-    //     umatrix
-    //   });
-    // }
-  };
-
-  private initWorkers() {
-    this.gridWorker = new GridWorker();
-    this.gridWorker.addEventListener(
-      "message",
-      this.onGetGridWorkerMessage,
-      false
-    );
-
+  protected initWorkers() {
     this.calculateWorker = new CalculateWorker();
     this.calculateWorker.addEventListener(
       "message",
@@ -180,13 +109,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     );
   }
 
-  private destroyWorkers() {
-    this.gridWorker.terminate();
-    this.gridWorker.removeEventListener(
-      "message",
-      this.onGetGridWorkerMessage,
-      false
-    );
+  protected destroyWorkers() {
     this.calculateWorker.terminate();
     this.calculateWorker.removeEventListener(
       "message",
@@ -197,34 +120,40 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
 
   protected onControlsSubmit = (
     newDimensions: IHexagonalGridDimensions,
-    newTrainingConfig: ITrainingConfig
+    newOptions: IOptions
   ) => {
-    this.setState({
-      calculated: false,
-      plotting: true
-    });
+    this.setState({ dimensions: newDimensions, options: newOptions });
+    this.startCalculating(this.state.data, newDimensions, newOptions);
+  };
 
-    this.gridWorker.postMessage({
-      dimensions: newDimensions,
-      trainingConfig: newTrainingConfig
+  protected onGetCalculateWorkerMessage = ({
+    data: { positions, umatrix, neurons }
+  }: MessageEvent) => {
+    this.setState({
+      positions,
+      umatrix,
+      neurons,
+      calculating: false,
+      calculated: true
     });
   };
 
-  protected onSwitchTraining = (checked: boolean) => {
-    this.setState({
-      withTraining: checked
-    });
-  };
+  public startCalculating(
+    data: number[][],
+    dimensions: IHexagonalGridDimensions,
+    options: IOptions
+  ) {
+    this.setState({ calculated: false, calculating: true });
+    this.calculateWorker.postMessage({ data, dimensions, options });
+  }
 
   public render(): JSX.Element {
     const { classes } = this.props;
     const {
       calculating,
-      plotting,
-      plotted,
+      calculated,
       dimensions,
-      trainingConfig,
-      withTraining,
+      options,
       neurons,
       umatrix
     } = this.state;
@@ -237,14 +166,12 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
           </Typography>
           <Divider className={classes.divider} />
           <SOMControls
-            trainingConfig={trainingConfig}
+            options={options}
             dimensions={dimensions}
             onSubmit={this.onControlsSubmit}
-            onSwitchTraining={this.onSwitchTraining}
-            withTraining={withTraining}
-            loading={calculating || plotting}
+            loading={calculating}
           />
-          {plotted && (
+          {calculated && (
             <div className={classes.maps}>
               <HexagonalGrid
                 title="Heatmap"

@@ -2,16 +2,13 @@ import { createStyles, Theme, withStyles, WithStyles } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormGroup from "@material-ui/core/FormGroup";
 import Grid from "@material-ui/core/Grid";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
-import Switch from "@material-ui/core/Switch";
 import Typography from "@material-ui/core/Typography";
-import React, { Component, createRef } from "react";
+import React, { Component, createRef, RefObject } from "react";
 import { IHexagonalGridDimensions } from "src/models/chart.model";
-import { ITrainingConfig } from "src/models/som.model";
+import { IOptions } from "src/models/som.model";
 
 const styles = ({ spacing, palette }: Theme) =>
   createStyles({
@@ -56,15 +53,13 @@ const styles = ({ spacing, palette }: Theme) =>
   });
 
 interface IProps extends WithStyles<typeof styles> {
-  trainingConfig: ITrainingConfig;
+  options: IOptions;
   dimensions: IHexagonalGridDimensions;
   onSubmit: (
     newDimensions: IHexagonalGridDimensions,
-    newTrainingConfig: ITrainingConfig
+    newOptions: IOptions
   ) => void;
   loading?: boolean;
-  onSwitchTraining: (checked: boolean) => void;
-  withTraining?: boolean;
 }
 
 export const SOMControls = withStyles(styles)(
@@ -78,18 +73,22 @@ export const SOMControls = withStyles(styles)(
     private minNeighborhoodInputRef = createRef<HTMLInputElement>();
     private maxNeighborhoodInputRef = createRef<HTMLInputElement>();
 
-    private getValueFromInputRef = (
-      ref: React.RefObject<HTMLInputElement>
-    ): number => {
-      if (ref && ref.current) {
-        const value = Number(ref.current.value);
+    protected getValueFromInputRef = ({
+      current
+    }: RefObject<HTMLInputElement>): number => {
+      if (current) {
+        const { value } = current;
 
-        return value;
+        return Number(value);
       }
 
       return 0;
     };
 
+    /**
+     * uncontrolled form
+     * get values from the each created reference
+     */
     protected onSubmit = (event: React.FormEvent<EventTarget>): void => {
       event.preventDefault();
 
@@ -127,7 +126,7 @@ export const SOMControls = withStyles(styles)(
         hexagonSize: hexagonSizeInputValue
       };
 
-      const newTrainingConfig: ITrainingConfig = {
+      const newOptions: IOptions = {
         maxStep: iterationsInputValue,
         minLearningCoef: minLearningCoefInputRefValue,
         maxLearningCoef: maxLearningCoefInputRefValue,
@@ -135,33 +134,22 @@ export const SOMControls = withStyles(styles)(
         maxNeighborhood: maxNeighborhoodInputRefValue
       };
 
-      this.props.onSubmit(newDimensions, newTrainingConfig);
-    };
-
-    protected onSwitchTraining = (
-      event: React.ChangeEvent<HTMLInputElement>
-    ): void => {
-      const { checked } = event.target;
-
-      this.props.onSwitchTraining(checked);
+      this.props.onSubmit(newDimensions, newOptions);
     };
 
     public render(): JSX.Element {
       const {
         classes,
         loading,
-        dimensions,
-        withTraining,
-        trainingConfig
+        dimensions: { columns, rows, hexagonSize },
+        options: {
+          maxStep,
+          minLearningCoef,
+          maxLearningCoef,
+          minNeighborhood,
+          maxNeighborhood
+        }
       } = this.props;
-      const {
-        maxStep,
-        minLearningCoef,
-        maxLearningCoef,
-        minNeighborhood,
-        maxNeighborhood
-      } = trainingConfig;
-      const { columns, rows, hexagonSize } = dimensions;
 
       return (
         <div className={classes.root}>
@@ -413,22 +401,6 @@ export const SOMControls = withStyles(styles)(
                         />
                       )}
                     </div>
-                  </Grid>
-                  <Grid item={true} xs={6} sm={4} md={2}>
-                    <FormGroup row={true}>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            onChange={this.onSwitchTraining}
-                            disabled={loading}
-                            color="primary"
-                            checked={withTraining}
-                            value={withTraining}
-                          />
-                        }
-                        label="Training"
-                      />
-                    </FormGroup>
                   </Grid>
                 </Grid>
               </div>

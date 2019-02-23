@@ -173,7 +173,6 @@ export const HexagonalGrid = withStyles(styles)(
       neurons: Neuron[]
     ) {
       if (!isUndefined(this.grid)) {
-        this.grid.exit();
         this.grid.remove();
       }
 
@@ -193,11 +192,6 @@ export const HexagonalGrid = withStyles(styles)(
      * draws hexagons on the grid by neurons positions
      */
     public drawHexagons(hexagonSize: number, neurons: Neuron[]) {
-      if (!isUndefined(this.hexagons)) {
-        this.hexagons.exit();
-        this.hexagons.remove();
-      }
-
       // generate path of an hexagon
       const generatePath = ({ pos: [x, y] }: Neuron) => {
         const sX = this.scaleGrid(hexagonSize)(x);

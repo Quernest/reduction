@@ -1,30 +1,43 @@
-import { Kohonen } from "@seracio/kohonen";
-import { Neuron } from "@seracio/kohonen/dist/types";
+import { generateGrid, Kohonen } from "@seracio/kohonen";
+import { IHexagonalGridDimensions } from "src/models/chart.model";
+import { IOptions } from "src/models/som.model";
 
 const ctx: Worker = self as any;
 
+interface IEventData {
+  data: number[][];
+  dimensions: IHexagonalGridDimensions;
+  options: IOptions;
+}
+
 ctx.addEventListener("message", (event: MessageEvent) => {
-  const k = new Kohonen(event.data);
-  // const queue: Array<{ neurons: Neuron[]; step: number }> = [];
+  const {
+    data,
+    dimensions: { columns, rows },
+    options: {
+      maxStep,
+      minLearningCoef,
+      maxLearningCoef,
+      minNeighborhood,
+      maxNeighborhood
+    }
+  }: IEventData = event.data;
 
-  // let prev: Neuron[] = [];
-
-  k.training((neurons: Neuron[], step: number) => {
-    // console.log(neurons, prev);
-    // if (step % 20 === 0) {
-    //   console.log(k.topographicError());
-    //   console.log(k.quantizationError());
-    // }
-    // queue.push({ neurons, step });
+  const k = new Kohonen({
+    neurons: generateGrid(columns, rows),
+    data,
+    maxStep,
+    minLearningCoef,
+    maxLearningCoef,
+    minNeighborhood,
+    maxNeighborhood
   });
 
-  // for (let i: number = 0; i < queue.length; i++) {
-  //   ((j: number) => setTimeout(() => ctx.postMessage(queue[j]), 1000 * j))(i);
-  // }
+  k.training();
 
-  const positions = k.mapping();
-  const umatrix = k.umatrix();
-  const { neurons } = k;
-
-  ctx.postMessage({ positions, umatrix, neurons });
+  ctx.postMessage({
+    positions: k.mapping(),
+    umatrix: k.umatrix(),
+    neurons: k.neurons
+  });
 });

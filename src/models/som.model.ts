@@ -1,4 +1,4 @@
-export interface ITrainingConfig {
+export interface IOptions {
   maxStep: number;
   minLearningCoef: number;
   maxLearningCoef: number;
