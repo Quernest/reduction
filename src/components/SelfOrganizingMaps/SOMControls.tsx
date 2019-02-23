@@ -47,7 +47,7 @@ const styles = ({ spacing, palette }: Theme) =>
       marginLeft: -12
     },
     space: {
-      padding: 8,
+      padding: 12,
       flexGrow: 1
     }
   });

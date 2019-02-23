@@ -2,9 +2,17 @@ import { createStyles, withStyles, WithStyles } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
 import { range } from "d3-array";
-import { scaleLinear } from "d3-scale";
+import {
+  forceCollide,
+  forceSimulation,
+  forceX,
+  forceY,
+  SimulationNodeDatum
+} from "d3-force";
+import { scaleBand, scaleLinear } from "d3-scale";
 import { interpolateGreys, interpolateSpectral } from "d3-scale-chromatic";
-import { select } from "d3-selection";
+import { event, select } from "d3-selection";
+import "d3-selection-multi";
 import { line } from "d3-shape";
 import has from "lodash/has";
 import head from "lodash/head";
@@ -38,14 +46,29 @@ const styles = createStyles({
     left: 0,
     width: "100%",
     height: "100%"
+  },
+  grid: {
+    filter: "url(#glow)"
+  },
+  tooltip: {
+    position: "absolute",
+    zIndex: 10,
+    visibility: "hidden",
+    fontSize: 14,
+    fontFamily: "Roboto, sans-serif"
   }
 });
+
+interface IPosition extends SimulationNodeDatum {
+  name?: string;
+}
 
 interface IProps extends WithStyles<typeof styles> {
   title?: string;
   neurons: Neuron[];
   dimensions: IHexagonalGridDimensions;
   umatrix?: number[];
+  positions?: number[][];
   heatmap?: boolean;
 }
 
@@ -55,6 +78,7 @@ export const HexagonalGrid = withStyles(styles)(
     protected ctx: any;
     protected grid: any;
     protected hexagons: any;
+    protected tooltip: any;
     protected hexagonRadius: number = 0;
 
     public readonly state = {
@@ -82,7 +106,7 @@ export const HexagonalGrid = withStyles(styles)(
     }
 
     public componentDidMount() {
-      const { neurons, dimensions, umatrix, heatmap } = this.props;
+      const { neurons, dimensions, umatrix, heatmap, positions } = this.props;
 
       this.initContext(this.state);
       this.drawGrid(dimensions, neurons);
@@ -94,6 +118,31 @@ export const HexagonalGrid = withStyles(styles)(
 
       if (!isUndefined(umatrix) && !isEmpty(umatrix)) {
         this.drawUMatrix(umatrix as number[]);
+      }
+
+      if (!isUndefined(positions) && !isEmpty(positions)) {
+        // NOTE: it's fake data, it must be dynamic
+        const observations = [
+          "Position 1",
+          "Position 2",
+          "Position 3",
+          "Position 4",
+          "Position 5",
+          "Position 6",
+          "Position 7",
+          "Position 8"
+        ];
+
+        // NOTE: it's fake data, it must be dynamic
+        const input = positions.map<IPosition>(([x, y], index) => ({
+          index,
+          x,
+          y,
+          name: observations[index]
+        }));
+
+        this.drawPositions(dimensions, input, observations);
+        this.createTooltip();
       }
     }
 
@@ -118,6 +167,10 @@ export const HexagonalGrid = withStyles(styles)(
       }
     }
 
+    public componentWillUnmount() {
+      this.removeTooltip();
+    }
+
     public getContext({ current }: RefObject<SVGSVGElement>) {
       this.ctx = select(current);
     }
@@ -134,6 +187,20 @@ export const HexagonalGrid = withStyles(styles)(
         .attr("preserveAspectRatio", "xMinYMin meet")
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
+    }
+
+    public createTooltip() {
+      const { classes } = this.props;
+
+      this.tooltip = select("body")
+        .append("div")
+        .attr("class", classes.tooltip);
+    }
+
+    public removeTooltip() {
+      if (!isUndefined(this.tooltip)) {
+        this.tooltip.remove();
+      }
     }
 
     /**
@@ -172,18 +239,19 @@ export const HexagonalGrid = withStyles(styles)(
       { hexagonSize }: IHexagonalGridDimensions,
       neurons: Neuron[]
     ) {
+      const { classes } = this.props;
+
       if (!isUndefined(this.grid)) {
         this.grid.remove();
       }
 
       this.computeHexagonRadius(hexagonSize);
 
-      this.grid = this.ctx
-        .append("g")
-        .attr(
-          "transform",
-          `translate(${-hexagonSize / 2}, ${-hexagonSize + this.hexagonRadius})`
-        );
+      this.grid = this.ctx.append("g").attrs({
+        class: classes.grid,
+        transform: `translate(${-hexagonSize / 2}, ${-hexagonSize +
+          this.hexagonRadius})`
+      });
 
       this.drawHexagons(hexagonSize, neurons);
     }
@@ -240,6 +308,83 @@ export const HexagonalGrid = withStyles(styles)(
         );
     }
 
+    /**
+     * draw positions of observations
+     */
+    public drawPositions(
+      { hexagonSize }: IHexagonalGridDimensions,
+      input: IPosition[],
+      observations: string[]
+    ) {
+      const scaleColor = scaleBand()
+        .domain(observations)
+        .range([0, 1]);
+
+      const getColor = (name: string) =>
+        interpolateSpectral(scaleColor(name) as number);
+
+      const getFill = ({ name }: IPosition) => getColor(name as string);
+
+      const getX = ({ x }: IPosition) => {
+        return this.scaleGrid(hexagonSize)(x as number);
+      };
+
+      const getY = ({ y }: IPosition) => {
+        return this.scaleGrid(hexagonSize)(y as number);
+      };
+
+      forceSimulation(input)
+        .force("x", forceX(getX))
+        .force("y", forceY(getY))
+        .force("collide", forceCollide(hexagonSize / 5))
+        .on("tick", () => {
+          const circles = this.grid.selectAll(".circle").data(input);
+
+          circles
+            .enter()
+            .append("circle")
+            .attrs({
+              class: "circle",
+              r: hexagonSize / 5
+            })
+            .styles({
+              fill: getFill
+            })
+            .on("mouseover", ({ name }: IPosition) =>
+              this.tooltip.html(name).styles({
+                visibility: "visible"
+              })
+            )
+            .on("mousemove", ({ name }: IPosition) => {
+              let left = event.pageX + 10;
+
+              const rect = this.tooltip.node().getBoundingClientRect();
+
+              // todo: create smth. better
+              if (event.pageX >= window.innerWidth - 100) {
+                left = event.pageX - rect.width - 10;
+              }
+
+              this.tooltip.html(name).styles({
+                top: event.pageY - 10 + "px",
+                left: left + "px"
+              });
+            })
+            .on("mouseout", ({ name }: IPosition) =>
+              this.tooltip.html(null).styles({
+                visibility: "hidden",
+                top: "0px",
+                left: "0px"
+              })
+            )
+            .merge(circles)
+            .attrs({
+              cx: ({ x }: IPosition): number => x as number,
+              cy: ({ y }: IPosition): number => y as number
+            });
+        });
+    }
+
     public render(): JSX.Element {
       const { classes, title, heatmap } = this.props;
       const { fullWidth, fullHeight } = this.state;
@@ -260,7 +405,17 @@ export const HexagonalGrid = withStyles(styles)(
             className={classes.svgContainer}
             style={{ paddingBottom: `${(fullHeight / fullWidth) * 100}%` }}
           >
-            <svg className={classes.svg} ref={this.ref} />
+            <svg className={classes.svg} ref={this.ref}>
+              <defs>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                  <feMerge>
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+            </svg>
           </div>
         </div>
       );

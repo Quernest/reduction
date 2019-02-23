@@ -66,12 +66,12 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     calculating: false,
     calculated: false,
     dimensions: {
-      columns: 50,
-      rows: 24,
-      hexagonSize: 25
+      columns: 25,
+      rows: 12,
+      hexagonSize: 50
     },
     options: {
-      maxStep: 1000,
+      maxStep: 500,
       minLearningCoef: 0.5,
       maxLearningCoef: 1,
       minNeighborhood: 0.4,
@@ -81,7 +81,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     positions: [],
     umatrix: [],
     data: [
-      [0, 0, 0],
+      [255, 255, 255],
       [0, 0, 255],
       [0, 255, 0],
       [0, 255, 255],
@@ -155,7 +155,8 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
       dimensions,
       options,
       neurons,
-      umatrix
+      umatrix,
+      positions
     } = this.state;
 
     return (
@@ -173,6 +174,12 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
           />
           {calculated && (
             <div className={classes.maps}>
+              <HexagonalGrid
+                title="Positions"
+                neurons={neurons}
+                dimensions={dimensions}
+                positions={positions}
+              />
               <HexagonalGrid
                 title="Heatmap"
                 neurons={neurons}
