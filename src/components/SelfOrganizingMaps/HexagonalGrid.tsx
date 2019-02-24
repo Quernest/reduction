@@ -74,8 +74,8 @@ interface IProps extends WithStyles<typeof styles> {
 
 export const HexagonalGrid = withStyles(styles)(
   class extends Component<IProps, IChartState> {
-    protected ref = createRef<SVGSVGElement>();
-    protected ctx: any;
+    protected svgRef = createRef<SVGSVGElement>();
+    protected svg: any;
     protected grid: any;
     protected hexagons: any;
     protected tooltip: any;
@@ -98,17 +98,17 @@ export const HexagonalGrid = withStyles(styles)(
       }
     };
 
-    public initContext({ fullWidth, fullHeight, margin }: IChartState) {
-      if (this.ref) {
-        this.getContext(this.ref);
-        this.setContextAttributes(fullWidth, fullHeight, margin);
+    public initSVG({ fullWidth, fullHeight, margin }: IChartState) {
+      if (this.svgRef) {
+        this.getSVG(this.svgRef);
+        this.setSVGAttributes(fullWidth, fullHeight, margin);
       }
     }
 
     public componentDidMount() {
       const { neurons, dimensions, umatrix, heatmap, positions } = this.props;
 
-      this.initContext(this.state);
+      this.initSVG(this.state);
       this.drawGrid(dimensions, neurons);
 
       // draw only if the heatmap is enabled and neuron have weights (v property)
@@ -171,16 +171,12 @@ export const HexagonalGrid = withStyles(styles)(
       this.removeTooltip();
     }
 
-    public getContext({ current }: RefObject<SVGSVGElement>) {
-      this.ctx = select(current);
+    public getSVG({ current }: RefObject<SVGSVGElement>) {
+      this.svg = select(current);
     }
 
-    public setContextAttributes(
-      width: number,
-      height: number,
-      margin: IMargin
-    ) {
-      this.ctx = this.ctx
+    public setSVGAttributes(width: number, height: number, margin: IMargin) {
+      this.svg = this.svg
         .attr("width", "100%")
         .attr("height", "100%")
         .attr("viewBox", `0 0 ${width} ${height}`)
@@ -247,7 +243,7 @@ export const HexagonalGrid = withStyles(styles)(
 
       this.computeHexagonRadius(hexagonSize);
 
-      this.grid = this.ctx.append("g").attrs({
+      this.grid = this.svg.append("g").attrs({
         class: classes.grid,
         transform: `translate(${-hexagonSize / 2}, ${-hexagonSize +
           this.hexagonRadius})`
@@ -360,8 +356,7 @@ export const HexagonalGrid = withStyles(styles)(
 
               const rect = this.tooltip.node().getBoundingClientRect();
 
-              // todo: create smth. better
-              if (event.pageX >= window.innerWidth - 100) {
+              if (left + rect.width > window.innerWidth - 30) {
                 left = event.pageX - rect.width - 10;
               }
 
@@ -405,7 +400,7 @@ export const HexagonalGrid = withStyles(styles)(
             className={classes.svgContainer}
             style={{ paddingBottom: `${(fullHeight / fullWidth) * 100}%` }}
           >
-            <svg className={classes.svg} ref={this.ref}>
+            <svg className={classes.svg} ref={this.svgRef}>
               <defs>
                 <filter id="glow">
                   <feGaussianBlur stdDeviation="3" result="coloredBlur" />
