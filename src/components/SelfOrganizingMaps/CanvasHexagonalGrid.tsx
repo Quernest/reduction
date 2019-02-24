@@ -33,7 +33,9 @@ const styles = createStyles({
     top: 0,
     left: 0,
     padding: 0,
-    margin: 0
+    margin: 0,
+    width: "100%",
+    height: "auto"
   }
 });
 
@@ -122,7 +124,7 @@ export const CanvasHexagonalGrid = withStyles(styles)(
         right: 0,
         bottom: 0
       },
-      fullWidth: 1280,
+      fullWidth: 1275,
       fullHeight: 560,
       get width() {
         return this.fullWidth - this.margin.left - this.margin.right;
@@ -170,7 +172,7 @@ export const CanvasHexagonalGrid = withStyles(styles)(
 
     public componentDidMount() {
       const {
-        dimensions: { hexagonSize },
+        dimensions: { hexagonSize, columns, rows },
         neurons,
         heatmap,
         umatrix,
@@ -178,32 +180,100 @@ export const CanvasHexagonalGrid = withStyles(styles)(
       } = this.props;
       this.computeHexagonRadius(hexagonSize);
 
-      // initialize lower canvas
-      this.initLowerCanvas(this.lowerCanvasReference);
-      this.initLowerBase();
+      const bestWidth =
+        columns * this.hexagonRadius * Math.sqrt(3) + this.hexagonRadius;
+      const bestHeight =
+        rows * 1.5 * this.hexagonRadius + 0.5 * this.hexagonRadius;
 
-      // move ctxs to the top-left corner
-      this.lowerCtx.translate(
-        -hexagonSize / 2,
-        -hexagonSize + this.hexagonRadius
+      this.setState(
+        {
+          fullWidth: Math.round(bestWidth),
+          fullHeight: Math.round(bestHeight)
+        },
+        () => {
+          // initialize lower canvas
+          this.initLowerCanvas(this.lowerCanvasReference);
+          this.initLowerBase();
+
+          // move ctxs to the top-left corner
+          this.lowerCtx.translate(
+            1 - hexagonSize / 2,
+            -hexagonSize + this.hexagonRadius
+          );
+
+          this.drawHexagons(hexagonSize, neurons, heatmap, umatrix);
+
+          if (positions && positions.length > 0) {
+            // initialize upper canvas
+            this.initUpperCanvas(this.upperCanvasReference);
+            this.initUpperBase();
+
+            // move ctx to the top-left corner
+            this.upperCtx.translate(
+              1 - hexagonSize / 2,
+              -hexagonSize + this.hexagonRadius
+            );
+
+            // draw circles
+            this.drawPositions(hexagonSize, positions);
+          }
+        }
       );
 
-      this.drawHexagons(hexagonSize, neurons, heatmap, umatrix);
+      // // get initial width
+      // const { fullWidth, fullHeight } = this.state;
 
-      if (positions && positions.length > 0) {
-        // initialize upper canvas
-        this.initUpperCanvas(this.upperCanvasReference);
-        this.initUpperBase();
+      // /**
+      //  * radius to width
+      //  */
+      // const rW = fullWidth / (Math.sqrt(3) * columns + 3);
 
-        // move ctx to the top-left corner
-        this.upperCtx.translate(
-          -hexagonSize / 2,
-          -hexagonSize + this.hexagonRadius
-        );
+      // /**
+      //  * radius to height
+      //  */
+      // const rH = fullHeight / ((rows + 3) * 1.5);
 
-        // draw circles
-        this.drawPositions(hexagonSize, positions);
-      }
+      // /**
+      //  * best radius
+      //  */
+      // const r = Math.round(min([rW, rH]) as number);
+
+      // /**
+      //  * short diagonal
+      //  */
+      // const d = (r as number) * 2;
+
+      // /**
+      //  * long diagonal
+      //  */
+      // const D = 2 * (d / Math.sqrt(3));
+
+      // /**
+      //  * best width
+      //  */
+      // const w = columns * r * Math.sqrt(3) + r;
+
+      // /**
+      //  * best height
+      //  */
+      // const h = rows * 1.5 * r + 0.5 * r;
+
+      // console.log(
+      //   "width",
+      //   w,
+      //   "height",
+      //   h,
+      //   "radius",
+      //   r,
+      //   "short diagonal",
+      //   d,
+      //   "long diagonal",
+      //   D
+      // );
+
+      // console.log(D * rows);
+
+      // this.hexagonRadius = r as number;
     }
 
     public componentWillUnmount() {
@@ -370,7 +440,7 @@ export const CanvasHexagonalGrid = withStyles(styles)(
         .enter()
         .append("circle");
 
-      const r: number = hexagonSize / 5;
+      const r: number = hexagonSize / 6;
 
       // physics simulation
       this.force = forceSimulation(input)
@@ -409,7 +479,10 @@ export const CanvasHexagonalGrid = withStyles(styles)(
               {title}
             </Typography>
           )}
-          <div className={classes.container} style={{ height: fullHeight }}>
+          <div
+            className={classes.container}
+            style={{ paddingBottom: `${(fullHeight / fullWidth) * 100}%` }}
+          >
             <canvas
               width={fullWidth}
               height={fullHeight}
