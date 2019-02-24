@@ -10,7 +10,7 @@ import { Neuron } from "@seracio/kohonen/dist/types";
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import compose from "recompose/compose";
-import { HexagonalGrid, SOMControls } from "src/components";
+import { CanvasHexagonalGrid, SOMControls } from "src/components";
 import { IHexagonalGridDimensions } from "src/models/chart.model";
 import { IOptions } from "src/models/som.model";
 import CalculateWorker from "worker-loader!src/components/SelfOrganizingMaps/calculate.worker";
@@ -174,7 +174,25 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
           />
           {calculated && (
             <div className={classes.maps}>
-              <HexagonalGrid
+              <CanvasHexagonalGrid
+                title="Positions"
+                neurons={neurons}
+                dimensions={dimensions}
+                positions={positions}
+              />
+              <CanvasHexagonalGrid
+                title="Heatmap"
+                neurons={neurons}
+                dimensions={dimensions}
+                heatmap={true}
+              />
+              <CanvasHexagonalGrid
+                title="U-matrix"
+                neurons={neurons}
+                dimensions={dimensions}
+                umatrix={umatrix}
+              />
+              {/* <HexagonalGrid
                 title="Positions"
                 neurons={neurons}
                 dimensions={dimensions}
@@ -191,7 +209,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
                 neurons={neurons}
                 dimensions={dimensions}
                 umatrix={umatrix}
-              />
+              /> */}
             </div>
           )}
         </div>
