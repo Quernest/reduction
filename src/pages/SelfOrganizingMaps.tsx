@@ -10,7 +10,7 @@ import { Neuron } from "@seracio/kohonen/dist/types";
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import compose from "recompose/compose";
-import { CanvasHexagonalGrid, SOMControls } from "src/components";
+import { HexagonalGrid, SOMControls } from "src/components";
 import { IHexagonalGridDimensions } from "src/models/chart.model";
 import { IOptions } from "src/models/som.model";
 import CalculateWorker from "worker-loader!src/components/SelfOrganizingMaps/calculate.worker";
@@ -67,11 +67,10 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     calculated: false,
     dimensions: {
       columns: 25,
-      rows: 12,
-      hexagonSize: 50
+      rows: 12
     },
     options: {
-      maxStep: 500,
+      maxStep: 400,
       minLearningCoef: 0.5,
       maxLearningCoef: 1,
       minNeighborhood: 0.4,
@@ -174,42 +173,24 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
           />
           {calculated && (
             <div className={classes.maps}>
-              <CanvasHexagonalGrid
+              <HexagonalGrid
                 title="Positions"
                 neurons={neurons}
                 dimensions={dimensions}
                 positions={positions}
               />
-              <CanvasHexagonalGrid
+              <HexagonalGrid
                 title="Heatmap"
                 neurons={neurons}
                 dimensions={dimensions}
                 heatmap={true}
               />
-              <CanvasHexagonalGrid
+              <HexagonalGrid
                 title="U-matrix"
                 neurons={neurons}
                 dimensions={dimensions}
                 umatrix={umatrix}
               />
-              {/* <HexagonalGrid
-                title="Positions"
-                neurons={neurons}
-                dimensions={dimensions}
-                positions={positions}
-              />
-              <HexagonalGrid
-                title="Heatmap"
-                neurons={neurons}
-                dimensions={dimensions}
-                heatmap={true}
-              />
-              <HexagonalGrid
-                title="U-matrix (Neighbour Distance)"
-                neurons={neurons}
-                dimensions={dimensions}
-                umatrix={umatrix}
-              /> */}
             </div>
           )}
         </div>

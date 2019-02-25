@@ -66,7 +66,6 @@ export const SOMControls = withStyles(styles)(
   class extends Component<IProps, {}> {
     private columnsInputRef = createRef<HTMLInputElement>();
     private rowsInputRef = createRef<HTMLInputElement>();
-    private hexagonSizeInputRef = createRef<HTMLInputElement>();
     private iterationsInputRef = createRef<HTMLInputElement>();
     private minLearningCoefInputRef = createRef<HTMLInputElement>();
     private maxLearningCoefInputRef = createRef<HTMLInputElement>();
@@ -96,10 +95,6 @@ export const SOMControls = withStyles(styles)(
 
       const rowsInputValue = this.getValueFromInputRef(this.rowsInputRef);
 
-      const hexagonSizeInputValue = this.getValueFromInputRef(
-        this.hexagonSizeInputRef
-      );
-
       const iterationsInputValue = this.getValueFromInputRef(
         this.iterationsInputRef
       );
@@ -122,8 +117,7 @@ export const SOMControls = withStyles(styles)(
 
       const newDimensions: IHexagonalGridDimensions = {
         columns: columnsInputValue,
-        rows: rowsInputValue,
-        hexagonSize: hexagonSizeInputValue
+        rows: rowsInputValue
       };
 
       const newOptions: IOptions = {
@@ -141,7 +135,7 @@ export const SOMControls = withStyles(styles)(
       const {
         classes,
         loading,
-        dimensions: { columns, rows, hexagonSize },
+        dimensions: { columns, rows },
         options: {
           maxStep,
           minLearningCoef,
@@ -205,33 +199,6 @@ export const SOMControls = withStyles(styles)(
                         required={true}
                         inputRef={this.rowsInputRef}
                         disabled={loading}
-                        type="number"
-                        classes={{
-                          underline: classes.cssUnderline
-                        }}
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item={true} xs={6} sm={4} md={2}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel
-                        htmlFor="hexagonSize"
-                        required={true}
-                        classes={{
-                          root: classes.cssLabel,
-                          focused: classes.cssFocused
-                        }}
-                      >
-                        Hexagon size
-                      </InputLabel>
-                      <Input
-                        id="hexagonSize"
-                        defaultValue={hexagonSize.toString()}
-                        inputProps={{ min: "1", max: "250", step: "1" }}
-                        fullWidth={true}
-                        required={true}
-                        disabled={loading}
-                        inputRef={this.hexagonSizeInputRef}
                         type="number"
                         classes={{
                           underline: classes.cssUnderline

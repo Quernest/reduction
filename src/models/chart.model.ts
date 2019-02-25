@@ -20,7 +20,6 @@ export interface IChartState {
 export interface IHexagonalGridDimensions {
   columns: number;
   rows: number;
-  hexagonSize: number;
 }
 
 // list of values

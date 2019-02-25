@@ -1,30 +1,21 @@
 import { createStyles, withStyles, WithStyles } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
-import { range } from "d3-array";
+import { max, range } from "d3-array";
 import {
   forceCollide,
   forceSimulation,
   forceX,
   forceY,
+  Simulation,
   SimulationNodeDatum
 } from "d3-force";
 import { scaleBand, scaleLinear } from "d3-scale";
 import { interpolateGreys, interpolateSpectral } from "d3-scale-chromatic";
-import { event, select } from "d3-selection";
-import "d3-selection-multi";
+import { select, Selection } from "d3-selection";
 import { line } from "d3-shape";
-import has from "lodash/has";
-import head from "lodash/head";
-import isEmpty from "lodash/isEmpty";
-import isEqual from "lodash/isEqual";
-import isUndefined from "lodash/isUndefined";
 import React, { Component, createRef, RefObject } from "react";
-import {
-  IChartState,
-  IHexagonalGridDimensions,
-  IMargin
-} from "src/models/chart.model";
+import { IChartState, IHexagonalGridDimensions } from "src/models/chart.model";
 
 const styles = createStyles({
   root: {
@@ -34,28 +25,18 @@ const styles = createStyles({
     marginTop: 16,
     marginBottom: 8
   },
-  svgContainer: {
-    position: "relative",
-    height: 0,
-    width: "100%",
-    padding: 0 // reset
+  container: {
+    position: "relative"
   },
-  svg: {
+  canvas: {
     position: "absolute",
     top: 0,
     left: 0,
+    padding: 0,
+    margin: 0,
     width: "100%",
-    height: "100%"
-  },
-  grid: {
-    filter: "url(#glow)"
-  },
-  tooltip: {
-    position: "absolute",
-    zIndex: 10,
-    visibility: "hidden",
-    fontSize: 14,
-    fontFamily: "Roboto, sans-serif"
+    height: "auto",
+    border: "1px solid #eee"
   }
 });
 
@@ -63,30 +44,86 @@ interface IPosition extends SimulationNodeDatum {
   name?: string;
 }
 
-interface IProps extends WithStyles<typeof styles> {
+interface IProps extends WithStyles {
   title?: string;
   neurons: Neuron[];
   dimensions: IHexagonalGridDimensions;
+  heatmap?: boolean;
   umatrix?: number[];
   positions?: number[][];
-  heatmap?: boolean;
 }
 
 export const HexagonalGrid = withStyles(styles)(
   class extends Component<IProps, IChartState> {
-    protected svgRef = createRef<SVGSVGElement>();
-    protected svg: any;
-    protected grid: any;
-    protected hexagons: any;
-    protected tooltip: any;
-    protected hexagonRadius: number = 0;
+    /**
+     * react reference object with lower canvas layer element
+     */
+    protected lowerCanvasReference = createRef<HTMLCanvasElement>();
 
+    /**
+     * react reference object with upper canvas layer element
+     */
+    protected upperCanvasReference = createRef<HTMLCanvasElement>();
+
+    /**
+     * lower canvas selection
+     */
+    protected lowerCanvas: Selection<HTMLCanvasElement, {}, null, undefined>;
+
+    /**
+     * upper canvas selection
+     */
+    protected upperCanvas: Selection<HTMLCanvasElement, {}, null, undefined>;
+
+    /**
+     * 2d context of lower canvas
+     */
+    protected lowerCtx: CanvasRenderingContext2D;
+
+    /**
+     * 2d context of upper canvas
+     */
+    protected upperCtx: CanvasRenderingContext2D;
+
+    /**
+     * element for custom data-binding for lower canvas
+     */
+    protected lowerCustomBase = document.createElement("custom1");
+
+    /**
+     * selection for custom data-binding for lower canvas
+     */
+    protected lowerBase: Selection<HTMLElement, {}, null, undefined>;
+
+    /**
+     * element for custom data-binding for upper canvas
+     */
+    protected upperCustomBase = document.createElement("custom2");
+
+    /**
+     * selection for custom data-binding for upper canvas
+     */
+    protected upperBase: Selection<HTMLElement, {}, null, undefined>;
+
+    /**
+     * computed radius of hexagon
+     */
+    protected hexagonRadius: number;
+
+    /**
+     * force simulation
+     */
+    protected force: Simulation<IPosition, undefined>;
+
+    /**
+     * react component state
+     */
     public readonly state = {
       margin: {
-        left: 2,
-        top: 2,
-        right: 2,
-        bottom: 2
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0
       },
       fullWidth: 1280,
       fullHeight: 560,
@@ -98,220 +135,250 @@ export const HexagonalGrid = withStyles(styles)(
       }
     };
 
-    public initSVG({ fullWidth, fullHeight, margin }: IChartState) {
-      if (this.svgRef) {
-        this.getSVG(this.svgRef);
-        this.setSVGAttributes(fullWidth, fullHeight, margin);
+    /**
+     * initialize lower canvas and it's context
+     */
+    public initLowerCanvas({ current }: RefObject<HTMLCanvasElement>) {
+      if (current) {
+        this.lowerCanvas = select(current);
+        // @ts-ignore
+        this.lowerCtx = this.lowerCanvas.node().getContext("2d");
       }
+    }
+
+    /**
+     * initialize lower base for data-binding
+     */
+    public initLowerBase() {
+      this.lowerBase = select(this.lowerCustomBase);
+    }
+
+    /**
+     * initialize upper canvas and it's context
+     */
+    public initUpperCanvas({ current }: RefObject<HTMLCanvasElement>) {
+      if (current) {
+        this.upperCanvas = select(current);
+        // @ts-ignore
+        this.upperCtx = this.upperCanvas.node().getContext("2d");
+      }
+    }
+
+    /**
+     * initialize upper base for data-binding
+     */
+    public initUpperBase() {
+      this.upperBase = select(this.upperCustomBase);
     }
 
     public componentDidMount() {
-      const { neurons, dimensions, umatrix, heatmap, positions } = this.props;
+      const {
+        dimensions: { columns, rows },
+        neurons,
+        heatmap,
+        umatrix,
+        positions
+      } = this.props;
+      const { fullWidth, fullHeight } = this.state;
 
-      this.initSVG(this.state);
-      this.drawGrid(dimensions, neurons);
+      /**
+       * incircle radius
+       */
+      const r = Math.round(max([
+        fullWidth / (Math.sqrt(3) * columns + 3),
+        fullHeight / ((rows + 3) * 1.5)
+      ]) as number);
 
-      // draw only if the heatmap is enabled and neuron have weights (v property)
-      if (has(head(neurons), "v") && heatmap) {
-        this.drawHeatmap(0);
-      }
+      /**
+       * short diagonal
+       */
+      const d = (r as number) * 2;
 
-      if (!isUndefined(umatrix) && !isEmpty(umatrix)) {
-        this.drawUMatrix(umatrix as number[]);
-      }
+      /**
+       * long diagonal
+       */
+      const D = 2 * (d / Math.sqrt(3));
 
-      if (!isUndefined(positions) && !isEmpty(positions)) {
-        // NOTE: it's fake data, it must be dynamic
-        const observations = [
-          "Position 1",
-          "Position 2",
-          "Position 3",
-          "Position 4",
-          "Position 5",
-          "Position 6",
-          "Position 7",
-          "Position 8"
-        ];
+      /**
+       * circumcircle radius
+       */
+      const R = Math.round(D / 2);
 
-        // NOTE: it's fake data, it must be dynamic
-        const input = positions.map<IPosition>(([x, y], index) => ({
-          index,
-          x,
-          y,
-          name: observations[index]
-        }));
+      /**
+       * best canvas width calculation
+       */
+      const bestWidth = Math.round(columns * d + r / 2 + R / 2) + d;
 
-        this.drawPositions(dimensions, input, observations);
-        this.createTooltip();
-      }
-    }
+      /**
+       * best canvas height calculation
+       */
+      const bestHeight = Math.round(rows * (D - R / 2) + r / 2) + d;
 
-    public componentDidUpdate(props: IProps) {
-      const { neurons, dimensions, umatrix, heatmap } = this.props;
+      // console.group("hexagon dimensions");
+      // console.log("best width:", bestWidth);
+      // console.log("best height:", bestHeight);
+      // console.log("r:", r);
+      // console.log("R:", R);
+      // console.log("d:", d);
+      // console.log("D:", D);
+      // console.groupEnd();
 
-      if (
-        !isEqual(props.neurons, neurons) ||
-        !isEqual(props.dimensions, dimensions)
-      ) {
-        this.drawGrid(dimensions, neurons);
+      // set the circumcircle radius
+      this.hexagonRadius = R;
 
-        if (has(head(neurons), "v") && heatmap) {
-          this.drawHeatmap(0);
+      this.setState(
+        {
+          fullWidth: bestWidth,
+          fullHeight: bestHeight
+        },
+        () => {
+          this.initLowerCanvas(this.lowerCanvasReference);
+          this.initLowerBase();
+          this.drawHexagons(d, R, neurons, heatmap, umatrix);
+
+          if (positions && positions.length > 0) {
+            this.initUpperCanvas(this.upperCanvasReference);
+            this.initUpperBase();
+            this.drawPositions(d, positions);
+          }
         }
-      }
-
-      if (!isEqual(props.umatrix, umatrix)) {
-        if (!isUndefined(umatrix) && !isEmpty(umatrix)) {
-          this.drawUMatrix(umatrix as number[]);
-        }
-      }
+      );
     }
 
     public componentWillUnmount() {
-      this.removeTooltip();
-    }
+      if (this.force) {
+        this.force.stop();
+      }
 
-    public getSVG({ current }: RefObject<SVGSVGElement>) {
-      this.svg = select(current);
-    }
+      if (this.lowerCustomBase) {
+        this.lowerCustomBase.remove();
+      }
 
-    public setSVGAttributes(width: number, height: number, margin: IMargin) {
-      this.svg = this.svg
-        .attr("width", "100%")
-        .attr("height", "100%")
-        .attr("viewBox", `0 0 ${width} ${height}`)
-        .attr("preserveAspectRatio", "xMinYMin meet")
-        .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
-    }
+      if (this.lowerBase) {
+        this.lowerBase.remove();
+      }
 
-    public createTooltip() {
-      const { classes } = this.props;
+      if (this.upperCustomBase) {
+        this.lowerCustomBase.remove();
+      }
 
-      this.tooltip = select("body")
-        .append("div")
-        .attr("class", classes.tooltip);
-    }
-
-    public removeTooltip() {
-      if (!isUndefined(this.tooltip)) {
-        this.tooltip.remove();
+      if (this.upperBase) {
+        this.lowerBase.remove();
       }
     }
 
     /**
      * hexagonData are normalized such as 2 neighbors have a distance of 1
      * scale them to have this distance
+     * @param d short diagonal of the hexagon
      */
-    public scaleGrid(hexagonSize: number) {
+    public scaleGrid(d: number) {
       return scaleLinear()
         .domain([0, 1])
-        .range([0, hexagonSize]);
-    }
-
-    /**
-     * computes the radius of an hexagon
-     */
-    public computeHexagonRadius(hexagonSize: number) {
-      this.hexagonRadius = hexagonSize / 2 / Math.cos(Math.PI / 6);
+        .range([0, d]);
     }
 
     /**
      * generates points of an hexagon
+     * @param [x, y] is a pos of neuron
+     * @param R circumcircle radius of the hexagon
      */
-    public getHexagonPoints([x, y]: [number, number], hexagonRadius: number) {
+    public getHexagonPoints([x, y]: [number, number], R: number) {
       return range(-Math.PI / 2, 2 * Math.PI, (2 * Math.PI) / 6).map<
         [number, number]
-      >((a: number) => [
-        x + Math.cos(a) * hexagonRadius,
-        y + Math.sin(a) * hexagonRadius
-      ]);
+      >((a: number) => [x + Math.cos(a) * R, y + Math.sin(a) * R]);
     }
 
     /**
-     * draws the grid of hexagons by neurons positions
+     * draw grid of hexagons and optional heatmap or umatrix
+     * @param d short diagonal of the hexagon
+     * @param R circumcircle radius of the hexagon
+     * @param neurons collection of neurons
+     * @param heatmap if true hexagons map will be filled in color by weight value
+     * @param umatrix array of neighbour distances (numbers)
      */
-    public drawGrid(
-      { hexagonSize }: IHexagonalGridDimensions,
-      neurons: Neuron[]
+    public drawHexagons(
+      d: number,
+      R: number,
+      neurons: Neuron[],
+      heatmap?: boolean,
+      umatrix?: number[]
     ) {
-      const { classes } = this.props;
-
-      if (!isUndefined(this.grid)) {
-        this.grid.remove();
-      }
-
-      this.computeHexagonRadius(hexagonSize);
-
-      this.grid = this.svg.append("g").attrs({
-        class: classes.grid,
-        transform: `translate(${-hexagonSize / 2}, ${-hexagonSize +
-          this.hexagonRadius})`
-      });
-
-      this.drawHexagons(hexagonSize, neurons);
-    }
-
-    /**
-     * draws hexagons on the grid by neurons positions
-     */
-    public drawHexagons(hexagonSize: number, neurons: Neuron[]) {
-      // generate path of an hexagon
       const generatePath = ({ pos: [x, y] }: Neuron) => {
-        const sX = this.scaleGrid(hexagonSize)(x);
-        const sY = this.scaleGrid(hexagonSize)(y);
+        const sX = this.scaleGrid(d)(x);
+        const sY = this.scaleGrid(d)(y);
 
-        const points = this.getHexagonPoints([sX, sY], this.hexagonRadius);
+        const points = this.getHexagonPoints([sX, sY], R);
 
         return line()(points);
       };
 
-      this.hexagons = this.grid
-        .selectAll()
+      const hexagons = this.lowerBase
+        .selectAll(".hexagon")
         .data(neurons)
         .enter()
         .append("path")
-        .style("fill", "#e0e0e0")
-        .style("stroke", "fff")
         .attr("d", generatePath);
-    }
 
-    /**
-     * draws the greyscaled grid of hexagons by umatrix values
-     */
-    public drawUMatrix(umatrix: number[]) {
-      this.hexagons
-        .transition()
-        .duration(700)
-        .style(
-          "fill",
-          (_: any, i: number): string =>
-            umatrix[i] ? interpolateGreys(umatrix[i]) : "#e0e0e0"
-        );
-    }
+      hexagons.each(({ v }: Neuron, i: number, nodes: SVGPathElement[]) => {
+        const node = select(nodes[i]) as Selection<
+          SVGPathElement,
+          {},
+          null,
+          undefined
+        >;
 
-    /**
-     * draws the heatmap grid of hexagons by specific variable
-     */
-    public drawHeatmap(variable: number) {
-      this.hexagons
-        .transition()
-        .duration(700)
-        .style(
-          "fill",
-          (d: Neuron, i: number): string =>
-            d.v ? interpolateSpectral(d.v[variable]) : "#e0e0e0"
-        );
+        // parse D path from hexagon attribute
+        const path = new Path2D(node.attr("d"));
+
+        this.lowerCtx.beginPath();
+
+        // todo: make a separate methods?
+        if (v && heatmap) {
+          this.lowerCtx.fillStyle = interpolateSpectral(v[1]);
+        } else if (umatrix) {
+          this.lowerCtx.fillStyle = interpolateGreys(umatrix[i]);
+        } else {
+          this.lowerCtx.fillStyle = "#e0e0e0";
+        }
+
+        this.lowerCtx.strokeStyle = "#bbb";
+        this.lowerCtx.stroke(path);
+        this.lowerCtx.fill(path);
+        this.lowerCtx.closePath();
+      });
+
+      hexagons.exit().remove();
     }
 
     /**
      * draw positions of observations
+     * @param d short diagonal of the hexagon
+     * @param positions result from the SOM mapping process, array of arrays with x and y positions
      */
-    public drawPositions(
-      { hexagonSize }: IHexagonalGridDimensions,
-      input: IPosition[],
-      observations: string[]
-    ) {
+    public drawPositions(d: number, positions: number[][]) {
+      const { fullWidth, fullHeight } = this.state;
+
+      // NOTE: it's fake data, it must be dynamic
+      const observations = [
+        "Position 1",
+        "Position 2",
+        "Position 3",
+        "Position 4",
+        "Position 5",
+        "Position 6",
+        "Position 7",
+        "Position 8"
+      ];
+
+      // NOTE: it's fake data, it must be dynamic
+      const input = positions.map<IPosition>(([x, y], index) => ({
+        index,
+        x,
+        y,
+        name: observations[index]
+      }));
+
       const scaleColor = scaleBand()
         .domain(observations)
         .range([0, 1]);
@@ -319,69 +386,50 @@ export const HexagonalGrid = withStyles(styles)(
       const getColor = (name: string) =>
         interpolateSpectral(scaleColor(name) as number);
 
-      const getFill = ({ name }: IPosition) => getColor(name as string);
-
       const getX = ({ x }: IPosition) => {
-        return this.scaleGrid(hexagonSize)(x as number);
+        return this.scaleGrid(d)(x as number);
       };
 
       const getY = ({ y }: IPosition) => {
-        return this.scaleGrid(hexagonSize)(y as number);
+        return this.scaleGrid(d)(y as number);
       };
 
-      forceSimulation(input)
+      const circles = this.upperBase
+        .selectAll(".circle")
+        .data(input)
+        .enter()
+        .append("circle");
+
+      const circleRadius: number = d / 6;
+
+      // physics simulation
+      this.force = forceSimulation(input)
         .force("x", forceX(getX))
         .force("y", forceY(getY))
-        .force("collide", forceCollide(hexagonSize / 5))
+        .force("collide", forceCollide(circleRadius))
         .on("tick", () => {
-          const circles = this.grid.selectAll(".circle").data(input);
+          this.upperCtx.clearRect(0, 0, fullWidth, fullHeight);
 
-          circles
-            .enter()
-            .append("circle")
-            .attrs({
-              class: "circle",
-              r: hexagonSize / 5
-            })
-            .styles({
-              fill: getFill
-            })
-            .on("mouseover", ({ name }: IPosition) =>
-              this.tooltip.html(name).styles({
-                visibility: "visible"
-              })
-            )
-            .on("mousemove", ({ name }: IPosition) => {
-              let left = event.pageX + 10;
-
-              const rect = this.tooltip.node().getBoundingClientRect();
-
-              if (left + rect.width > window.innerWidth - 30) {
-                left = event.pageX - rect.width - 10;
-              }
-
-              this.tooltip.html(name).styles({
-                top: event.pageY - 10 + "px",
-                left: left + "px"
-              });
-            })
-            .on("mouseout", ({ name }: IPosition) =>
-              this.tooltip.html(null).styles({
-                visibility: "hidden",
-                top: "0px",
-                left: "0px"
-              })
-            )
-            .merge(circles)
-            .attrs({
-              cx: ({ x }: IPosition): number => x as number,
-              cy: ({ y }: IPosition): number => y as number
-            });
+          circles.each(({ x, y, name }: IPosition, i: number) => {
+            this.upperCtx.beginPath();
+            this.upperCtx.fillStyle = getColor(name as string);
+            this.upperCtx.arc(
+              x as number,
+              y as number,
+              circleRadius,
+              0,
+              2 * Math.PI
+            );
+            this.upperCtx.fill();
+            this.upperCtx.closePath();
+          });
         });
+
+      circles.exit().remove();
     }
 
     public render(): JSX.Element {
-      const { classes, title, heatmap } = this.props;
+      const { classes, title, positions } = this.props;
       const { fullWidth, fullHeight } = this.state;
 
       return (
@@ -391,26 +439,24 @@ export const HexagonalGrid = withStyles(styles)(
               {title}
             </Typography>
           )}
-          {heatmap && (
-            <Typography variant="button" color="textSecondary" paragraph={true}>
-              select variables component will be here
-            </Typography>
-          )}
           <div
-            className={classes.svgContainer}
+            className={classes.container}
             style={{ paddingBottom: `${(fullHeight / fullWidth) * 100}%` }}
           >
-            <svg className={classes.svg} ref={this.svgRef}>
-              <defs>
-                <filter id="glow">
-                  <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-                  <feMerge>
-                    <feMergeNode in="coloredBlur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-            </svg>
+            <canvas
+              width={fullWidth}
+              height={fullHeight}
+              className={classes.canvas}
+              ref={this.lowerCanvasReference}
+            />
+            {positions && (
+              <canvas
+                width={fullWidth}
+                height={fullHeight}
+                className={classes.canvas}
+                ref={this.upperCanvasReference}
+              />
+            )}
           </div>
         </div>
       );
