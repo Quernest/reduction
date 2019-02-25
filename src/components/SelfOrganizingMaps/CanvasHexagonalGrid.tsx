@@ -1,7 +1,10 @@
+/* tslint:disable */
+
 import { createStyles, withStyles, WithStyles } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
-import { range } from "d3-array";
+// @ts-ignore
+import { max, min, range } from "d3-array";
 import {
   forceCollide,
   forceSimulation,
@@ -124,7 +127,7 @@ export const CanvasHexagonalGrid = withStyles(styles)(
         right: 0,
         bottom: 0
       },
-      fullWidth: 1275,
+      fullWidth: 1280,
       fullHeight: 560,
       get width() {
         return this.fullWidth - this.margin.left - this.margin.right;
@@ -172,23 +175,62 @@ export const CanvasHexagonalGrid = withStyles(styles)(
 
     public componentDidMount() {
       const {
-        dimensions: { hexagonSize, columns, rows },
+        dimensions: { columns, rows },
         neurons,
         heatmap,
         umatrix,
         positions
       } = this.props;
-      this.computeHexagonRadius(hexagonSize);
+      const { fullWidth, fullHeight } = this.state;
 
-      const bestWidth =
-        columns * this.hexagonRadius * Math.sqrt(3) + this.hexagonRadius;
-      const bestHeight =
-        rows * 1.5 * this.hexagonRadius + 0.5 * this.hexagonRadius;
+      /**
+       * incircle radius
+       */
+      const r = Math.round(max([
+        fullWidth / (Math.sqrt(3) * columns + 3),
+        fullHeight / ((rows + 3) * 1.5)
+      ]) as number);
+
+      /**
+       * short diagonal
+       */
+      const d = (r as number) * 2;
+
+      /**
+       * long diagonal
+       */
+      const D = 2 * (d / Math.sqrt(3));
+
+      /**
+       * circumcircle radius
+       */
+      const R = Math.round(D / 2);
+
+      /**
+       * best canvas width calculation
+       */
+      const bestWidth = Math.round(columns * d + 0.5 * r + R / 2);
+
+      /**
+       * best canvas height calculation
+       */
+      const bestHeight = Math.round(rows * (D - R / 2) + r / 2);
+
+      console.group("hexagon dimensions");
+      console.log("best width:", bestWidth);
+      console.log("r:", r);
+      console.log("R:", R);
+      console.log("d:", d);
+      console.log("D:", D);
+      console.groupEnd();
+
+      // set the circumcircle radius
+      this.hexagonRadius = R;
 
       this.setState(
         {
-          fullWidth: Math.round(bestWidth),
-          fullHeight: Math.round(bestHeight)
+          fullWidth: bestWidth,
+          fullHeight: bestHeight
         },
         () => {
           // initialize lower canvas
@@ -196,12 +238,9 @@ export const CanvasHexagonalGrid = withStyles(styles)(
           this.initLowerBase();
 
           // move ctxs to the top-left corner
-          this.lowerCtx.translate(
-            1 - hexagonSize / 2,
-            -hexagonSize + this.hexagonRadius
-          );
+          this.lowerCtx.translate(1 - r, -d + r);
 
-          this.drawHexagons(hexagonSize, neurons, heatmap, umatrix);
+          this.drawHexagons(d, neurons, heatmap, umatrix);
 
           if (positions && positions.length > 0) {
             // initialize upper canvas
@@ -209,71 +248,13 @@ export const CanvasHexagonalGrid = withStyles(styles)(
             this.initUpperBase();
 
             // move ctx to the top-left corner
-            this.upperCtx.translate(
-              1 - hexagonSize / 2,
-              -hexagonSize + this.hexagonRadius
-            );
+            this.upperCtx.translate(1 - r, -d + r);
 
             // draw circles
-            this.drawPositions(hexagonSize, positions);
+            this.drawPositions(d, positions);
           }
         }
       );
-
-      // // get initial width
-      // const { fullWidth, fullHeight } = this.state;
-
-      // /**
-      //  * radius to width
-      //  */
-      // const rW = fullWidth / (Math.sqrt(3) * columns + 3);
-
-      // /**
-      //  * radius to height
-      //  */
-      // const rH = fullHeight / ((rows + 3) * 1.5);
-
-      // /**
-      //  * best radius
-      //  */
-      // const r = Math.round(min([rW, rH]) as number);
-
-      // /**
-      //  * short diagonal
-      //  */
-      // const d = (r as number) * 2;
-
-      // /**
-      //  * long diagonal
-      //  */
-      // const D = 2 * (d / Math.sqrt(3));
-
-      // /**
-      //  * best width
-      //  */
-      // const w = columns * r * Math.sqrt(3) + r;
-
-      // /**
-      //  * best height
-      //  */
-      // const h = rows * 1.5 * r + 0.5 * r;
-
-      // console.log(
-      //   "width",
-      //   w,
-      //   "height",
-      //   h,
-      //   "radius",
-      //   r,
-      //   "short diagonal",
-      //   d,
-      //   "long diagonal",
-      //   D
-      // );
-
-      // console.log(D * rows);
-
-      // this.hexagonRadius = r as number;
     }
 
     public componentWillUnmount() {
@@ -382,7 +363,7 @@ export const CanvasHexagonalGrid = withStyles(styles)(
           this.lowerCtx.fillStyle = "#e0e0e0";
         }
 
-        this.lowerCtx.strokeStyle = "#fff";
+        this.lowerCtx.strokeStyle = "#bbb";
         this.lowerCtx.stroke(path);
         this.lowerCtx.fill(path);
         this.lowerCtx.closePath();
@@ -448,7 +429,14 @@ export const CanvasHexagonalGrid = withStyles(styles)(
         .force("y", forceY(getY))
         .force("collide", forceCollide(r))
         .on("tick", () => {
+          // save my current ctx state
+          this.upperCtx.save();
+          // set default transform
+          this.upperCtx.setTransform(1, 0, 0, 1, 0, 0);
+          // clear canvas space
           this.upperCtx.clearRect(0, 0, fullWidth, fullHeight);
+          // restore old ctx state
+          this.upperCtx.restore();
 
           circles.each(
             (
