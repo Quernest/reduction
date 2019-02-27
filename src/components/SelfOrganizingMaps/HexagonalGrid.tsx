@@ -513,7 +513,7 @@ export const HexagonalGrid = withStyles(styles)(
                */
               const climbs =
                 canvasRect.width * scaleX - x <=
-                tooltipRect.width + offset * scaleX;
+                (tooltipRect.width + offset) * scaleX;
 
               this.tooltip.styles({
                 opacity: 1,
