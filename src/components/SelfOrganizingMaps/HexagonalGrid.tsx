@@ -44,11 +44,12 @@ const styles = createStyles({
     top: 0,
     left: 0,
     zIndex: 10,
-    visibility: "hidden",
+    opacity: 0,
     fontSize: 14,
     fontFamily: "Roboto, sans-serif",
     userSelect: "none",
-    pointerEvents: "none"
+    pointerEvents: "none",
+    whiteSpace: "nowrap"
   }
 });
 
@@ -499,26 +500,32 @@ export const HexagonalGrid = withStyles(styles)(
           if (node && node.name) {
             const { name } = node;
 
-            /**
-             * if true that means that the text
-             * climbs abroad canvas and we need
-             * to shift the text to the
-             * left side of the cursor
-             */
-            const climbs =
-              canvasRect.width * scaleX - x <=
-              (tooltipRect.width + offset) * scaleX;
+            // add text
+            this.tooltip.text(name);
 
-            this.tooltip.text(name).styles({
-              visibility: "visible",
-              top: `${event.pageY - offset}px`,
-              left: climbs
-                ? `${event.pageX - tooltipRect.width - offset}px`
-                : `${event.pageX + offset}px`
-            });
+            // because tooltip initializes with width = 0
+            if (tooltipRect.width) {
+              /**
+               * if true that means that the text
+               * climbs abroad canvas and we need
+               * to shift the text to the
+               * left side of the cursor
+               */
+              const climbs =
+                canvasRect.width * scaleX - x <=
+                tooltipRect.width + offset * scaleX;
+
+              this.tooltip.styles({
+                opacity: 1,
+                top: `${event.pageY - offset}px`,
+                left: climbs
+                  ? `${event.pageX - tooltipRect.width - offset}px`
+                  : `${event.pageX + offset}px`
+              });
+            }
           } else {
             this.tooltip.text(null).styles({
-              visibility: "hidden"
+              opacity: 0
             });
           }
         });
