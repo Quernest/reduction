@@ -12,7 +12,8 @@ import {
 } from "d3-force";
 import { scaleBand, scaleLinear } from "d3-scale";
 import { interpolateGreys, interpolateSpectral } from "d3-scale-chromatic";
-import { select, Selection } from "d3-selection";
+import { event, select, Selection } from "d3-selection";
+import "d3-selection-multi";
 import { line } from "d3-shape";
 import React, { Component, createRef, RefObject } from "react";
 import { IChartState, IHexagonalGridDimensions } from "src/models/chart.model";
@@ -37,6 +38,17 @@ const styles = createStyles({
     width: "100%",
     height: "auto",
     border: "1px solid #eee"
+  },
+  tooltip: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 10,
+    visibility: "hidden",
+    fontSize: 14,
+    fontFamily: "Roboto, sans-serif",
+    userSelect: "none",
+    pointerEvents: "none"
   }
 });
 
@@ -111,9 +123,14 @@ export const HexagonalGrid = withStyles(styles)(
     protected hexagonRadius: number;
 
     /**
-     * force simulation
+     * physics simulation
      */
-    protected force: Simulation<IPosition, undefined>;
+    protected simulation: Simulation<IPosition, undefined>;
+
+    /**
+     * tooltip container
+     */
+    protected tooltip: Selection<HTMLDivElement, {}, HTMLElement, any>;
 
     /**
      * react component state
@@ -239,6 +256,7 @@ export const HexagonalGrid = withStyles(styles)(
           if (positions && positions.length > 0) {
             this.initUpperCanvas(this.upperCanvasReference);
             this.initUpperBase();
+            this.createTooltip();
             this.drawPositions(d, positions);
           }
         }
@@ -246,8 +264,8 @@ export const HexagonalGrid = withStyles(styles)(
     }
 
     public componentWillUnmount() {
-      if (this.force) {
-        this.force.stop();
+      if (this.simulation) {
+        this.simulation.stop();
       }
 
       if (this.lowerCustomBase) {
@@ -265,6 +283,18 @@ export const HexagonalGrid = withStyles(styles)(
       if (this.upperBase) {
         this.lowerBase.remove();
       }
+
+      if (this.tooltip) {
+        this.tooltip.remove();
+      }
+    }
+
+    public createTooltip() {
+      const { classes } = this.props;
+
+      this.tooltip = select("body")
+        .append("div")
+        .attr("class", classes.tooltip);
     }
 
     /**
@@ -394,38 +424,105 @@ export const HexagonalGrid = withStyles(styles)(
         return this.scaleGrid(d)(y as number);
       };
 
-      const circles = this.upperBase
-        .selectAll(".circle")
-        .data(input)
-        .enter()
-        .append("circle");
+      /**
+       * radius of circle
+       */
+      const r: number = d / 6;
 
-      const circleRadius: number = d / 6;
-
-      // physics simulation
-      this.force = forceSimulation(input)
+      // force simulation and draw positions (circles)
+      this.simulation = forceSimulation(input)
         .force("x", forceX(getX))
         .force("y", forceY(getY))
-        .force("collide", forceCollide(circleRadius))
+        .force("collide", forceCollide(r))
         .on("tick", () => {
           this.upperCtx.clearRect(0, 0, fullWidth, fullHeight);
 
-          circles.each(({ x, y, name }: IPosition, i: number) => {
+          input.forEach(({ x, y, name }: IPosition) => {
+            if (!x || !y || !name) {
+              return;
+            }
+
             this.upperCtx.beginPath();
-            this.upperCtx.fillStyle = getColor(name as string);
-            this.upperCtx.arc(
-              x as number,
-              y as number,
-              circleRadius,
-              0,
-              2 * Math.PI
-            );
+            this.upperCtx.fillStyle = getColor(name);
+            this.upperCtx.arc(x, y, r, 0, 2 * Math.PI);
             this.upperCtx.fill();
             this.upperCtx.closePath();
           });
         });
 
-      circles.exit().remove();
+      const tooltip = this.tooltip.node();
+      const canvas = this.upperCanvas.node();
+
+      if (tooltip && canvas) {
+        /**
+         * offset from cursor to the text
+         */
+        const offset = 10;
+
+        this.upperCanvas.on("mousemove", () => {
+          /**
+           * size of the canvas element and its position relative to the viewport
+           */
+          const canvasRect = canvas.getBoundingClientRect();
+
+          /**
+           * size of the tooltip div element and its position relative to the viewport
+           */
+          const tooltipRect = tooltip.getBoundingClientRect();
+
+          /**
+           * x scaling coefficient
+           */
+          const scaleX = canvas.width / canvasRect.width;
+
+          /**
+           * y scaling coefficient
+           */
+          const scaleY = canvas.height / canvasRect.height;
+
+          /**
+           * cursor position in canvas (multiplied by scaleY)
+           */
+          const x = (event.clientX - canvasRect.left) * scaleX;
+
+          /**
+           * cursor position in canvas (multiplied by scaleY)
+           */
+          const y = (event.clientY - canvasRect.top) * scaleY;
+
+          /**
+           * closest node to the position ⟨x,y⟩ with the given search radius.
+           */
+          const node = this.simulation.find(x, y, r);
+
+          // if node is not undefined and has name
+          if (node && node.name) {
+            const { name } = node;
+
+            /**
+             * if true that means that the text
+             * climbs abroad canvas and we need
+             * to shift the text to the
+             * left side of the cursor
+             */
+            const climbs =
+              canvasRect.width * scaleX - x <=
+              (tooltipRect.width + offset) * scaleX;
+
+            this.tooltip.text(name).styles({
+              visibility: "visible",
+              top: `${event.pageY - offset}px`,
+              left: climbs
+                ? `${event.pageX - tooltipRect.width - offset}px`
+                : `${event.pageX + offset}px`
+            });
+          } else {
+            this.tooltip.text(null).styles({
+              visibility: "hidden"
+            });
+          }
+        });
+      }
     }
 
     public render(): JSX.Element {
