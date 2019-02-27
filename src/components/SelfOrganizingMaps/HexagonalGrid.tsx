@@ -392,14 +392,14 @@ export const HexagonalGrid = withStyles(styles)(
 
       // NOTE: it's fake data, it must be dynamic
       const observations = [
-        "Position 1",
-        "Position 2",
-        "Position 3",
-        "Position 4",
-        "Position 5",
-        "Position 6",
-        "Position 7",
-        "Position 8"
+        "John",
+        "Mike",
+        "Caleb",
+        "Yana",
+        "James",
+        "Mark",
+        "Vasya",
+        "Alex"
       ];
 
       // NOTE: it's fake data, it must be dynamic
