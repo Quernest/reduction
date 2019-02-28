@@ -22,6 +22,29 @@ export interface IHexagonalGridDimensions {
   rows: number;
 }
 
+export interface IHexagonParameters {
+  /**
+   * incircle radius
+   */
+  r: number;
+  /**
+   * circumcircle radius
+   */
+  R: number;
+  /**
+   * short diagonal
+   */
+  d: number;
+  /**
+   * long diagonal
+   */
+  D: number;
+  /**
+   * edge
+   */
+  a: number;
+}
+
 // list of values
 export type PointList = number[];
 

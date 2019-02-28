@@ -11,8 +11,9 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import compose from "recompose/compose";
 import { HexagonalGrid, SOMControls } from "src/components";
+import { gspData } from "src/data/gsp";
 import { IHexagonalGridDimensions } from "src/models/chart.model";
-import { IOptions } from "src/models/som.model";
+import { IOptions, ISOMData } from "src/models/som.model";
 import CalculateWorker from "worker-loader!src/components/SelfOrganizingMaps/calculate.worker";
 
 const styles = ({ spacing, breakpoints }: Theme) =>
@@ -52,9 +53,10 @@ interface IState {
   dimensions: IHexagonalGridDimensions;
   options: IOptions;
   neurons: Neuron[];
-  data: number[][];
+  data: ISOMData;
   positions: Array<[number, number]>;
   umatrix: number[];
+  currentVariableIndex: number;
 }
 
 class SelfOrganizingMapsPage extends Component<IProps, IState> {
@@ -79,16 +81,11 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     neurons: [],
     positions: [],
     umatrix: [],
-    data: [
-      [255, 255, 255],
-      [0, 0, 255],
-      [0, 255, 0],
-      [0, 255, 255],
-      [255, 0, 0],
-      [255, 0, 255],
-      [255, 255, 0],
-      [255, 255, 255]
-    ]
+    data: gspData,
+    /**
+     * is equal index of variable in variables array
+     */
+    currentVariableIndex: 0
   };
 
   public componentDidMount() {
@@ -122,7 +119,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     newOptions: IOptions
   ) => {
     this.setState({ dimensions: newDimensions, options: newOptions });
-    this.startCalculating(this.state.data, newDimensions, newOptions);
+    this.startCalculating(this.state.data.values, newDimensions, newOptions);
   };
 
   protected onGetCalculateWorkerMessage = ({
@@ -134,6 +131,15 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
       neurons,
       calculating: false,
       calculated: true
+    });
+  };
+
+  /**
+   * change variable index handler
+   */
+  protected onChangeVariable = (variableIndex: number) => {
+    this.setState({
+      currentVariableIndex: variableIndex
     });
   };
 
@@ -155,7 +161,9 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
       options,
       neurons,
       umatrix,
-      positions
+      positions,
+      data: { observations, variables },
+      currentVariableIndex
     } = this.state;
 
     return (
@@ -169,21 +177,22 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
             options={options}
             dimensions={dimensions}
             onSubmit={this.onControlsSubmit}
+            onChangeVariable={this.onChangeVariable}
+            currentVariableIndex={currentVariableIndex}
+            variables={variables}
             loading={calculating}
           />
           {calculated && (
             <div className={classes.maps}>
               <HexagonalGrid
-                title="Positions"
-                neurons={neurons}
-                dimensions={dimensions}
-                positions={positions}
-              />
-              <HexagonalGrid
                 title="Heatmap"
                 neurons={neurons}
                 dimensions={dimensions}
                 heatmap={true}
+                currentVariableIndex={currentVariableIndex}
+                positions={positions}
+                observations={observations}
+                variables={variables}
               />
               <HexagonalGrid
                 title="U-matrix"

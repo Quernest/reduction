@@ -5,3 +5,10 @@ export interface IOptions {
   minNeighborhood: number;
   maxNeighborhood: number;
 }
+
+export interface ISOMData {
+  variables: string[];
+  observations: string[];
+  values: number[][];
+  types?: string[];
+}

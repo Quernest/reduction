@@ -11,12 +11,22 @@ import {
   SimulationNodeDatum
 } from "d3-force";
 import { scaleBand, scaleLinear } from "d3-scale";
-import { interpolateGreys, interpolateSpectral } from "d3-scale-chromatic";
+import {
+  interpolateBlues,
+  interpolateGreys,
+  interpolateSpectral
+} from "d3-scale-chromatic";
 import { event, select, Selection } from "d3-selection";
 import "d3-selection-multi";
 import { line } from "d3-shape";
+import forEach from "lodash/forEach";
+import isUndefined from "lodash/isUndefined";
 import React, { Component, createRef, RefObject } from "react";
-import { IChartState, IHexagonalGridDimensions } from "src/models/chart.model";
+import {
+  IChartState,
+  IHexagonalGridDimensions,
+  IHexagonParameters
+} from "src/models/chart.model";
 
 const styles = createStyles({
   root: {
@@ -43,13 +53,16 @@ const styles = createStyles({
     position: "absolute",
     top: 0,
     left: 0,
-    zIndex: 10,
-    opacity: 0,
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: "Roboto, sans-serif",
     userSelect: "none",
     pointerEvents: "none",
-    whiteSpace: "nowrap"
+    whiteSpace: "nowrap",
+    color: "#fff",
+    zIndex: 10,
+    opacity: 0,
+    textShadow:
+      "1px 1px 0 rgba(0,0,0,0.5), 1px -1px 0 rgba(0,0,0,0.5), -1px 1px 0 rgba(0,0,0,0.5), -1px -1px 0 rgba(0,0,0,0.5), 1px 0px 0 rgba(0,0,0,0.5), 0px 1px 0 rgba(0,0,0,0.5), -1px 0px 0 rgba(0,0,0,0.5), 0px -1px 0 rgba(0,0,0,0.5)"
   }
 });
 
@@ -64,10 +77,17 @@ interface IProps extends WithStyles {
   heatmap?: boolean;
   umatrix?: number[];
   positions?: number[][];
+  observations?: string[];
+  variables?: string[];
+  currentVariableIndex?: number;
+}
+
+interface IState extends IChartState {
+  hexagonParameters: IHexagonParameters;
 }
 
 export const HexagonalGrid = withStyles(styles)(
-  class extends Component<IProps, IChartState> {
+  class extends Component<IProps, IState> {
     /**
      * react reference object with lower canvas layer element
      */
@@ -150,6 +170,13 @@ export const HexagonalGrid = withStyles(styles)(
       },
       get height() {
         return this.fullHeight - this.margin.top - this.margin.bottom;
+      },
+      hexagonParameters: {
+        r: 0,
+        R: 0,
+        d: 0,
+        D: 0,
+        a: 0
       }
     };
 
@@ -159,8 +186,11 @@ export const HexagonalGrid = withStyles(styles)(
     public initLowerCanvas({ current }: RefObject<HTMLCanvasElement>) {
       if (current) {
         this.lowerCanvas = select(current);
-        // @ts-ignore
-        this.lowerCtx = this.lowerCanvas.node().getContext("2d");
+        const node = this.lowerCanvas.node();
+
+        if (node) {
+          this.lowerCtx = node.getContext("2d") as CanvasRenderingContext2D;
+        }
       }
     }
 
@@ -177,8 +207,11 @@ export const HexagonalGrid = withStyles(styles)(
     public initUpperCanvas({ current }: RefObject<HTMLCanvasElement>) {
       if (current) {
         this.upperCanvas = select(current);
-        // @ts-ignore
-        this.upperCtx = this.upperCanvas.node().getContext("2d");
+        const node = this.upperCanvas.node();
+
+        if (node) {
+          this.upperCtx = node.getContext("2d") as CanvasRenderingContext2D;
+        }
       }
     }
 
@@ -189,28 +222,31 @@ export const HexagonalGrid = withStyles(styles)(
       this.upperBase = select(this.upperCustomBase);
     }
 
-    public componentDidMount() {
-      const {
-        dimensions: { columns, rows },
-        neurons,
-        heatmap,
-        umatrix,
-        positions
-      } = this.props;
-      const { fullWidth, fullHeight } = this.state;
+    public computeHexagonParameters(
+      width: number,
+      height: number,
+      rows: number,
+      columns: number
+    ): IHexagonParameters {
+      /**
+       * radius from columns
+       */
+      const rW = Math.sqrt(3) * columns + 3;
+
+      /**
+       * radius from rows
+       */
+      const rH = (rows + 3) * 1.5;
 
       /**
        * incircle radius
        */
-      const r = Math.round(max([
-        fullWidth / (Math.sqrt(3) * columns + 3),
-        fullHeight / ((rows + 3) * 1.5)
-      ]) as number);
+      const r = max([width / rW, height / rH]) as number;
 
       /**
        * short diagonal
        */
-      const d = (r as number) * 2;
+      const d = r * 2;
 
       /**
        * long diagonal
@@ -220,7 +256,50 @@ export const HexagonalGrid = withStyles(styles)(
       /**
        * circumcircle radius
        */
-      const R = Math.round(D / 2);
+      const R = D / 2;
+
+      /**
+       * edge
+       */
+      const a = R;
+
+      const hexagonParameters: IHexagonParameters = {
+        r,
+        R,
+        d,
+        D,
+        a
+      };
+
+      this.setState({
+        hexagonParameters: {
+          ...this.state.hexagonParameters,
+          ...hexagonParameters
+        }
+      });
+
+      return hexagonParameters;
+    }
+
+    public componentDidMount() {
+      const {
+        dimensions: { columns, rows },
+        neurons,
+        heatmap,
+        umatrix,
+        positions,
+        observations
+      } = this.props;
+      const { fullWidth, fullHeight } = this.state;
+
+      const hexagonParameters = this.computeHexagonParameters(
+        fullWidth,
+        fullHeight,
+        rows,
+        columns
+      );
+
+      const { d, r, R, D } = hexagonParameters;
 
       /**
        * best canvas width calculation
@@ -232,18 +311,6 @@ export const HexagonalGrid = withStyles(styles)(
        */
       const bestHeight = Math.round(rows * (D - R / 2) + r / 2) + d;
 
-      // console.group("hexagon dimensions");
-      // console.log("best width:", bestWidth);
-      // console.log("best height:", bestHeight);
-      // console.log("r:", r);
-      // console.log("R:", R);
-      // console.log("d:", d);
-      // console.log("D:", D);
-      // console.groupEnd();
-
-      // set the circumcircle radius
-      this.hexagonRadius = R;
-
       this.setState(
         {
           fullWidth: bestWidth,
@@ -254,14 +321,32 @@ export const HexagonalGrid = withStyles(styles)(
           this.initLowerBase();
           this.drawHexagons(d, R, neurons, heatmap, umatrix);
 
-          if (positions && positions.length > 0) {
+          if (
+            positions &&
+            positions.length > 0 &&
+            (observations && observations.length > 0)
+          ) {
             this.initUpperCanvas(this.upperCanvasReference);
             this.initUpperBase();
             this.createTooltip();
-            this.drawPositions(d, positions);
+            this.drawPositions(d, positions, observations);
           }
         }
       );
+    }
+
+    public componentDidUpdate(prevProps: IProps, prevState: IState) {
+      const { neurons, heatmap, umatrix, currentVariableIndex } = this.props;
+      const {
+        hexagonParameters: { d, R }
+      } = this.state;
+
+      if (prevProps.currentVariableIndex !== currentVariableIndex) {
+        this.clearCtxRect(this.lowerCtx);
+
+        // redraw hexagons
+        this.drawHexagons(d, R, neurons, heatmap, umatrix);
+      }
     }
 
     public componentWillUnmount() {
@@ -335,7 +420,9 @@ export const HexagonalGrid = withStyles(styles)(
       heatmap?: boolean,
       umatrix?: number[]
     ) {
-      const generatePath = ({ pos: [x, y] }: Neuron) => {
+      const { currentVariableIndex } = this.props;
+
+      const generatePathLine = ([x, y]: [number, number]) => {
         const sX = this.scaleGrid(d)(x);
         const sY = this.scaleGrid(d)(y);
 
@@ -344,29 +431,20 @@ export const HexagonalGrid = withStyles(styles)(
         return line()(points);
       };
 
-      const hexagons = this.lowerBase
-        .selectAll(".hexagon")
-        .data(neurons)
-        .enter()
-        .append("path")
-        .attr("d", generatePath);
+      forEach(neurons, ({ pos, v }: Neuron, i: number) => {
+        const pathLine = generatePathLine(pos);
 
-      hexagons.each(({ v }: Neuron, i: number, nodes: SVGPathElement[]) => {
-        const node = select(nodes[i]) as Selection<
-          SVGPathElement,
-          {},
-          null,
-          undefined
-        >;
+        if (!pathLine) {
+          return;
+        }
 
-        // parse D path from hexagon attribute
-        const path = new Path2D(node.attr("d"));
+        const path = new Path2D(pathLine);
 
         this.lowerCtx.beginPath();
 
         // todo: make a separate methods?
-        if (v && heatmap) {
-          this.lowerCtx.fillStyle = interpolateSpectral(v[1]);
+        if (v && heatmap && !isUndefined(currentVariableIndex)) {
+          this.lowerCtx.fillStyle = interpolateBlues(v[currentVariableIndex]);
         } else if (umatrix) {
           this.lowerCtx.fillStyle = interpolateGreys(umatrix[i]);
         } else {
@@ -378,8 +456,6 @@ export const HexagonalGrid = withStyles(styles)(
         this.lowerCtx.fill(path);
         this.lowerCtx.closePath();
       });
-
-      hexagons.exit().remove();
     }
 
     /**
@@ -387,22 +463,11 @@ export const HexagonalGrid = withStyles(styles)(
      * @param d short diagonal of the hexagon
      * @param positions result from the SOM mapping process, array of arrays with x and y positions
      */
-    public drawPositions(d: number, positions: number[][]) {
-      const { fullWidth, fullHeight } = this.state;
-
-      // NOTE: it's fake data, it must be dynamic
-      const observations = [
-        "John",
-        "Mike",
-        "Caleb",
-        "Yana",
-        "James",
-        "Mark",
-        "Vasya",
-        "Alex"
-      ];
-
-      // NOTE: it's fake data, it must be dynamic
+    public drawPositions(
+      d: number,
+      positions: number[][],
+      observations: string[]
+    ) {
       const input = positions.map<IPosition>(([x, y], index) => ({
         index,
         x,
@@ -436,7 +501,7 @@ export const HexagonalGrid = withStyles(styles)(
         .force("y", forceY(getY))
         .force("collide", forceCollide(r))
         .on("tick", () => {
-          this.upperCtx.clearRect(0, 0, fullWidth, fullHeight);
+          this.clearCtxRect(this.upperCtx);
 
           input.forEach(({ x, y, name }: IPosition) => {
             if (!x || !y || !name) {
@@ -446,6 +511,8 @@ export const HexagonalGrid = withStyles(styles)(
             this.upperCtx.beginPath();
             this.upperCtx.fillStyle = getColor(name);
             this.upperCtx.arc(x, y, r, 0, 2 * Math.PI);
+            this.upperCtx.strokeStyle = "#000";
+            this.upperCtx.stroke();
             this.upperCtx.fill();
             this.upperCtx.closePath();
           });
@@ -530,6 +597,12 @@ export const HexagonalGrid = withStyles(styles)(
           }
         });
       }
+    }
+
+    public clearCtxRect(ctx: CanvasRenderingContext2D) {
+      const { fullWidth, fullHeight } = this.state;
+
+      ctx.clearRect(0, 0, fullWidth, fullHeight);
     }
 
     public render(): JSX.Element {

@@ -9,6 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import React, { Component, createRef, RefObject } from "react";
 import { IHexagonalGridDimensions } from "src/models/chart.model";
 import { IOptions } from "src/models/som.model";
+import { VariableSelector } from "./";
 
 const styles = ({ spacing, palette }: Theme) =>
   createStyles({
@@ -59,6 +60,9 @@ interface IProps extends WithStyles<typeof styles> {
     newDimensions: IHexagonalGridDimensions,
     newOptions: IOptions
   ) => void;
+  variables: string[];
+  currentVariableIndex: number;
+  onChangeVariable: (variableIndex: number) => void;
   loading?: boolean;
 }
 
@@ -142,7 +146,10 @@ export const SOMControls = withStyles(styles)(
           maxLearningCoef,
           minNeighborhood,
           maxNeighborhood
-        }
+        },
+        onChangeVariable,
+        variables,
+        currentVariableIndex
       } = this.props;
 
       return (
@@ -368,6 +375,13 @@ export const SOMControls = withStyles(styles)(
                         />
                       )}
                     </div>
+                  </Grid>
+                  <Grid item={true} xs={6} sm={4} md={2}>
+                    <VariableSelector
+                      onChangeVariable={onChangeVariable}
+                      currentVariableIndex={currentVariableIndex}
+                      variables={variables}
+                    />
                   </Grid>
                 </Grid>
               </div>
