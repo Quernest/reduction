@@ -10,7 +10,7 @@ import {
   Simulation,
   SimulationNodeDatum
 } from "d3-force";
-import { scaleBand, scaleLinear } from "d3-scale";
+import { scaleLinear } from "d3-scale";
 import {
   interpolateBlues,
   interpolateGreys,
@@ -21,6 +21,8 @@ import "d3-selection-multi";
 import { line } from "d3-shape";
 import forEach from "lodash/forEach";
 import isUndefined from "lodash/isUndefined";
+import map from "lodash/map";
+import * as math from "mathjs";
 import React, { Component, createRef, RefObject } from "react";
 import {
   IChartState,
@@ -475,12 +477,28 @@ export const HexagonalGrid = withStyles(styles)(
         name: observations[index]
       }));
 
-      const scaleColor = scaleBand()
-        .domain(observations)
-        .range([0, 1]);
+      /**
+       * mean of each position
+       */
+      const means: number[] = map(positions, pos => math.mean(pos));
 
-      const getColor = (name: string) =>
-        interpolateSpectral(scaleColor(name) as number);
+      /**
+       * max value of means array
+       */
+      const maxMean: number = math.max(means);
+
+      /**
+       * positions represented in the interval from 0 to 1
+       */
+      const posInterval = map(means, mean => mean / maxMean);
+
+      // classify by type (add type to input and pass as param)
+      // const scaleColor = scaleBand()
+      //   .domain(observations)
+      //   .range([0, 1]);
+
+      // const getColor = (name: string) =>
+      //   interpolateSpectral(scaleColor(name) as number);
 
       const getX = ({ x }: IPosition) => {
         return this.scaleGrid(d)(x as number);
@@ -503,13 +521,13 @@ export const HexagonalGrid = withStyles(styles)(
         .on("tick", () => {
           this.clearCtxRect(this.upperCtx);
 
-          input.forEach(({ x, y, name }: IPosition) => {
-            if (!x || !y || !name) {
+          input.forEach(({ x, y }: IPosition, i) => {
+            if (!x || !y) {
               return;
             }
 
             this.upperCtx.beginPath();
-            this.upperCtx.fillStyle = getColor(name);
+            this.upperCtx.fillStyle = interpolateSpectral(posInterval[i]);
             this.upperCtx.arc(x, y, r, 0, 2 * Math.PI);
             this.upperCtx.strokeStyle = "#000";
             this.upperCtx.stroke();
