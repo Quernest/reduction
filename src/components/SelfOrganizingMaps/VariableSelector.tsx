@@ -23,12 +23,14 @@ interface IProps {
   variables: string[];
   currentVariableIndex: number;
   onChangeVariable: (variableIndex: number) => void;
+  disabled?: boolean;
 }
 
 export function VariableSelector({
   variables,
   currentVariableIndex,
-  onChangeVariable
+  onChangeVariable,
+  disabled
 }: IProps): JSX.Element {
   const classes = useStyles();
 
@@ -43,6 +45,7 @@ export function VariableSelector({
       <FormControl fullWidth={true} className={classes.formControl}>
         <InputLabel htmlFor="variable">Variable</InputLabel>
         <Select
+          disabled={disabled}
           value={currentVariableIndex}
           onChange={handleChange}
           inputProps={{

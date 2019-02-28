@@ -381,6 +381,7 @@ export const SOMControls = withStyles(styles)(
                       onChangeVariable={onChangeVariable}
                       currentVariableIndex={currentVariableIndex}
                       variables={variables}
+                      disabled={loading}
                     />
                   </Grid>
                 </Grid>
