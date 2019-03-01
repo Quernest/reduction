@@ -5,6 +5,7 @@ import FormControl from "@material-ui/core/FormControl";
 import Grid from "@material-ui/core/Grid";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
+import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import React, { Component, createRef, RefObject } from "react";
 import { IHexagonalGridDimensions } from "src/models/chart.model";
@@ -15,15 +16,6 @@ const styles = ({ spacing, palette }: Theme) =>
   createStyles({
     root: {
       flexGrow: 1
-    },
-    margin: {
-      marginRight: spacing.unit * 2,
-      marginTop: spacing.unit,
-      marginBottom: spacing.unit
-    },
-    fullWidth: {
-      flexGrow: 1,
-      width: "100%"
     },
     cssLabel: {
       "&$cssFocused": {
@@ -156,206 +148,232 @@ export const SOMControls = withStyles(styles)(
         <div className={classes.root}>
           <form autoComplete="off" onSubmit={this.onSubmit}>
             <Grid container={true} spacing={24}>
-              <Grid item={true} xs={12}>
+              <Grid item={true} xs={12} sm={3}>
                 <Typography variant="body1">Model</Typography>
                 <Grid container={true} spacing={16}>
-                  <Grid item={true} xs={6} sm={4} md={2}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel
-                        required={true}
-                        htmlFor="columns"
-                        classes={{
-                          root: classes.cssLabel,
-                          focused: classes.cssFocused
-                        }}
-                      >
-                        Columns
-                      </InputLabel>
-                      <Input
-                        id="columns"
-                        defaultValue={columns.toString()}
-                        inputProps={{ min: "1", max: "150", step: "1" }}
-                        required={true}
-                        fullWidth={true}
-                        inputRef={this.columnsInputRef}
-                        type="number"
-                        disabled={loading}
-                        classes={{
-                          underline: classes.cssUnderline
-                        }}
-                      />
-                    </FormControl>
+                  <Grid item={true} xs={12} md={6}>
+                    <Tooltip title="hexagons per column">
+                      <FormControl fullWidth={true}>
+                        <InputLabel
+                          required={true}
+                          htmlFor="columns"
+                          classes={{
+                            root: classes.cssLabel,
+                            focused: classes.cssFocused
+                          }}
+                        >
+                          columns
+                        </InputLabel>
+                        <Input
+                          id="columns"
+                          defaultValue={columns.toString()}
+                          inputProps={{ min: "1", max: "150", step: "1" }}
+                          required={true}
+                          fullWidth={true}
+                          inputRef={this.columnsInputRef}
+                          type="number"
+                          disabled={loading}
+                          classes={{
+                            underline: classes.cssUnderline
+                          }}
+                        />
+                      </FormControl>
+                    </Tooltip>
                   </Grid>
-                  <Grid item={true} xs={6} sm={4} md={2}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel
-                        htmlFor="rows"
-                        required={true}
-                        classes={{
-                          root: classes.cssLabel,
-                          focused: classes.cssFocused
-                        }}
-                      >
-                        Rows
-                      </InputLabel>
-                      <Input
-                        id="rows"
-                        defaultValue={rows.toString()}
-                        inputProps={{ min: "1", max: "150", step: "1" }}
-                        fullWidth={true}
-                        required={true}
-                        inputRef={this.rowsInputRef}
-                        disabled={loading}
-                        type="number"
-                        classes={{
-                          underline: classes.cssUnderline
-                        }}
-                      />
-                    </FormControl>
+                  <Grid item={true} xs={12} md={6}>
+                    <Tooltip title="hexagons per row">
+                      <FormControl fullWidth={true}>
+                        <InputLabel
+                          htmlFor="rows"
+                          required={true}
+                          classes={{
+                            root: classes.cssLabel,
+                            focused: classes.cssFocused
+                          }}
+                        >
+                          rows
+                        </InputLabel>
+                        <Input
+                          id="rows"
+                          defaultValue={rows.toString()}
+                          inputProps={{ min: "1", max: "150", step: "1" }}
+                          fullWidth={true}
+                          required={true}
+                          inputRef={this.rowsInputRef}
+                          disabled={loading}
+                          type="number"
+                          classes={{
+                            underline: classes.cssUnderline
+                          }}
+                        />
+                      </FormControl>
+                    </Tooltip>
                   </Grid>
                 </Grid>
               </Grid>
-              <Grid item={true} xs={12}>
+              <Grid item={true} xs={12} sm={9}>
                 <Typography variant="body1">Training</Typography>
                 <Grid container={true} spacing={16}>
                   <Grid item={true} xs={12} sm={4} md={2}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel
-                        htmlFor="iterations"
-                        required={true}
-                        classes={{
-                          root: classes.cssLabel,
-                          focused: classes.cssFocused
-                        }}
-                      >
-                        Iterations
-                      </InputLabel>
-                      <Input
-                        id="iterations"
-                        defaultValue={maxStep.toString()}
-                        inputProps={{ min: "1", max: "100000", step: "1" }}
-                        fullWidth={true}
-                        inputRef={this.iterationsInputRef}
-                        required={true}
-                        type="number"
-                        disabled={loading}
-                        classes={{
-                          underline: classes.cssUnderline
-                        }}
-                      />
-                    </FormControl>
+                    <Tooltip title="maximum step (iteration) value">
+                      <FormControl fullWidth={true}>
+                        <InputLabel
+                          htmlFor="steps"
+                          required={true}
+                          classes={{
+                            root: classes.cssLabel,
+                            focused: classes.cssFocused
+                          }}
+                        >
+                          &lambda; max
+                        </InputLabel>
+                        <Input
+                          id="steps"
+                          defaultValue={maxStep.toString()}
+                          inputProps={{ min: "1", max: "100000", step: "1" }}
+                          fullWidth={true}
+                          inputRef={this.iterationsInputRef}
+                          required={true}
+                          type="number"
+                          disabled={loading}
+                          classes={{
+                            underline: classes.cssUnderline
+                          }}
+                        />
+                      </FormControl>
+                    </Tooltip>
                   </Grid>
                   <Grid item={true} xs={6} sm={4} md={2}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel
-                        htmlFor="minLearningCoeff"
-                        required={true}
-                        classes={{
-                          root: classes.cssLabel,
-                          focused: classes.cssFocused
-                        }}
-                      >
-                        Min learn. coef.
-                      </InputLabel>
-                      <Input
-                        id="minLearningCoeff"
-                        defaultValue={minLearningCoef.toString()}
-                        inputProps={{ min: "0.1", max: "1", step: "0.1" }}
-                        fullWidth={true}
-                        inputRef={this.minLearningCoefInputRef}
-                        required={true}
-                        type="number"
-                        disabled={loading}
-                        classes={{
-                          underline: classes.cssUnderline
-                        }}
-                      />
-                    </FormControl>
+                    <Tooltip title="minimum learning coefficient">
+                      <FormControl fullWidth={true}>
+                        <InputLabel
+                          htmlFor="minLearningCoeff"
+                          required={true}
+                          classes={{
+                            root: classes.cssLabel,
+                            focused: classes.cssFocused
+                          }}
+                        >
+                          &alpha; min
+                        </InputLabel>
+                        <Input
+                          id="minLearningCoeff"
+                          defaultValue={minLearningCoef.toString()}
+                          inputProps={{ min: "0.1", max: "1", step: "0.1" }}
+                          fullWidth={true}
+                          inputRef={this.minLearningCoefInputRef}
+                          required={true}
+                          type="number"
+                          disabled={loading}
+                          classes={{
+                            underline: classes.cssUnderline
+                          }}
+                        />
+                      </FormControl>
+                    </Tooltip>
                   </Grid>
                   <Grid item={true} xs={6} sm={4} md={2}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel
-                        htmlFor="maxLearningCoefficient"
-                        required={true}
-                        classes={{
-                          root: classes.cssLabel,
-                          focused: classes.cssFocused
-                        }}
-                      >
-                        Max learn. coef.
-                      </InputLabel>
-                      <Input
-                        id="maxLearningCoefficient"
-                        defaultValue={maxLearningCoef.toString()}
-                        inputProps={{ min: "0.1", max: "1", step: "0.1" }}
-                        fullWidth={true}
-                        inputRef={this.maxLearningCoefInputRef}
-                        required={true}
-                        type="number"
-                        disabled={loading}
-                        classes={{
-                          underline: classes.cssUnderline
-                        }}
-                      />
-                    </FormControl>
+                    <Tooltip title="maximum learning coefficient">
+                      <FormControl fullWidth={true}>
+                        <InputLabel
+                          htmlFor="maxLearningCoefficient"
+                          required={true}
+                          classes={{
+                            root: classes.cssLabel,
+                            focused: classes.cssFocused
+                          }}
+                        >
+                          &alpha; max
+                        </InputLabel>
+                        <Input
+                          id="maxLearningCoefficient"
+                          defaultValue={maxLearningCoef.toString()}
+                          inputProps={{ min: "0.1", max: "1", step: "0.1" }}
+                          fullWidth={true}
+                          inputRef={this.maxLearningCoefInputRef}
+                          required={true}
+                          type="number"
+                          disabled={loading}
+                          classes={{
+                            underline: classes.cssUnderline
+                          }}
+                        />
+                      </FormControl>
+                    </Tooltip>
                   </Grid>
                   <Grid item={true} xs={6} sm={4} md={2}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel
-                        htmlFor="minNeighborhood"
-                        required={true}
-                        classes={{
-                          root: classes.cssLabel,
-                          focused: classes.cssFocused
-                        }}
-                      >
-                        Min neighborhood
-                      </InputLabel>
-                      <Input
-                        id="minNeighborhood"
-                        defaultValue={minNeighborhood.toString()}
-                        inputProps={{ min: "0.1", max: "1", step: "0.1" }}
-                        fullWidth={true}
-                        inputRef={this.minNeighborhoodInputRef}
-                        required={true}
-                        type="number"
-                        disabled={loading}
-                        classes={{
-                          underline: classes.cssUnderline
-                        }}
-                      />
-                    </FormControl>
+                    <Tooltip title="minimum neighbor value">
+                      <FormControl fullWidth={true}>
+                        <InputLabel
+                          htmlFor="minNeighborhood"
+                          required={true}
+                          classes={{
+                            root: classes.cssLabel,
+                            focused: classes.cssFocused
+                          }}
+                        >
+                          &theta; min
+                        </InputLabel>
+                        <Input
+                          id="minNeighborhood"
+                          defaultValue={minNeighborhood.toString()}
+                          inputProps={{ min: "0.1", max: "1", step: "0.1" }}
+                          fullWidth={true}
+                          inputRef={this.minNeighborhoodInputRef}
+                          required={true}
+                          type="number"
+                          disabled={loading}
+                          classes={{
+                            underline: classes.cssUnderline
+                          }}
+                        />
+                      </FormControl>
+                    </Tooltip>
                   </Grid>
                   <Grid item={true} xs={6} sm={4} md={2}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel
-                        htmlFor="maxNeighborhood"
-                        required={true}
-                        classes={{
-                          root: classes.cssLabel,
-                          focused: classes.cssFocused
-                        }}
-                      >
-                        Max neighborhood
-                      </InputLabel>
-                      <Input
-                        id="maxNeighborhood"
-                        defaultValue={maxNeighborhood.toString()}
-                        inputProps={{ min: "0.1", max: "1", step: "0.1" }}
-                        fullWidth={true}
-                        inputRef={this.maxNeighborhoodInputRef}
-                        required={true}
-                        type="number"
-                        disabled={loading}
-                        classes={{
-                          underline: classes.cssUnderline
-                        }}
-                      />
-                    </FormControl>
+                    <Tooltip title="maximum neighbor value">
+                      <FormControl fullWidth={true}>
+                        <InputLabel
+                          htmlFor="maxNeighborhood"
+                          required={true}
+                          classes={{
+                            root: classes.cssLabel,
+                            focused: classes.cssFocused
+                          }}
+                        >
+                          &theta; max
+                        </InputLabel>
+                        <Input
+                          id="maxNeighborhood"
+                          defaultValue={maxNeighborhood.toString()}
+                          inputProps={{ min: "0.1", max: "1", step: "0.1" }}
+                          fullWidth={true}
+                          inputRef={this.maxNeighborhoodInputRef}
+                          required={true}
+                          type="number"
+                          disabled={loading}
+                          classes={{
+                            underline: classes.cssUnderline
+                          }}
+                        />
+                      </FormControl>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item={true} xs={12} sm={4} md={2}>
+                    <Grid container={true} spacing={16}>
+                      <Grid item={true} xs={12}>
+                        <VariableSelector
+                          onChangeVariable={onChangeVariable}
+                          currentVariableIndex={currentVariableIndex}
+                          variables={variables}
+                          disabled={loading}
+                        />
+                      </Grid>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
-              <div className={classes.space}>
+              <Grid item={true} xs={12}>
                 <Grid container={true} alignItems="center" spacing={16}>
                   <Grid item={true} xs={6} sm={4} md={2}>
                     <div className={classes.wrapper}>
@@ -376,16 +394,8 @@ export const SOMControls = withStyles(styles)(
                       )}
                     </div>
                   </Grid>
-                  <Grid item={true} xs={6} sm={4} md={2}>
-                    <VariableSelector
-                      onChangeVariable={onChangeVariable}
-                      currentVariableIndex={currentVariableIndex}
-                      variables={variables}
-                      disabled={loading}
-                    />
-                  </Grid>
                 </Grid>
-              </div>
+              </Grid>
             </Grid>
           </form>
         </div>

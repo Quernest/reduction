@@ -4,7 +4,7 @@ import Grid from "@material-ui/core/Grid";
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
-import * as React from "react";
+import React, { useMemo } from "react";
 import { OutputTable } from "src/components/Tables";
 import { IParsedCSV } from "src/utils/csv";
 
@@ -42,10 +42,7 @@ export const CalculateControls = ({
   const classes = useStyles();
   const { variables, observations, values } = parsedFile;
 
-  /**
-   * memoized table for preventing unnecessary re-renders
-   */
-  const table = React.useMemo(
+  const table = useMemo(
     () => <OutputTable rows={[observations, ...values]} columns={variables} />,
     [parsedFile]
   );
@@ -77,8 +74,8 @@ export const CalculateControls = ({
             </div>
           </Grid>
           <Grid item={true} xs={12}>
-            <Typography variant="button" className={classes.tableTitle}>
-              dataset
+            <Typography variant="body1" className={classes.tableTitle}>
+              Dataset
             </Typography>
             {table}
           </Grid>

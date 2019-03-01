@@ -8,14 +8,8 @@ import map from "lodash/map";
 import React, { ChangeEvent } from "react";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
-  root: {
-    display: "flex",
-    flexWrap: "wrap"
-  },
   formControl: {
-    minWidth: 100,
-    marginTop: spacing.unit,
-    marginBottom: spacing.unit * 2
+    minWidth: 100
   }
 }));
 
@@ -41,10 +35,11 @@ export function VariableSelector({
   }
 
   return (
-    <div className={classes.root}>
+    <>
       <FormControl fullWidth={true} className={classes.formControl}>
-        <InputLabel htmlFor="variable">Variable</InputLabel>
+        <InputLabel htmlFor="variable">var</InputLabel>
         <Select
+          fullWidth={true}
           disabled={disabled}
           value={currentVariableIndex}
           onChange={handleChange}
@@ -60,6 +55,6 @@ export function VariableSelector({
             ))}
         </Select>
       </FormControl>
-    </div>
+    </>
   );
 }

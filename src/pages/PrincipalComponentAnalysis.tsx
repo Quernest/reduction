@@ -247,58 +247,44 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
           )}
           Principal Component Analysis
         </Typography>
-        {(() => {
-          if (visualized) {
-            return (
-              <Charts
-                onChangeSelectComponents={onChangeSelectComponents}
-                parsedFile={parsedFile}
-                calculations={calculations}
-                components={components}
-              />
-            );
-          }
-
-          if (calculated) {
-            return (
-              <>
-                <VisualizeControls
-                  analysis={analysis}
-                  onVisualize={onVisualize}
-                  onChangeSelectComponents={onChangeSelectComponents}
-                  components={components}
-                />
-                <Calculations
-                  parsedFile={parsedFile}
-                  calculations={calculations}
-                />
-              </>
-            );
-          }
-
-          if (uploaded) {
-            return (
-              <CalculateControls
-                parsedFile={parsedFile}
-                onCalculate={onCalculate}
-                calculating={calculating}
-              />
-            );
-          }
-
-          return (
-            <>
-              <Info />
-              <UploadControls
-                file={file}
-                onUpload={onUploadFile}
-                onChange={onChangeFile}
-                onCancel={onCancelFile}
-                uploading={uploading}
-              />
-            </>
-          );
-        })()}
+        {(visualized || calculated) && (
+          <VisualizeControls
+            visualized={visualized}
+            analysis={analysis}
+            onVisualize={onVisualize}
+            onChangeSelectComponents={onChangeSelectComponents}
+            components={components}
+          />
+        )}
+        {visualized && (
+          <Charts
+            parsedFile={parsedFile}
+            calculations={calculations}
+            components={components}
+          />
+        )}
+        {calculated && !visualized && (
+          <Calculations parsedFile={parsedFile} calculations={calculations} />
+        )}
+        {uploaded && !calculated && (
+          <CalculateControls
+            parsedFile={parsedFile}
+            onCalculate={onCalculate}
+            calculating={calculating}
+          />
+        )}
+        {!uploaded && !calculated && (
+          <>
+            <Info />
+            <UploadControls
+              file={file}
+              onUpload={onUploadFile}
+              onChange={onChangeFile}
+              onCancel={onCancelFile}
+              uploading={uploading}
+            />
+          </>
+        )}
         <ErrorBox message={error} />
       </div>
     </div>

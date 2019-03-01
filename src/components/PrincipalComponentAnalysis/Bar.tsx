@@ -2,17 +2,18 @@ import { createStyles, Theme, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
 import round from "lodash/round";
-import * as React from "react";
+import React, { Component } from "react";
 import { IChartState } from "src/models/chart.model";
 import { from2D } from "../../utils/transformations";
 
-const styles = ({ palette }: Theme) =>
+const styles = ({ palette, spacing }: Theme) =>
   createStyles({
     root: {
       width: "100%"
     },
     title: {
-      marginTop: 16
+      marginTop: spacing.unit * 2,
+      marginBottom: spacing.unit
     },
     svgContainer: {
       position: "relative",
@@ -72,7 +73,7 @@ interface IProps {
 }
 
 export const Bar = withStyles(styles)(
-  class extends React.Component<IProps, IChartState> {
+  class extends Component<IProps, IChartState> {
     /**
      * main svg element
      */
@@ -90,8 +91,8 @@ export const Bar = withStyles(styles)(
 
     public readonly state = {
       margin: {
-        top: 35,
-        right: 35,
+        top: 45,
+        right: 45,
         bottom: 60,
         left: 60
       },
@@ -293,7 +294,7 @@ export const Bar = withStyles(styles)(
       return (
         <div className={classes.root}>
           {title && (
-            <Typography className={classes.title} align="center" variant="h6">
+            <Typography className={classes.title} variant="body1">
               {title}
             </Typography>
           )}

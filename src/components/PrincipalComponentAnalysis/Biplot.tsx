@@ -1,53 +1,55 @@
 import Hidden from "@material-ui/core/Hidden";
-import { createStyles, withStyles } from "@material-ui/core/styles";
+import { createStyles, Theme, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
 import * as React from "react";
 import { IChartState, Points, Vectors } from "src/models/chart.model";
 
-const styles = createStyles({
-  root: {
-    width: "100%"
-  },
-  title: {
-    marginTop: 16
-  },
-  svgContainer: {
-    position: "relative",
-    height: 0,
-    width: "100%",
-    padding: 0 // reset
-  },
-  svg: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%"
-  },
-  axis: {
-    fontSize: 16,
-    fontFamily: "Roboto, sans-serif"
-  },
-  axisLabel: {
-    fontSize: 16,
-    fontFamily: "Roboto, sans-serif",
-    textAnchor: "middle"
-  },
-  variable: {
-    fontSize: 16,
-    fontFamily: "Roboto, sans-serif",
-    textAnchor: "middle"
-  },
-  vector: {
-    stroke: "#000",
-    strokeWidth: 1.5,
-    markerEnd: "url(#arrow)"
-  },
-  point: {
-    fill: "red"
-  }
-});
+const styles = ({ spacing }: Theme) =>
+  createStyles({
+    root: {
+      width: "100%"
+    },
+    title: {
+      marginTop: spacing.unit * 2,
+      marginBottom: spacing.unit
+    },
+    svgContainer: {
+      position: "relative",
+      height: 0,
+      width: "100%",
+      padding: 0 // reset
+    },
+    svg: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%"
+    },
+    axis: {
+      fontSize: 16,
+      fontFamily: "Roboto, sans-serif"
+    },
+    axisLabel: {
+      fontSize: 16,
+      fontFamily: "Roboto, sans-serif",
+      textAnchor: "middle"
+    },
+    variable: {
+      fontSize: 16,
+      fontFamily: "Roboto, sans-serif",
+      textAnchor: "middle"
+    },
+    vector: {
+      stroke: "#000",
+      strokeWidth: 1.5,
+      markerEnd: "url(#arrow)"
+    },
+    point: {
+      fill: "red"
+    }
+  });
 
 interface IProps {
   title?: string;
@@ -79,8 +81,8 @@ export const Biplot = withStyles(styles)(
 
     public readonly state = {
       margin: {
-        top: 35,
-        right: 35,
+        top: 45,
+        right: 45,
         bottom: 60,
         left: 60
       },
@@ -471,12 +473,12 @@ export const Biplot = withStyles(styles)(
       return (
         <div className={classes.root}>
           {title && (
-            <Typography align="center" className={classes.title} variant="h6">
+            <Typography className={classes.title} variant="body1">
               {title}
             </Typography>
           )}
           <Hidden smDown={true}>
-            <Typography align="center" variant="body1" color="textSecondary">
+            <Typography variant="caption" color="textSecondary">
               Use mouse scroll to zoom the biplot
             </Typography>
           </Hidden>

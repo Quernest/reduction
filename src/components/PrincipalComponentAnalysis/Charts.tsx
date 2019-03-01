@@ -1,36 +1,44 @@
-import Typography from "@material-ui/core/Typography";
-import * as React from "react";
+import { Theme } from "@material-ui/core";
+import Divider from "@material-ui/core/Divider";
+import Hidden from "@material-ui/core/Hidden";
+import { makeStyles } from "@material-ui/styles";
+import React, { useMemo } from "react";
 import { Points, Vectors } from "src/models/chart.model";
 import { IPCACalculations } from "src/models/pca.model";
 import { IParsedCSV } from "src/utils/csv";
 import { getMatrixColumn } from "src/utils/numbers";
-import { SelectComponents } from "./";
 import { Bar, Biplot } from "./";
 
 interface IProps {
-  onChangeSelectComponents: (newComponents: { x: number; y: number }) => void;
-  components: { x: number; y: number };
   calculations: IPCACalculations;
   parsedFile: IParsedCSV;
+  components: { x: number; y: number };
 }
 
-export const Charts = ({
-  onChangeSelectComponents,
-  components,
-  calculations,
-  parsedFile
-}: IProps) => {
-  const { adjustedDataset, eigens, analysis } = calculations;
-  const { tailedVariables } = parsedFile;
-  const { x, y } = components;
+const useStyles = makeStyles(({ spacing }: Theme) => ({
+  root: {
+    flexGrow: 1
+  },
+  divider: {
+    marginTop: spacing.unit * 2,
+    marginBottom: spacing.unit * 2
+  }
+}));
 
-  const points = React.useMemo(() => [adjustedDataset[x], adjustedDataset[y]], [
+export const Charts = ({
+  calculations: { adjustedDataset, eigens, analysis },
+  parsedFile: { tailedVariables },
+  components: { x, y }
+}: IProps) => {
+  const classes = useStyles();
+
+  const points = useMemo(() => [adjustedDataset[x], adjustedDataset[y]], [
     adjustedDataset,
     x,
     y
   ]) as Points;
 
-  const vectors = React.useMemo(() => {
+  const vectors = useMemo(() => {
     const x2s: number[] = getMatrixColumn(eigens.E.x, x);
     const y2s: number[] = getMatrixColumn(eigens.E.x, y);
     const x1s: number[] = Array(x2s.length).fill(0);
@@ -41,15 +49,7 @@ export const Charts = ({
   }, [eigens.E.x, x, y]) as Vectors;
 
   return (
-    <>
-      <Typography variant="body1">
-        You can select and switch components what you want to see below
-      </Typography>
-      <SelectComponents
-        analysis={analysis}
-        onChange={onChangeSelectComponents}
-        components={components}
-      />
+    <div className={classes.root}>
       <Biplot
         title="Biplot of score variables"
         eigenvectors={vectors}
@@ -58,11 +58,14 @@ export const Charts = ({
         yAxisLabel={`Component ${y + 1}`}
         points={points}
       />
+      <Hidden smUp={true}>
+        <Divider className={classes.divider} />
+      </Hidden>
       <Bar
         title="Scree plot of eigenvalues"
         eigenvalues={eigens.lambda.x}
         variables={tailedVariables}
       />
-    </>
+    </div>
   );
 };
