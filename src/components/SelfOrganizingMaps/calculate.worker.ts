@@ -38,6 +38,8 @@ ctx.addEventListener("message", (event: MessageEvent) => {
   ctx.postMessage({
     positions: k.mapping(),
     umatrix: k.umatrix(),
-    neurons: k.neurons
+    neurons: k.neurons,
+    topographicError: k.topographicError(),
+    quantizationError: k.quantizationError()
   });
 });

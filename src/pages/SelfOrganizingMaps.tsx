@@ -1,4 +1,5 @@
 import Divider from "@material-ui/core/Divider";
+import Grid from "@material-ui/core/Grid";
 import {
   createStyles,
   Theme,
@@ -7,6 +8,7 @@ import {
 } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
+import round from "lodash/round";
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import compose from "recompose/compose";
@@ -40,6 +42,10 @@ const styles = ({ spacing, breakpoints }: Theme) =>
     maps: {
       marginTop: spacing.unit,
       marginBottom: spacing.unit
+    },
+    errors: {
+      marginTop: spacing.unit * 2,
+      marginBottom: spacing.unit * 2
     }
   });
 
@@ -53,6 +59,8 @@ interface IState {
   dimensions: IHexagonalGridDimensions;
   options: IOptions;
   neurons: Neuron[];
+  topographicError: number;
+  quantizationError: number;
   data: ISOMData;
   positions: Array<[number, number]>;
   umatrix: number[];
@@ -68,19 +76,24 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     calculating: false,
     calculated: false,
     dimensions: {
-      columns: 25,
-      rows: 12
+      columns: 16,
+      rows: 8
     },
     options: {
-      maxStep: 400,
-      minLearningCoef: 0.5,
-      maxLearningCoef: 1,
+      maxStep: 100,
+      minLearningCoef: 0.3,
+      maxLearningCoef: 0.7,
       minNeighborhood: 0.4,
       maxNeighborhood: 1
     },
     neurons: [],
     positions: [],
     umatrix: [],
+    topographicError: 0,
+    quantizationError: 0,
+    /**
+     * uploaded and parsed dataset
+     */
     data: gspData,
     /**
      * is equal index of variable in variables array
@@ -123,12 +136,14 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
   };
 
   protected onGetCalculateWorkerMessage = ({
-    data: { positions, umatrix, neurons }
+    data: { positions, umatrix, neurons, topographicError, quantizationError }
   }: MessageEvent) => {
     this.setState({
       positions,
       umatrix,
       neurons,
+      topographicError,
+      quantizationError,
       calculating: false,
       calculated: true
     });
@@ -163,7 +178,9 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
       umatrix,
       positions,
       data: { observations, variables },
-      currentVariableIndex
+      currentVariableIndex,
+      quantizationError,
+      topographicError
     } = this.state;
 
     return (
@@ -184,6 +201,22 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
           />
           {calculated && (
             <div className={classes.maps}>
+              <div className={classes.errors}>
+                <Grid container={true} spacing={8}>
+                  <Grid item={true} xs="auto">
+                    <Typography variant="body2">
+                      Topographic error:{" "}
+                      <span>{round(topographicError, 6)}</span>
+                    </Typography>
+                  </Grid>
+                  <Grid item={true} xs="auto">
+                    <Typography variant="body2">
+                      Quantization error:{" "}
+                      <span>{round(quantizationError, 6)}</span>
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </div>
               <HexagonalGrid
                 title="Heatmap"
                 neurons={neurons}
