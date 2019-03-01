@@ -1,5 +1,7 @@
+import IconButton from "@material-ui/core/IconButton";
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { makeStyles } from "@material-ui/styles";
 import has from "lodash/has";
 import isUndefined from "lodash/isUndefined";
@@ -34,6 +36,10 @@ const useStyles = makeStyles(({ spacing, breakpoints }: Theme) => ({
   },
   progress: {
     flexGrow: 1
+  },
+  back: {
+    marginLeft: -spacing.unit,
+    marginRight: spacing.unit
   }
 }));
 
@@ -219,6 +225,10 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
     setState({ ...state, visualized: true });
   };
 
+  const onBack = (): void => {
+    setState({ ...state, visualized: false });
+  };
+
   const onChangeSelectComponents = (newComponents: {
     x: number;
     y: number;
@@ -230,6 +240,11 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
     <div className={classes.root}>
       <div className={classes.wrap}>
         <Typography variant="h5" paragraph={true}>
+          {visualized && (
+            <IconButton className={classes.back} onClick={onBack}>
+              <ArrowBackIcon />
+            </IconButton>
+          )}
           Principal Component Analysis
         </Typography>
         {(() => {

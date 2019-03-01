@@ -3,7 +3,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
 import * as math from "mathjs";
-import * as React from "react";
+import React, { useMemo } from "react";
 import { OutputTable } from "src/components/Tables";
 import { IPCACalculations } from "src/models/pca.model";
 import { IParsedCSV } from "src/utils/csv";
@@ -44,29 +44,29 @@ export const Calculations = ({
   } = calculations;
   const { tailedVariables, variables, observations, values } = parsedFile;
 
-  const tables = React.useMemo(
+  const tables = useMemo(
     () => (
       <div className={classes.tables}>
         <div className={classes.tableBox}>
-          <Typography className={classes.tableTitle} variant="button">
-            dataset
+          <Typography className={classes.tableTitle} variant="body1">
+            Dataset
           </Typography>
           <OutputTable rows={[observations, ...values]} columns={variables} />
         </div>
         <div className={classes.tableBox}>
-          <Typography className={classes.tableTitle} variant="button">
-            adjusted dataset
+          <Typography className={classes.tableTitle} variant="body1">
+            Adjusted dataset
           </Typography>
           <OutputTable rows={adjustedDataset} columns={tailedVariables} />
         </div>
         <div className={classes.tableBox}>
-          <Typography className={classes.tableTitle} variant="button">
-            covariation matrix
+          <Typography className={classes.tableTitle} variant="body1">
+            Covariation matrix
           </Typography>
           <OutputTable rows={covariance} columns={tailedVariables} />
         </div>
         <div className={classes.tableBox}>
-          <Typography className={classes.tableTitle} variant="button">
+          <Typography className={classes.tableTitle} variant="body1">
             Eigenanalysis of the Covariation Matrix
           </Typography>
           <OutputTable
@@ -86,7 +86,7 @@ export const Calculations = ({
           />
         </div>
         <div className={classes.tableBox}>
-          <Typography className={classes.tableTitle} variant="button">
+          <Typography className={classes.tableTitle} variant="body1">
             Eigenvectors (component loadings)
           </Typography>
           <OutputTable
@@ -100,7 +100,7 @@ export const Calculations = ({
           />
         </div>
         <div className={classes.tableBox}>
-          <Typography className={classes.tableTitle} variant="button">
+          <Typography className={classes.tableTitle} variant="body1">
             Linear Combinations
           </Typography>
           <OutputTable

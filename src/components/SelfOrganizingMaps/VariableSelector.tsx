@@ -13,7 +13,7 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
     flexWrap: "wrap"
   },
   formControl: {
-    minWidth: 150,
+    minWidth: 100,
     marginTop: spacing.unit,
     marginBottom: spacing.unit * 2
   }
