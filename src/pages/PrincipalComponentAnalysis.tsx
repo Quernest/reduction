@@ -109,7 +109,10 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
     analysis: {
       proportion: [],
       cumulative: [],
-      differences: []
+      differences: [],
+      totalProportion: 0,
+      importantComponentsVariance: 0,
+      amountOfImportantComponents: 0
     }
   });
 

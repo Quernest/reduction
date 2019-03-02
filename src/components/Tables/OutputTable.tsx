@@ -164,7 +164,7 @@ export const OutputTable = ({
           <TableFooter>
             <TableRow>
               <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
+                rowsPerPageOptions={[5, 10, 15, 20, 25]}
                 colSpan={1}
                 count={formattedRows.length}
                 className={classes.tablePagination}

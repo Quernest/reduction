@@ -22,6 +22,10 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
   },
   tables: {
     flexGrow: 1
+  },
+  analysisInfo: {
+    marginTop: spacing.unit * 2,
+    marginBottom: spacing.unit * 2
   }
 }));
 
@@ -39,7 +43,14 @@ export const Calculations = ({
     adjustedDataset,
     covariance,
     eigens,
-    analysis,
+    analysis: {
+      proportion,
+      totalProportion,
+      importantComponentsVariance,
+      amountOfImportantComponents,
+      differences,
+      cumulative
+    },
     linearCombinations
   } = calculations;
   const { tailedVariables, variables, observations, values } = parsedFile;
@@ -57,7 +68,10 @@ export const Calculations = ({
           <Typography className={classes.tableTitle} variant="body1">
             Adjusted dataset
           </Typography>
-          <OutputTable rows={adjustedDataset} columns={tailedVariables} />
+          <OutputTable
+            rows={[observations, ...adjustedDataset]}
+            columns={variables}
+          />
         </div>
         <div className={classes.tableBox}>
           <Typography className={classes.tableTitle} variant="body1">
@@ -67,27 +81,38 @@ export const Calculations = ({
         </div>
         <div className={classes.tableBox}>
           <Typography className={classes.tableTitle} variant="body1">
-            Eigenanalysis of the Covariation Matrix
+            Eigenanalysis of the covariation matrix
           </Typography>
+          <div className={classes.analysisInfo}>
+            <Typography variant="body2" gutterBottom={true}>
+              Number of components equal to total number of variables:{" "}
+              <strong>{tailedVariables.length}</strong>
+            </Typography>
+            <Typography variant="body2" gutterBottom={true}>
+              All <strong>{tailedVariables.length}</strong> components explain{" "}
+              <strong>{totalProportion}%</strong> variation of the data
+            </Typography>
+            <Typography variant="body2" gutterBottom={true}>
+              <strong>{amountOfImportantComponents}</strong> component
+              {amountOfImportantComponents > 1 ? "s" : ""} have eigenvalue
+              {amountOfImportantComponents > 1 ? "s" : ""} above 1 and explain{" "}
+              <strong>{importantComponentsVariance}%</strong> of variation.
+            </Typography>
+          </div>
           <OutputTable
             enumerateSymbol="Component"
-            rows={[
-              eigens.lambda.x,
-              analysis.differences,
-              analysis.proportion,
-              analysis.cumulative
-            ]}
+            rows={[eigens.lambda.x, differences, proportion, cumulative]}
             columns={[
               "Eigenvalue",
               "Difference b/n eigenvalues",
-              "Proportion of variance explained",
-              "Cumulative proportion of variance explained"
+              "Proportion of variance explained, %",
+              "Cumulative proportion of variance explained, %"
             ]}
           />
         </div>
         <div className={classes.tableBox}>
           <Typography className={classes.tableTitle} variant="body1">
-            Eigenvectors (component loadings)
+            Component loadings
           </Typography>
           <OutputTable
             rows={[
@@ -101,11 +126,13 @@ export const Calculations = ({
         </div>
         <div className={classes.tableBox}>
           <Typography className={classes.tableTitle} variant="body1">
-            Linear Combinations
+            Predicted principal components
           </Typography>
           <OutputTable
-            rows={linearCombinations}
-            columns={map(tailedVariables, (_, i) => `PC${i + 1}`)}
+            rows={[observations, ...linearCombinations]}
+            columns={map(variables, (variable, i) =>
+              i === 0 ? variable : `PC${i}`
+            )}
           />
         </div>
       </div>

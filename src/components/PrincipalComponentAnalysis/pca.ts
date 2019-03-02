@@ -79,10 +79,7 @@ export class PCA implements IPCA {
       const variance: number = math.var(instance);
       const std: number = math.sqrt(variance);
 
-      return map(
-        instance,
-        (value: number): number => round((value - mean) / std, 3)
-      );
+      return map(instance, (value: number): number => (value - mean) / std);
     });
   }
 
@@ -167,12 +164,41 @@ export class PCA implements IPCA {
     const summary: number = math.sum(eigenvalues);
 
     /**
+     * components with eigenvalues higher than 1
+     */
+    let amountOfImportantComponents = 0;
+
+    /**
+     * percentage of their variance
+     */
+    let importantComponentsVariance = 0;
+
+    /**
      * Proportion of variance explained
      */
     const proportion: number[] = map(
       eigenvalues,
-      (lambda: number): number => round((lambda / summary) * 100, 2)
+      (eigenvalue): number => {
+        const percentage = round((eigenvalue / summary) * 100, 1);
+
+        /**
+         * eigenvalues less than 1.00 are not considered to be stable.
+         * They account for less variability than does a single variable
+         * and are not retained in the analysis.
+         */
+        if (eigenvalue >= 1) {
+          amountOfImportantComponents += 1;
+          importantComponentsVariance += percentage;
+        }
+
+        return percentage;
+      }
     );
+
+    /**
+     * total proportion of variance explained
+     */
+    const totalProportion: number = math.sum(proportion);
 
     /**
      * Cumulative proportion of variance explained
@@ -212,6 +238,9 @@ export class PCA implements IPCA {
 
     return {
       proportion,
+      totalProportion,
+      importantComponentsVariance,
+      amountOfImportantComponents,
       cumulative,
       differences
     };
