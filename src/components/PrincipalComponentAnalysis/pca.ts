@@ -166,7 +166,7 @@ export class PCA implements IPCA {
     /**
      * components with eigenvalues higher than 1
      */
-    let amountOfImportantComponents = 0;
+    const importantComponents: number[] = [];
 
     /**
      * percentage of their variance
@@ -178,7 +178,7 @@ export class PCA implements IPCA {
      */
     const proportion: number[] = map(
       eigenvalues,
-      (eigenvalue): number => {
+      (eigenvalue, i): number => {
         const percentage = round((eigenvalue / summary) * 100, 1);
 
         /**
@@ -187,13 +187,18 @@ export class PCA implements IPCA {
          * and are not retained in the analysis.
          */
         if (eigenvalue >= 1) {
-          amountOfImportantComponents += 1;
+          importantComponents.push(i);
           importantComponentsVariance += percentage;
         }
 
         return percentage;
       }
     );
+
+    /**
+     * amount of components with eigenvalues higher than 1
+     */
+    const amountOfImportantComponents = importantComponents.length;
 
     /**
      * total proportion of variance explained
@@ -239,6 +244,7 @@ export class PCA implements IPCA {
     return {
       proportion,
       totalProportion,
+      importantComponents,
       importantComponentsVariance,
       amountOfImportantComponents,
       cumulative,
