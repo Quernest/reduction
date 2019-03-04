@@ -1,22 +1,11 @@
-// Math.js is an extensive math library for JavaScript and Node.js.
-import * as math from "mathjs";
-
-// lib computes the covariance between one or more numeric arrays.
 import cov from "compute-covariance";
-
-// library for formatting and manipulating numbers.
-import numeric from "numeric";
-
-// utility library delivering modularity, performance & extras.
-import isArray from "lodash/isArray";
-import isEmpty from "lodash/isEmpty";
 import isUndefined from "lodash/isUndefined";
 import map from "lodash/map";
 import reduce from "lodash/reduce";
 import round from "lodash/round";
 import sum from "lodash/sum";
-
-// models
+import * as math from "mathjs";
+import numeric from "numeric";
 import { IEigenAnalysis, IEigens, IPCA } from "src/models/pca.model";
 
 try {
@@ -38,16 +27,6 @@ export class PCA implements IPCA {
   public readonly analysis: IEigenAnalysis;
 
   public constructor(dataset: number[][], variables: string[]) {
-    // handle if the dataset is empty
-    if (isEmpty(dataset)) {
-      throw new Error("no dataset found");
-    }
-
-    // handle if the dataset type is't array
-    if (!isArray(dataset)) {
-      throw new Error("the dataset must be an array type");
-    }
-
     // copy the dataset
     this.dataset = dataset;
 

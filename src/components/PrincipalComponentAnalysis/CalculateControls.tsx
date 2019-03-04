@@ -4,9 +4,14 @@ import Grid from "@material-ui/core/Grid";
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
+import MUIDataTable from "mui-datatables";
 import React, { useMemo } from "react";
-import { OutputTable } from "src/components/Tables";
 import { IParsedCSV } from "src/utils/csv";
+import {
+  generateColumns,
+  generateData,
+  MUITableOptions
+} from "src/utils/table";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {
@@ -36,53 +41,52 @@ interface IProps {
 
 export const CalculateControls = ({
   calculating,
-  parsedFile,
+  parsedFile: { variables, observations, values },
   onCalculate
 }: IProps) => {
   const classes = useStyles();
-  const { variables, observations, values } = parsedFile;
 
-  const table = useMemo(
-    () => <OutputTable rows={[observations, ...values]} columns={variables} />,
-    [parsedFile]
-  );
+  const DatasetTable = useMemo(() => {
+    const columns = generateColumns(variables);
+    const rows = [observations, ...values];
+    const data = generateData(rows);
 
-  if (variables && observations && values) {
     return (
-      <div className={classes.root}>
-        <Typography variant="body1" paragraph={true}>
-          The dataset is processed. Press on the calculate button
-        </Typography>
-        <Grid container={true} alignItems="center" spacing={16}>
-          <Grid item={true} xs={6} sm={4} md={3} lg={2}>
-            <div className={classes.buttonWrapper}>
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={calculating}
-                onClick={onCalculate}
-                fullWidth={true}
-              >
-                Calculate
-              </Button>
-              {calculating && (
-                <CircularProgress
-                  size={24}
-                  className={classes.buttonProgress}
-                />
-              )}
-            </div>
-          </Grid>
-          <Grid item={true} xs={12}>
-            <Typography variant="body1" className={classes.tableTitle}>
-              Dataset
-            </Typography>
-            {table}
-          </Grid>
-        </Grid>
-      </div>
+      <MUIDataTable
+        title="Dataset"
+        data={data}
+        columns={columns}
+        options={MUITableOptions}
+      />
     );
-  }
+  }, [observations, values, variables]);
 
-  return null;
+  return (
+    <div className={classes.root}>
+      <Typography variant="body1" paragraph={true}>
+        The dataset is processed. Press on the calculate button
+      </Typography>
+      <Grid container={true} alignItems="center" spacing={16}>
+        <Grid item={true} xs={6} sm={4} md={3} lg={2}>
+          <div className={classes.buttonWrapper}>
+            <Button
+              variant="contained"
+              color="primary"
+              disabled={calculating}
+              onClick={onCalculate}
+              fullWidth={true}
+            >
+              Calculate
+            </Button>
+            {calculating && (
+              <CircularProgress size={24} className={classes.buttonProgress} />
+            )}
+          </div>
+        </Grid>
+        <Grid item={true} xs={12}>
+          {DatasetTable}
+        </Grid>
+      </Grid>
+    </div>
+  );
 };

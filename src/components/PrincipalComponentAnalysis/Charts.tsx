@@ -5,8 +5,8 @@ import { makeStyles } from "@material-ui/styles";
 import React, { useMemo } from "react";
 import { Points, Vectors } from "src/models/chart.model";
 import { IPCACalculations } from "src/models/pca.model";
+import { getColumn } from "src/utils/arrays";
 import { IParsedCSV } from "src/utils/csv";
-import { getMatrixColumn } from "src/utils/numbers";
 import { Bar, Biplot } from "./";
 
 interface IProps {
@@ -39,8 +39,8 @@ export const Charts = ({
   ]) as Points;
 
   const vectors = useMemo(() => {
-    const x2s: number[] = getMatrixColumn(eigens.E.x, x);
-    const y2s: number[] = getMatrixColumn(eigens.E.x, y);
+    const x2s: number[] = getColumn(eigens.E.x, x);
+    const y2s: number[] = getColumn(eigens.E.x, y);
     const x1s: number[] = Array(x2s.length).fill(0);
     const y1s: number[] = Array(y2s.length).fill(0);
 

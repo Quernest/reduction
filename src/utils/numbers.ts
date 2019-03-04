@@ -14,5 +14,6 @@ export const opposite = (value: any[] | number): any[] | number => {
   return -value;
 };
 
-export const getMatrixColumn = (matrix: number[][], n: number) =>
-  map(matrix, (x: number[]) => x[n]);
+export const isLongNumber = (n: number, max: number) => {
+  return String(n).replace(".", "").length > max;
+};

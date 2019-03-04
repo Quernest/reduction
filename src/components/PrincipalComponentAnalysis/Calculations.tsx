@@ -1,13 +1,18 @@
-import Button from "@material-ui/core/Button";
+// import Button from "@material-ui/core/Button";
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
-import * as math from "mathjs";
-import React, { useMemo, useState } from "react";
-import { OutputTable } from "src/components/Tables";
+import unzip from "lodash/unzip";
+import MUIDataTable from "mui-datatables";
+import React, { useMemo } from "react";
 import { IPCACalculations } from "src/models/pca.model";
 import { IParsedCSV } from "src/utils/csv";
+import {
+  generateColumns,
+  generateData,
+  MUITableOptions
+} from "src/utils/table";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {
@@ -48,7 +53,6 @@ export const Calculations = ({
       proportion,
       totalProportion,
       importantComponentsVariance,
-      importantComponents,
       amountOfImportantComponents,
       differences,
       cumulative
@@ -56,93 +60,107 @@ export const Calculations = ({
     linearCombinations
   } = calculations;
   const { tailedVariables, variables, observations, values } = parsedFile;
-  const [onlyImportantComponents, showImportantComponents] = useState<boolean>(
-    false
-  );
+  // const [onlyImportantComponents, showImportantComponents] = useState<boolean>(
+  //   false
+  // );
 
-  function toggleImportantComponents() {
-    showImportantComponents(!onlyImportantComponents);
-  }
+  // function toggleImportantComponents() {
+  //   showImportantComponents(!onlyImportantComponents);
+  // }
 
-  function tableFilter(
-    components: number[] = [],
-    arr: any[] = [],
-    hasFirstColumn?: boolean
-  ) {
-    if (!components || components.length === 0) {
-      return arr;
-    }
+  // function tableFilter(
+  //   components: number[] = [],
+  //   arr: any[] = [],
+  //   hasFirstColumn?: boolean
+  // ) {
+  //   if (!components || components.length === 0) {
+  //     return arr;
+  //   }
 
-    const offset = hasFirstColumn ? 1 : 0;
-    const filtered = [];
+  //   const offset = hasFirstColumn ? 1 : 0;
+  //   const filtered = [];
 
-    if (hasFirstColumn) {
-      filtered.push(arr[0]);
-    }
+  //   if (hasFirstColumn) {
+  //     filtered.push(arr[0]);
+  //   }
 
-    components.forEach(component => {
-      filtered.push(arr[component + offset]);
-    });
+  //   components.forEach(component => {
+  //     filtered.push(arr[component + offset]);
+  //   });
 
-    return filtered;
-  }
+  //   return filtered;
+  // }
 
-  const datasetTable = useMemo(() => {
+  const DatasetTable = useMemo(() => {
+    const columns = generateColumns(variables);
     const rows = [observations, ...values];
-    const columns = variables;
+    const data = generateData(rows);
 
     return (
       <div className={classes.tableBox}>
-        <Typography className={classes.tableTitle} variant="body1">
-          Dataset
-        </Typography>
-        <OutputTable rows={rows} columns={columns} />
+        <MUIDataTable
+          title="Original dataset"
+          data={data}
+          columns={columns}
+          options={MUITableOptions}
+        />
       </div>
     );
   }, [observations, values, variables]);
 
-  const adjustedDatasetTable = useMemo(() => {
+  const AdjustedDatasetTable = useMemo(() => {
+    const columns = generateColumns(variables);
     const rows = [observations, ...adjustedDataset];
-    const columns = variables;
+    const data = generateData(rows);
 
     return (
       <div className={classes.tableBox}>
-        <Typography className={classes.tableTitle} variant="body1">
-          Adjusted dataset
-        </Typography>
-        <OutputTable rows={rows} columns={columns} />
+        <MUIDataTable
+          title="Adjusted dataset"
+          data={data}
+          columns={columns}
+          options={MUITableOptions}
+        />
       </div>
     );
   }, [observations, adjustedDataset, variables]);
 
-  const covariationMatrixTable = useMemo(() => {
+  const CovarianceTable = useMemo(() => {
+    const columns = generateColumns(tailedVariables);
     const rows = covariance;
-    const columns = tailedVariables;
+    const data = generateData(rows);
 
     return (
       <div className={classes.tableBox}>
-        <Typography className={classes.tableTitle} variant="body1">
-          Covariation matrix
-        </Typography>
-        <OutputTable rows={rows} columns={columns} />
+        <MUIDataTable
+          title="Covariance matrix"
+          data={data}
+          columns={columns}
+          options={MUITableOptions}
+        />
       </div>
     );
   }, [covariance, tailedVariables]);
 
-  const EigenanalysisTable = useMemo(() => {
-    const rows = [eigens.lambda.x, differences, proportion, cumulative];
-    const columns = [
+  const AnalysisTable = useMemo(() => {
+    const columns = generateColumns([
+      "Component",
       "Eigenvalue",
       "Difference b/n eigenvalues",
       "Proportion of variance explained, %",
       "Cumulative proportion of variance explained, %"
+    ]);
+    const rows = [
+      map(eigens.lambda.x, (_, i) => `PC${i + 1}`),
+      eigens.lambda.x,
+      differences,
+      proportion,
+      cumulative
     ];
+    const data = generateData(rows);
 
     return (
       <div className={classes.tableBox}>
-        <Typography className={classes.tableTitle} variant="body1">
-          Eigenanalysis of the covariation matrix
-        </Typography>
         <div className={classes.analysisInfo}>
           <Typography variant="body2" gutterBottom={true}>
             Number of components equal to total number of variables:{" "}
@@ -159,10 +177,11 @@ export const Calculations = ({
             <strong>{importantComponentsVariance}%</strong> of variation.
           </Typography>
         </div>
-        <OutputTable
-          enumerateSymbol="Component"
-          rows={rows}
+        <MUIDataTable
+          title="Analysis"
+          data={data}
           columns={columns}
+          options={MUITableOptions}
         />
       </div>
     );
@@ -176,83 +195,55 @@ export const Calculations = ({
     importantComponentsVariance
   ]);
 
-  const loadingsTable = useMemo(() => {
-    const rows = [
-      tailedVariables,
-      ...(math.transpose(eigens.E.x) as number[][])
-    ];
-
-    const columns = map(["Loadings", ...tailedVariables], (variable, i) =>
-      i === 0 ? variable : `PC${i}`
+  const LoadingsTable = useMemo(() => {
+    const columns = generateColumns(
+      map(["Loadings", ...tailedVariables], (variable, i) =>
+        i === 0 ? variable : `PC${i}`
+      )
     );
+    const rows = [tailedVariables, ...unzip<number>(eigens.E.x)];
+    const data = generateData(rows);
 
     return (
       <div className={classes.tableBox}>
-        <Typography className={classes.tableTitle} variant="body1">
-          Component loadings
-        </Typography>
-        <OutputTable
-          rows={
-            onlyImportantComponents
-              ? tableFilter(importantComponents, rows, true)
-              : rows
-          }
-          columns={
-            onlyImportantComponents
-              ? tableFilter(importantComponents, columns, true)
-              : columns
-          }
+        <MUIDataTable
+          title="Loadings (i.e., Q matrix)"
+          data={data}
+          columns={columns}
+          options={MUITableOptions}
         />
       </div>
     );
-  }, [eigens.E.x, tailedVariables, onlyImportantComponents]);
+  }, [eigens.E.x, tailedVariables]);
 
-  const predictedValuesTable = useMemo(() => {
+  const LinearCombinationsTable = useMemo(() => {
+    const columns = generateColumns(
+      map(variables, (variable, i) => (i === 0 ? variable : `PC${i}`))
+    );
     const rows = [observations, ...linearCombinations];
-
-    const columns = map(variables, (variable, i) =>
-      i === 0 ? variable : `PC${i}`
-    );
+    const data = generateData(rows);
 
     return (
       <div className={classes.tableBox}>
-        <Typography className={classes.tableTitle} variant="body1">
-          Predicted principal components
-        </Typography>
-        <OutputTable
-          rows={
-            onlyImportantComponents
-              ? tableFilter(importantComponents, rows, true)
-              : rows
-          }
-          columns={
-            onlyImportantComponents
-              ? tableFilter(importantComponents, columns, true)
-              : columns
-          }
+        <MUIDataTable
+          title="Linear Combinations"
+          data={data}
+          columns={columns}
+          options={MUITableOptions}
         />
       </div>
     );
-  }, [observations, variables, linearCombinations, onlyImportantComponents]);
+  }, [observations, variables, linearCombinations]);
 
   return (
     <div className={classes.root}>
       <div className={classes.tables}>
-        {datasetTable}
-        {adjustedDatasetTable}
-        {covariationMatrixTable}
-        {EigenanalysisTable}
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={toggleImportantComponents}
-        >
-          {onlyImportantComponents
-            ? "show unimportant components"
-            : "hide unimportant components"}
-        </Button>
-        {loadingsTable}
-        {predictedValuesTable}
+        {DatasetTable}
+        {AdjustedDatasetTable}
+        {CovarianceTable}
+        {AnalysisTable}
+        {LoadingsTable}
+        {LinearCombinationsTable}
       </div>
     </div>
   );
