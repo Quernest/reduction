@@ -4,7 +4,6 @@ import Grid from "@material-ui/core/Grid";
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
-import MUIDataTable from "mui-datatables";
 import React, { useMemo } from "react";
 import { IParsedCSV } from "src/utils/csv";
 import {
@@ -12,6 +11,7 @@ import {
   generateData,
   MUITableOptions
 } from "src/utils/table";
+import { MUIResponsiveDataTable } from "../Tables";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {
@@ -52,7 +52,7 @@ export const CalculateControls = ({
     const data = generateData(rows);
 
     return (
-      <MUIDataTable
+      <MUIResponsiveDataTable
         title="Dataset"
         data={data}
         columns={columns}

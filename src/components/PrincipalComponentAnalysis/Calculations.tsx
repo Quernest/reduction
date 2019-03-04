@@ -4,7 +4,6 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
 import unzip from "lodash/unzip";
-import MUIDataTable from "mui-datatables";
 import React, { useMemo } from "react";
 import { IPCACalculations } from "src/models/pca.model";
 import { IParsedCSV } from "src/utils/csv";
@@ -13,6 +12,7 @@ import {
   generateData,
   MUITableOptions
 } from "src/utils/table";
+import { MUIResponsiveDataTable } from "../Tables";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {
@@ -98,7 +98,7 @@ export const Calculations = ({
 
     return (
       <div className={classes.tableBox}>
-        <MUIDataTable
+        <MUIResponsiveDataTable
           title="Original dataset"
           data={data}
           columns={columns}
@@ -115,7 +115,7 @@ export const Calculations = ({
 
     return (
       <div className={classes.tableBox}>
-        <MUIDataTable
+        <MUIResponsiveDataTable
           title="Adjusted dataset"
           data={data}
           columns={columns}
@@ -132,7 +132,7 @@ export const Calculations = ({
 
     return (
       <div className={classes.tableBox}>
-        <MUIDataTable
+        <MUIResponsiveDataTable
           title="Covariance matrix"
           data={data}
           columns={columns}
@@ -177,7 +177,7 @@ export const Calculations = ({
             <strong>{importantComponentsVariance}%</strong> of variation.
           </Typography>
         </div>
-        <MUIDataTable
+        <MUIResponsiveDataTable
           title="Analysis"
           data={data}
           columns={columns}
@@ -206,7 +206,7 @@ export const Calculations = ({
 
     return (
       <div className={classes.tableBox}>
-        <MUIDataTable
+        <MUIResponsiveDataTable
           title="Loadings (i.e., Q matrix)"
           data={data}
           columns={columns}
@@ -225,7 +225,7 @@ export const Calculations = ({
 
     return (
       <div className={classes.tableBox}>
-        <MUIDataTable
+        <MUIResponsiveDataTable
           title="Linear Combinations"
           data={data}
           columns={columns}
