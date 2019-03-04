@@ -14,7 +14,6 @@ export const MUITableOptions: MUIDataTableOptions = {
   search: true,
   sortFilterList: false,
   filter: false,
-  filterType: "dropdown",
   selectableRows: false,
   responsive: "scroll"
 };

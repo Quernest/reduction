@@ -147,8 +147,8 @@ export const Calculations = ({
       "Component",
       "Eigenvalue",
       "Difference b/n eigenvalues",
-      "Proportion of variance explained, %",
-      "Cumulative proportion of variance explained, %"
+      "Proportion, %",
+      "Cumulative, %"
     ]);
     const rows = [
       map(eigens.lambda.x, (_, i) => `PC${i + 1}`),
