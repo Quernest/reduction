@@ -6,9 +6,11 @@ import {
   Row
 } from "@devexpress/dx-react-grid";
 import {
+  ColumnChooser,
   Grid,
   PagingPanel,
   Table,
+  TableColumnVisibility,
   TableHeaderRow,
   Toolbar
 } from "@devexpress/dx-react-grid-material-ui";
@@ -48,6 +50,9 @@ export const DXTable = ({ title, rows, columns }: IProps): JSX.Element => {
         <Grid rows={rows} columns={columns}>
           <PagingState defaultCurrentPage={0} defaultPageSize={5} />
           <IntegratedPaging />
+          <Table />
+          <TableHeaderRow />
+          <TableColumnVisibility defaultHiddenColumnNames={[]} />
           <Toolbar />
           {title && (
             <Plugin name="toolbarTitle">
@@ -62,8 +67,7 @@ export const DXTable = ({ title, rows, columns }: IProps): JSX.Element => {
               </Template>
             </Plugin>
           )}
-          <Table />
-          <TableHeaderRow />
+          <ColumnChooser />
           <PagingPanel pageSizes={[5, 10, 15]} />
         </Grid>
       </Paper>
