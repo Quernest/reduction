@@ -1,1 +1,1 @@
-export * from "./MUIResponsiveDataTable";
+export * from "./DXTable";

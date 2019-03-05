@@ -6,8 +6,8 @@ import "./bootstrap";
 
 import { createMuiTheme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
-import * as React from "react";
-import * as DOM from "react-dom";
+import React from "react";
+import ReactDOM from "react-dom";
 import { AppRouter } from "./router";
 
 const theme = createMuiTheme({
@@ -16,7 +16,7 @@ const theme = createMuiTheme({
   }
 });
 
-DOM.render(
+ReactDOM.render(
   <ThemeProvider theme={theme}>
     <AppRouter />
   </ThemeProvider>,

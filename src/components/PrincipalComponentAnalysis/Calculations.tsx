@@ -1,4 +1,3 @@
-// import Button from "@material-ui/core/Button";
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
@@ -7,12 +6,7 @@ import unzip from "lodash/unzip";
 import React, { useMemo } from "react";
 import { IPCACalculations } from "src/models/pca.model";
 import { IParsedCSV } from "src/utils/csv";
-import {
-  generateColumns,
-  generateData,
-  MUITableOptions
-} from "src/utils/table";
-import { MUIResponsiveDataTable } from "../Tables";
+import { DXTable, generateColumns, generateRows } from "../Tables";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {
@@ -93,96 +87,78 @@ export const Calculations = ({
 
   const DatasetTable = useMemo(() => {
     const columns = generateColumns(variables);
-    const rows = [observations, ...values];
-    const data = generateData(rows);
+    const rows = generateRows([observations, ...values], variables);
 
     return (
       <div className={classes.tableBox}>
-        <MUIResponsiveDataTable
-          title="Original dataset"
-          data={data}
-          columns={columns}
-          options={MUITableOptions}
-        />
+        <DXTable title="Original dataset" rows={rows} columns={columns} />
       </div>
     );
   }, [observations, values, variables]);
 
   const AdjustedDatasetTable = useMemo(() => {
     const columns = generateColumns(variables);
-    const rows = [observations, ...adjustedDataset];
-    const data = generateData(rows);
+    const rows = generateRows([observations, ...adjustedDataset], variables);
 
     return (
       <div className={classes.tableBox}>
-        <MUIResponsiveDataTable
-          title="Adjusted dataset"
-          data={data}
-          columns={columns}
-          options={MUITableOptions}
-        />
+        <DXTable title="Adjusted dataset" rows={rows} columns={columns} />
       </div>
     );
   }, [observations, adjustedDataset, variables]);
 
   const CovarianceTable = useMemo(() => {
     const columns = generateColumns(tailedVariables);
-    const rows = covariance;
-    const data = generateData(rows);
+    const rows = generateRows(covariance, tailedVariables);
 
     return (
       <div className={classes.tableBox}>
-        <MUIResponsiveDataTable
-          title="Covariance matrix"
-          data={data}
-          columns={columns}
-          options={MUITableOptions}
-        />
+        <DXTable title="Covariance matrix" rows={rows} columns={columns} />
       </div>
     );
   }, [covariance, tailedVariables]);
 
   const AnalysisTable = useMemo(() => {
-    const columns = generateColumns([
+    const columnNames = [
       "Component",
       "Eigenvalue",
       "Difference b/n eigenvalues",
       "Proportion, %",
       "Cumulative, %"
-    ]);
-    const rows = [
-      map(eigens.lambda.x, (_, i) => `PC${i + 1}`),
-      eigens.lambda.x,
-      differences,
-      proportion,
-      cumulative
     ];
-    const data = generateData(rows);
+
+    const columns = generateColumns(columnNames);
+
+    const rows = generateRows(
+      [
+        map(eigens.lambda.x, (_, i) => `PC${i + 1}`),
+        eigens.lambda.x,
+        differences,
+        proportion,
+        cumulative
+      ],
+      columnNames
+    );
 
     return (
       <div className={classes.tableBox}>
+        <DXTable title="Analysis" rows={rows} columns={columns} />
         <div className={classes.analysisInfo}>
-          <Typography variant="body2" gutterBottom={true}>
+          <Typography variant="body1" gutterBottom={true}>
             Number of components equal to total number of variables:{" "}
             <strong>{tailedVariables.length}</strong>
           </Typography>
-          <Typography variant="body2" gutterBottom={true}>
+          <Typography variant="body1" gutterBottom={true}>
             All <strong>{tailedVariables.length}</strong> components explain{" "}
             <strong>{totalProportion}%</strong> variation of the data
           </Typography>
-          <Typography variant="body2" gutterBottom={true}>
+          <Typography variant="body1" gutterBottom={true}>
             <strong>{amountOfImportantComponents}</strong> component
             {amountOfImportantComponents > 1 ? "s" : ""} have eigenvalue
             {amountOfImportantComponents > 1 ? "s" : ""} above 1 and explain{" "}
             <strong>{importantComponentsVariance}%</strong> of variation.
           </Typography>
         </div>
-        <MUIResponsiveDataTable
-          title="Analysis"
-          data={data}
-          columns={columns}
-          options={MUITableOptions}
-        />
       </div>
     );
   }, [
@@ -196,41 +172,41 @@ export const Calculations = ({
   ]);
 
   const LoadingsTable = useMemo(() => {
-    const columns = generateColumns(
-      map(["Loadings", ...tailedVariables], (variable, i) =>
-        i === 0 ? variable : `PC${i}`
-      )
+    const columnNames = map(["Loadings", ...tailedVariables], (variable, i) =>
+      i === 0 ? variable : `PC${i}`
     );
-    const rows = [tailedVariables, ...unzip<number>(eigens.E.x)];
-    const data = generateData(rows);
+
+    const columns = generateColumns(columnNames);
+    const rows = generateRows(
+      [tailedVariables, ...unzip<number>(eigens.E.x)],
+      columnNames
+    );
 
     return (
       <div className={classes.tableBox}>
-        <MUIResponsiveDataTable
+        <DXTable
           title="Loadings (i.e., Q matrix)"
-          data={data}
+          rows={rows}
           columns={columns}
-          options={MUITableOptions}
         />
       </div>
     );
   }, [eigens.E.x, tailedVariables]);
 
   const LinearCombinationsTable = useMemo(() => {
-    const columns = generateColumns(
-      map(variables, (variable, i) => (i === 0 ? variable : `PC${i}`))
+    const columnNames = map(variables, (variable, i) =>
+      i === 0 ? variable : `PC${i}`
     );
-    const rows = [observations, ...linearCombinations];
-    const data = generateData(rows);
+
+    const columns = generateColumns(columnNames);
+    const rows = generateRows(
+      [observations, ...linearCombinations],
+      columnNames
+    );
 
     return (
       <div className={classes.tableBox}>
-        <MUIResponsiveDataTable
-          title="Linear Combinations"
-          data={data}
-          columns={columns}
-          options={MUITableOptions}
-        />
+        <DXTable title="Linear Combinations" rows={rows} columns={columns} />
       </div>
     );
   }, [observations, variables, linearCombinations]);

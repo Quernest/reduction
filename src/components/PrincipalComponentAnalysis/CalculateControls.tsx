@@ -6,12 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import React, { useMemo } from "react";
 import { IParsedCSV } from "src/utils/csv";
-import {
-  generateColumns,
-  generateData,
-  MUITableOptions
-} from "src/utils/table";
-import { MUIResponsiveDataTable } from "../Tables";
+import { DXTable, generateColumns, generateRows } from "../Tables";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {
@@ -48,17 +43,9 @@ export const CalculateControls = ({
 
   const DatasetTable = useMemo(() => {
     const columns = generateColumns(variables);
-    const rows = [observations, ...values];
-    const data = generateData(rows);
+    const rows = generateRows([observations, ...values], variables);
 
-    return (
-      <MUIResponsiveDataTable
-        title="Dataset"
-        data={data}
-        columns={columns}
-        options={MUITableOptions}
-      />
-    );
+    return <DXTable title="Dataset" rows={rows} columns={columns} />;
   }, [observations, values, variables]);
 
   return (
