@@ -2,6 +2,7 @@
   "name": "reduction",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://quernest.github.io/reduction",
   "dependencies": {
     "@devexpress/dx-react-core": "^1.10.3",
     "@devexpress/dx-react-grid": "^1.10.3",
