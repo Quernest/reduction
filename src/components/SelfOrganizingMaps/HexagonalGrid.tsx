@@ -24,10 +24,7 @@ import isUndefined from "lodash/isUndefined";
 import map from "lodash/map";
 import * as math from "mathjs";
 import React, { Component, createRef, RefObject } from "react";
-import {
-  IHexagonalGridDimensions,
-  IHexagonParameters
-} from "src/models/chart.model";
+import { IHexagonalGridDimensions, IHexagonParameters } from "src/models";
 
 const styles = createStyles({
   root: {

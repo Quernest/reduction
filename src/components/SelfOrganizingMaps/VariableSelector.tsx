@@ -20,12 +20,12 @@ interface IProps {
   disabled?: boolean;
 }
 
-export function VariableSelector({
+export const VariableSelector = ({
   variables,
   currentVariableIndex,
   onChangeVariable,
   disabled
-}: IProps): JSX.Element {
+}: IProps): JSX.Element => {
   const classes = useStyles();
 
   function handleChange(event: ChangeEvent<HTMLSelectElement>) {
@@ -57,4 +57,4 @@ export function VariableSelector({
       </FormControl>
     </>
   );
-}
+};

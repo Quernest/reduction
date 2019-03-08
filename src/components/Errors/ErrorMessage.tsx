@@ -1,7 +1,7 @@
 import { Theme } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
-import * as React from "react";
+import React from "react";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
@@ -12,21 +12,17 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
 }));
 
 interface IProps {
-  message?: string;
+  text?: string;
 }
 
-export function ErrorBox({ message }: IProps) {
+export const ErrorMessage = ({ text }: IProps): JSX.Element => {
   const classes = useStyles();
 
-  if (message) {
-    return (
-      <div className={classes.root}>
-        <Typography variant="body1" color="error">
-          Error: {message}
-        </Typography>
-      </div>
-    );
-  }
-
-  return null;
-}
+  return (
+    <div className={classes.root}>
+      <Typography variant="body1" color="error">
+        Error: {text}
+      </Typography>
+    </div>
+  );
+};

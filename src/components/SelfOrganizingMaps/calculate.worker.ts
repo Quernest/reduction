@@ -1,13 +1,12 @@
 import { generateGrid, Kohonen } from "@seracio/kohonen";
-import { IHexagonalGridDimensions } from "src/models/chart.model";
-import { IOptions } from "src/models/som.model";
+import { IHexagonalGridDimensions, ISOMOptions } from "src/models";
 
 const ctx: Worker = self as any;
 
 interface IEventData {
   data: number[][];
   dimensions: IHexagonalGridDimensions;
-  options: IOptions;
+  options: ISOMOptions;
 }
 
 ctx.addEventListener("message", (event: MessageEvent) => {

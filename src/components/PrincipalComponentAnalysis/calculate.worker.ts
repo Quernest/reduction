@@ -1,4 +1,5 @@
-import { IPCA, IPCACalculations } from "src/models/pca.model";
+import { IPCA, IPCACalculations } from "src/models";
+import { IParsedCSV } from 'src/utils';
 import { PCA } from "./pca";
 
 const ctx: Worker = self as any;
@@ -6,7 +7,7 @@ const ctx: Worker = self as any;
 ctx.addEventListener(
   "message",
   (event: MessageEvent) => {
-    const { values, variables } = event.data;
+    const { values, variables }: IParsedCSV = event.data;
 
     const pca: IPCA = new PCA(values, variables);
 

@@ -3,16 +3,14 @@ import Divider from "@material-ui/core/Divider";
 import Hidden from "@material-ui/core/Hidden";
 import { makeStyles } from "@material-ui/styles";
 import React, { useMemo } from "react";
-import { Points, Vectors } from "src/models/chart.model";
-import { IPCACalculations } from "src/models/pca.model";
-import { getColumn } from "src/utils/arrays";
-import { IParsedCSV } from "src/utils/csv";
+import { IPCACalculations, Points, Vectors } from "src/models";
+import { getColumn, IParsedCSV } from "src/utils";
 import { Bar, Biplot } from "./";
 
 interface IProps {
   calculations: IPCACalculations;
   parsedFile: IParsedCSV;
-  components: { x: number; y: number };
+  selectedComponents: { x: number; y: number };
 }
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
@@ -26,9 +24,13 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
 }));
 
 export const Charts = ({
-  calculations: { adjustedDataset, eigens, analysis },
+  calculations: {
+    adjustedDataset,
+    eigens,
+    analysis: { components }
+  },
   parsedFile: { tailedVariables },
-  components: { x, y }
+  selectedComponents: { x, y }
 }: IProps) => {
   const classes = useStyles();
 
@@ -44,7 +46,6 @@ export const Charts = ({
     const x1s: number[] = Array(x2s.length).fill(0);
     const y1s: number[] = Array(y2s.length).fill(0);
 
-    // return vectors
     return [x1s, y1s, x2s, y2s];
   }, [eigens.E.x, x, y]) as Vectors;
 
@@ -54,8 +55,8 @@ export const Charts = ({
         title="Biplot of score variables"
         eigenvectors={vectors}
         variables={tailedVariables}
-        xAxisLabel={`Component ${x + 1}`}
-        yAxisLabel={`Component ${y + 1}`}
+        xAxisLabel={components[x]}
+        yAxisLabel={components[y]}
         points={points}
       />
       <Hidden smUp={true}>

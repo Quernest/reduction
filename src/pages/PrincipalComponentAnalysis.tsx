@@ -5,18 +5,18 @@ import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { makeStyles } from "@material-ui/styles";
 import has from "lodash/has";
 import isUndefined from "lodash/isUndefined";
-import * as React from "react";
+import React from "react";
 import {
   CalculateControls,
   Calculations,
   Charts,
-  ErrorBox,
+  ErrorMessage,
   Info,
   UploadControls,
   VisualizeControls
 } from "src/components";
-import { IPCACalculations } from "src/models/pca.model";
-import { IParsedCSV } from "src/utils/csv";
+import { IPCACalculations } from "src/models";
+import { IParsedCSV } from "src/utils";
 import CalculateWorker from "worker-loader!src/components/PrincipalComponentAnalysis/calculate.worker";
 import UploadWorker from "worker-loader!src/components/PrincipalComponentAnalysis/upload.worker";
 
@@ -113,7 +113,7 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
       totalProportion: 0,
       importantComponents: [],
       importantComponentsVariance: 0,
-      amountOfImportantComponents: 0
+      components: []
     }
   });
 
@@ -138,7 +138,10 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
    * selected components.
    * contains selected x and y axes of principal components
    */
-  const [components, setComponents] = React.useState<{ x: number; y: number }>({
+  const [selectedComponents, setSelectedComponents] = React.useState<{
+    x: number;
+    y: number;
+  }>({
     x: 0,
     y: 1
   });
@@ -233,11 +236,11 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
     setState({ ...state, visualized: false });
   };
 
-  const onChangeSelectComponents = (newComponents: {
+  const onChangeSelectedComponents = (newSelectedComponents: {
     x: number;
     y: number;
   }): void => {
-    setComponents({ ...components, ...newComponents });
+    setSelectedComponents({ ...selectedComponents, ...newSelectedComponents });
   };
 
   return (
@@ -256,15 +259,15 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
             visualized={visualized}
             analysis={analysis}
             onVisualize={onVisualize}
-            onChangeSelectComponents={onChangeSelectComponents}
-            components={components}
+            onChangeSelectedComponents={onChangeSelectedComponents}
+            selectedComponents={selectedComponents}
           />
         )}
         {visualized && (
           <Charts
             parsedFile={parsedFile}
             calculations={calculations}
-            components={components}
+            selectedComponents={selectedComponents}
           />
         )}
         {calculated && !visualized && (
@@ -289,7 +292,7 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
             />
           </>
         )}
-        <ErrorBox message={error} />
+        {error && <ErrorMessage text={error} />}
       </div>
     </div>
   );

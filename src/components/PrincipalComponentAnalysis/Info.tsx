@@ -5,7 +5,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
-import * as React from "react";
+import React from "react";
 
 const useStyles = makeStyles(({ spacing }) => ({
   root: {

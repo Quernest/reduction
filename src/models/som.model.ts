@@ -1,4 +1,4 @@
-export interface IOptions {
+export interface ISOMOptions {
   maxStep: number;
   minLearningCoef: number;
   maxLearningCoef: number;

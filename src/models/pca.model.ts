@@ -1,9 +1,9 @@
 export interface IEigenAnalysis {
   proportion: number[];
   totalProportion: number;
-  importantComponents: number[];
+  components: string[];
+  importantComponents: string[];
   importantComponentsVariance: number;
-  amountOfImportantComponents: number;
   cumulative: number[];
   differences: number[];
 }

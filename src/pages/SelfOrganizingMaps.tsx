@@ -13,9 +13,8 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import compose from "recompose/compose";
 import { HexagonalGrid, SOMControls } from "src/components";
-import { gspData } from "src/data/gsp";
-import { IHexagonalGridDimensions } from "src/models/chart.model";
-import { IOptions, ISOMData } from "src/models/som.model";
+import { gspData } from "src/data";
+import { IHexagonalGridDimensions, ISOMData, ISOMOptions } from "src/models";
 import CalculateWorker from "worker-loader!src/components/SelfOrganizingMaps/calculate.worker";
 
 const styles = ({ spacing, breakpoints }: Theme) =>
@@ -57,7 +56,7 @@ interface IState {
   calculating: boolean;
   calculated: boolean;
   dimensions: IHexagonalGridDimensions;
-  options: IOptions;
+  options: ISOMOptions;
   neurons: Neuron[];
   topographicError: number;
   quantizationError: number;
@@ -129,7 +128,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
 
   protected onControlsSubmit = (
     newDimensions: IHexagonalGridDimensions,
-    newOptions: IOptions
+    newOptions: ISOMOptions
   ) => {
     this.setState({ dimensions: newDimensions, options: newOptions });
     this.startCalculating(this.state.data.values, newDimensions, newOptions);
@@ -161,7 +160,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
   public startCalculating(
     data: number[][],
     dimensions: IHexagonalGridDimensions,
-    options: IOptions
+    options: ISOMOptions
   ) {
     this.setState({ calculated: false, calculating: true });
     this.calculateWorker.postMessage({ data, dimensions, options });

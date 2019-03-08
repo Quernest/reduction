@@ -1,12 +1,13 @@
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
-import map from "lodash/map";
+import filter from "lodash/filter";
+import includes from "lodash/includes";
 import unzip from "lodash/unzip";
 import React, { useMemo } from "react";
-import { IPCACalculations } from "src/models/pca.model";
-import { IParsedCSV } from "src/utils/csv";
-import { DXTable, generateColumns, generateRows } from "../Tables";
+import { DXTable, generateColumns, generateRows } from "src/components";
+import { IPCACalculations } from "src/models";
+import { IParsedCSV } from "src/utils";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {
@@ -46,9 +47,10 @@ export const Calculations = ({
     analysis: {
       proportion,
       totalProportion,
+      importantComponents,
       importantComponentsVariance,
-      amountOfImportantComponents,
       differences,
+      components,
       cumulative
     },
     linearCombinations
@@ -130,13 +132,7 @@ export const Calculations = ({
     const columns = generateColumns(columnNames);
 
     const rows = generateRows(
-      [
-        map(eigens.lambda.x, (_, i) => `PC${i + 1}`),
-        eigens.lambda.x,
-        differences,
-        proportion,
-        cumulative
-      ],
+      [components, eigens.lambda.x, differences, proportion, cumulative],
       columnNames
     );
 
@@ -153,9 +149,9 @@ export const Calculations = ({
             <strong>{totalProportion}%</strong> variation of the data
           </Typography>
           <Typography variant="body1" gutterBottom={true}>
-            <strong>{amountOfImportantComponents}</strong> component
-            {amountOfImportantComponents > 1 ? "s" : ""} have eigenvalue
-            {amountOfImportantComponents > 1 ? "s" : ""} above 1 and explain{" "}
+            <strong>{importantComponents.length}</strong> component
+            {importantComponents.length > 1 ? "s" : ""} have eigenvalue
+            {importantComponents.length > 1 ? "s" : ""} above 1 and explain{" "}
             <strong>{importantComponentsVariance}%</strong> of variation.
           </Typography>
         </div>
@@ -167,49 +163,64 @@ export const Calculations = ({
     proportion,
     totalProportion,
     cumulative,
-    amountOfImportantComponents,
     importantComponentsVariance
   ]);
 
   const LoadingsTable = useMemo(() => {
-    const columnNames = map(["Loadings", ...tailedVariables], (variable, i) =>
-      i === 0 ? variable : `PC${i}`
-    );
-
+    const columnNames = ["Loadings", ...components];
     const columns = generateColumns(columnNames);
+
     const rows = generateRows(
       [tailedVariables, ...unzip<number>(eigens.E.x)],
       columnNames
     );
 
+    const importantComponentNames = filter(components, component =>
+      includes(importantComponents, component)
+    );
+
+    const importantComponentsList = ["Loadings", ...importantComponentNames];
+
     return (
       <div className={classes.tableBox}>
         <DXTable
           title="Loadings (i.e., Q matrix)"
+          importantComponentsList={importantComponentsList}
           rows={rows}
           columns={columns}
         />
       </div>
     );
-  }, [eigens.E.x, tailedVariables]);
+  }, [eigens.E.x, tailedVariables, importantComponents]);
 
   const LinearCombinationsTable = useMemo(() => {
-    const columnNames = map(variables, (variable, i) =>
-      i === 0 ? variable : `PC${i}`
-    );
-
+    const columnNames = [variables[0], ...components];
     const columns = generateColumns(columnNames);
     const rows = generateRows(
       [observations, ...linearCombinations],
       columnNames
     );
 
+    const importantComponentNames = filter(components, component =>
+      includes(importantComponents, component)
+    );
+
+    const importantComponentsList = [
+      columnNames[0],
+      ...importantComponentNames
+    ];
+
     return (
       <div className={classes.tableBox}>
-        <DXTable title="Linear Combinations" rows={rows} columns={columns} />
+        <DXTable
+          title="Linear Combinations"
+          rows={rows}
+          columns={columns}
+          importantComponentsList={importantComponentsList}
+        />
       </div>
     );
-  }, [observations, variables, linearCombinations]);
+  }, [observations, variables, linearCombinations, importantComponents]);
 
   return (
     <div className={classes.root}>

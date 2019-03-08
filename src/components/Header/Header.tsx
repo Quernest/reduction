@@ -18,7 +18,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 import TimeLineIcon from "@material-ui/icons/Timeline";
 import { makeStyles } from "@material-ui/styles";
 import React from "react";
-import { redirectTo } from "src/utils/redirectTo";
+import { redirectTo } from "src/utils";
 
 const useStyles = makeStyles(({ breakpoints }: Theme) => ({
   root: {

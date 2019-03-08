@@ -1,7 +1,7 @@
 import forEach from "lodash/forEach";
 import isNaN from "lodash/isNaN";
 import isString from "lodash/isString";
-import { IParsedCSV, parseCSV } from "../../utils/csv";
+import { IParsedCSV, parseCSV } from "src/utils";
 
 const ctx: Worker = self as any;
 

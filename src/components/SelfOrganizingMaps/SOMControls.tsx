@@ -8,9 +8,8 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import React, { Component, createRef, RefObject } from "react";
-import { IHexagonalGridDimensions } from "src/models/chart.model";
-import { IOptions } from "src/models/som.model";
-import { VariableSelector } from "./";
+import { VariableSelector } from "src/components";
+import { IHexagonalGridDimensions, ISOMOptions } from "src/models";
 
 const styles = ({ spacing, palette }: Theme) =>
   createStyles({
@@ -46,11 +45,11 @@ const styles = ({ spacing, palette }: Theme) =>
   });
 
 interface IProps extends WithStyles<typeof styles> {
-  options: IOptions;
+  options: ISOMOptions;
   dimensions: IHexagonalGridDimensions;
   onSubmit: (
     newDimensions: IHexagonalGridDimensions,
-    newOptions: IOptions
+    newOptions: ISOMOptions
   ) => void;
   variables: string[];
   currentVariableIndex: number;
@@ -116,7 +115,7 @@ export const SOMControls = withStyles(styles)(
         rows: rowsInputValue
       };
 
-      const newOptions: IOptions = {
+      const newOptions: ISOMOptions = {
         maxStep: iterationsInputValue,
         minLearningCoef: minLearningCoefInputRefValue,
         maxLearningCoef: maxLearningCoefInputRefValue,

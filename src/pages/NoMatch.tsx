@@ -23,7 +23,7 @@ interface IProps {
   location: Location;
 }
 
-export function NoMatch({ location }: IProps): JSX.Element {
+export const NoMatch = ({ location }: IProps): JSX.Element => {
   const classes = useStyles();
 
   return (
@@ -35,4 +35,4 @@ export function NoMatch({ location }: IProps): JSX.Element {
       </div>
     </div>
   );
-}
+};

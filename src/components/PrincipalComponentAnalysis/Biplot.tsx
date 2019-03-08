@@ -2,8 +2,8 @@ import Hidden from "@material-ui/core/Hidden";
 import { createStyles, Theme, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
-import * as React from "react";
-import { IChartState, Points, Vectors } from "src/models/chart.model";
+import React from "react";
+import { IChartState, Points, Vectors } from "src/models";
 
 const styles = ({ spacing }: Theme) =>
   createStyles({
@@ -104,7 +104,7 @@ export const Biplot = withStyles(styles)(
     /**
      * main svg element
      */
-    private svg: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+    protected svg: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
     /**
      * zoom listener
@@ -114,35 +114,35 @@ export const Biplot = withStyles(styles)(
     /**
      * clip-path (wrapper for view)
      */
-    private clip: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+    protected clip: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
     /**
      * group element for zooming
      * append here translating elements
      */
-    private view: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+    protected view: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
     /**
      * x linear scale
      */
-    private x: d3.ScaleLinear<number, number>;
+    protected x: d3.ScaleLinear<number, number>;
 
     /**
      * y linear scale
      */
-    private y: d3.ScaleLinear<number, number>;
+    protected y: d3.ScaleLinear<number, number>;
 
     // axes
-    private axisTop: d3.Axis<number | { valueOf(): number }>;
-    private axisBottom: d3.Axis<number | { valueOf(): number }>;
-    private axisLeft: d3.Axis<number | { valueOf(): number }>;
-    private axisRight: d3.Axis<number | { valueOf(): number }>;
+    protected axisTop: d3.Axis<number | { valueOf(): number }>;
+    protected axisBottom: d3.Axis<number | { valueOf(): number }>;
+    protected axisLeft: d3.Axis<number | { valueOf(): number }>;
+    protected axisRight: d3.Axis<number | { valueOf(): number }>;
 
     // axes g (group) elements
-    private gAxisTop: d3.Selection<d3.BaseType, any, HTMLElement, any>;
-    private gAxisBottom: d3.Selection<d3.BaseType, any, HTMLElement, any>;
-    private gAxisLeft: d3.Selection<d3.BaseType, any, HTMLElement, any>;
-    private gAxisRight: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+    protected gAxisTop: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+    protected gAxisBottom: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+    protected gAxisLeft: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+    protected gAxisRight: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
     public componentDidMount() {
       const {
@@ -191,7 +191,7 @@ export const Biplot = withStyles(styles)(
       }
     }
 
-    private onZoom = () => {
+    public onZoom = () => {
       const { eigenvectors, variables, points, classes } = this.props;
       const { transform } = d3.event;
 
@@ -226,7 +226,7 @@ export const Biplot = withStyles(styles)(
       this.drawVectors(eigenvectors, variables);
     };
 
-    private selectSVGElement(): void {
+    public selectSVGElement(): void {
       const { fullWidth, fullHeight, margin } = this.state;
 
       this.zoom = d3
@@ -257,7 +257,7 @@ export const Biplot = withStyles(styles)(
       this.view = this.clip.append("g").attr("pointer-events", "all");
     }
 
-    private createDefs(): void {
+    public createDefs(): void {
       const { width, height } = this.state;
       const defs = this.svg.append("defs");
 
@@ -284,7 +284,7 @@ export const Biplot = withStyles(styles)(
         .attr("height", height);
     }
 
-    private drawAxes(
+    public drawAxes(
       points: Points,
       xAxisLabel: string,
       yAxisLabel: string
@@ -388,7 +388,7 @@ export const Biplot = withStyles(styles)(
      * draw points on 2d scatter
      * @param points points for scatter plot
      */
-    private drawPoints(points: Points): void {
+    public drawPoints(points: Points): void {
       const { classes } = this.props;
       const { k } = this.state.transform;
 
@@ -415,7 +415,7 @@ export const Biplot = withStyles(styles)(
      * @param eigenvectors array of eigenvectors
      * @param variables factor variables
      */
-    private drawVectors(eigenvectors: Vectors, variables: string[]): void {
+    public drawVectors(eigenvectors: Vectors, variables: string[]): void {
       const { classes } = this.props;
       const { k } = this.state.transform;
       // the length of each points collection is equal

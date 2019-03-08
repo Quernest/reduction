@@ -2,9 +2,9 @@ import { createStyles, Theme, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
 import round from "lodash/round";
+import zipWith from "lodash/zipWith";
 import React, { Component } from "react";
-import { IChartState } from "src/models/chart.model";
-import { from2D } from "../../utils/transformations";
+import { IChartState } from "src/models";
 
 const styles = ({ palette, spacing }: Theme) =>
   createStyles({
@@ -77,17 +77,17 @@ export const Bar = withStyles(styles)(
     /**
      * main svg element
      */
-    private svg: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+    protected svg: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
     /**
      * x axis
      */
-    private x: d3.ScaleBand<string>;
+    protected x: d3.ScaleBand<string>;
 
     /**
      * y axis
      */
-    private y: d3.ScaleLinear<number, number>;
+    protected y: d3.ScaleLinear<number, number>;
 
     public readonly state = {
       margin: {
@@ -110,29 +110,24 @@ export const Bar = withStyles(styles)(
       const { eigenvalues, variables } = this.props;
 
       /**
-       * array of combined eigenvalues ​​that we display in bar columns
-       */
-      const combinedData: [string[], number[]] = [variables, eigenvalues];
-
-      /**
-       * keys of this eigenvalues
-       * by default describes:
-       * component name, eigenvalue
-       */
-      const keys: string[] = ["component", "eigenvalue"];
-
-      /**
        * formatted data which represents a collection of objects
        * with provided keys and eigenvalues
        */
-      const data = from2D<IBarData>(combinedData, keys);
+      const data = zipWith<string, number, IBarData>(
+        variables,
+        eigenvalues,
+        (component, eigenvalue) => ({
+          component,
+          eigenvalue
+        })
+      );
 
       this.selectSVGElement();
       this.drawAxes(data);
       this.drawBars(data);
     }
 
-    private selectSVGElement(): void {
+    public selectSVGElement(): void {
       const { margin, fullWidth, fullHeight } = this.state;
 
       this.svg = d3
@@ -145,7 +140,7 @@ export const Bar = withStyles(styles)(
         .attr("transform", `translate(${margin.left},${margin.top})`);
     }
 
-    private drawAxes(data: IBarData[]): void {
+    public drawAxes(data: IBarData[]): void {
       const { classes } = this.props;
       const { width, height, margin } = this.state;
 
@@ -193,7 +188,7 @@ export const Bar = withStyles(styles)(
         .style("text-anchor", "middle");
     }
 
-    private drawBars(data: IBarData[]): void {
+    public drawBars(data: IBarData[]): void {
       const { classes } = this.props;
       const { width, height } = this.state;
 

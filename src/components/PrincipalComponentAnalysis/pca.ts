@@ -6,7 +6,7 @@ import round from "lodash/round";
 import sum from "lodash/sum";
 import * as math from "mathjs";
 import numeric from "numeric";
-import { IEigenAnalysis, IEigens, IPCA } from "src/models/pca.model";
+import { IEigenAnalysis, IEigens, IPCA } from "src/models";
 
 try {
   math.import(numeric, { wrap: true, silent: true });
@@ -143,9 +143,14 @@ export class PCA implements IPCA {
     const summary: number = math.sum(eigenvalues);
 
     /**
+     * components (component names, PC1, PC2... PCn)
+     */
+    const components = map(eigenvalues, (_, i) => `PC${++i}`);
+
+    /**
      * components with eigenvalues higher than 1
      */
-    const importantComponents: number[] = [];
+    const importantComponents: string[] = [];
 
     /**
      * percentage of their variance
@@ -166,18 +171,13 @@ export class PCA implements IPCA {
          * and are not retained in the analysis.
          */
         if (eigenvalue >= 1) {
-          importantComponents.push(i);
+          importantComponents.push(components[i]);
           importantComponentsVariance += percentage;
         }
 
         return percentage;
       }
     );
-
-    /**
-     * amount of components with eigenvalues higher than 1
-     */
-    const amountOfImportantComponents = importantComponents.length;
 
     /**
      * total proportion of variance explained
@@ -225,7 +225,7 @@ export class PCA implements IPCA {
       totalProportion,
       importantComponents,
       importantComponentsVariance,
-      amountOfImportantComponents,
+      components,
       cumulative,
       differences
     };

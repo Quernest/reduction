@@ -1,4 +1,4 @@
-import { ISOMData } from "src/models/som.model";
+import { ISOMData } from "src/models";
 
 export const observations: string[] = [
   "AL",

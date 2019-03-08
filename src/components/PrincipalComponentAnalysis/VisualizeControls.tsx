@@ -13,7 +13,7 @@ import ThreeSixtyIcon from "@material-ui/icons/ThreeSixty";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
 import React, { ChangeEvent, MouseEvent } from "react";
-import { IEigenAnalysis } from "src/models/pca.model";
+import { IEigenAnalysis } from "src/models";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
@@ -35,18 +35,21 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
 interface IProps {
   visualized?: boolean;
   analysis: IEigenAnalysis;
-  components: {
+  selectedComponents: {
     x: number;
     y: number;
   };
-  onChangeSelectComponents: (newComponents: { x: number; y: number }) => void;
+  onChangeSelectedComponents: (newSelectedComponents: {
+    x: number;
+    y: number;
+  }) => void;
   onVisualize: () => void;
 }
 
 export const VisualizeControls = ({
-  analysis: { proportion },
-  components,
-  onChangeSelectComponents,
+  analysis: { proportion, components },
+  selectedComponents,
+  onChangeSelectedComponents,
   onVisualize,
   visualized
 }: IProps) => {
@@ -55,14 +58,14 @@ export const VisualizeControls = ({
   const onChangeSelect = (event: ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = event.target;
 
-    onChangeSelectComponents({ ...components, [name]: value });
+    onChangeSelectedComponents({ ...selectedComponents, [name]: value });
   };
 
   const onSwap = (event: MouseEvent<HTMLElement>) => {
-    const x: number = components.y;
-    const y: number = components.x;
+    const x: number = selectedComponents.y;
+    const y: number = selectedComponents.x;
 
-    onChangeSelectComponents({ x, y });
+    onChangeSelectedComponents({ x, y });
   };
 
   return (
@@ -71,9 +74,9 @@ export const VisualizeControls = ({
         <Grid container={true} spacing={16}>
           <Grid item={true} xs={6} sm={4} md={3} lg={2}>
             <FormControl fullWidth={true} className={classes.formControl}>
-              <InputLabel htmlFor="x">Component X</InputLabel>
+              <InputLabel htmlFor="x">Axis X</InputLabel>
               <Select
-                value={components.x}
+                value={selectedComponents.x}
                 onChange={onChangeSelect}
                 disabled={proportion.length === 2}
                 inputProps={{
@@ -84,9 +87,9 @@ export const VisualizeControls = ({
                 {map(
                   proportion,
                   (value: number, i: number) =>
-                    i !== components.y && (
+                    i !== selectedComponents.y && (
                       <MenuItem key={i} value={i}>
-                        PC{i + 1} ({value}%)
+                        {components[i]} ({value}%)
                       </MenuItem>
                     )
                 )}
@@ -95,9 +98,9 @@ export const VisualizeControls = ({
           </Grid>
           <Grid item={true} xs={6} sm={4} md={3} lg={2}>
             <FormControl fullWidth={true} className={classes.formControl}>
-              <InputLabel htmlFor="y">Component Y</InputLabel>
+              <InputLabel htmlFor="y">Axis Y</InputLabel>
               <Select
-                value={components.y}
+                value={selectedComponents.y}
                 onChange={onChangeSelect}
                 disabled={proportion.length === 2}
                 inputProps={{
@@ -108,9 +111,9 @@ export const VisualizeControls = ({
                 {map(
                   proportion,
                   (value: number, i: number) =>
-                    i !== components.x && (
+                    i !== selectedComponents.x && (
                       <MenuItem key={i} value={i}>
-                        PC{i + 1} ({value}%)
+                        {components[i]} ({value}%)
                       </MenuItem>
                     )
                 )}
