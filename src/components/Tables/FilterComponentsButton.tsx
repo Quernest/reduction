@@ -7,7 +7,7 @@ interface IProps {
   onToggle: (e: MouseEvent<HTMLElement>) => void;
 }
 
-export const FilterButton = ({ onToggle, ...restProps }: IProps) => {
+export const FilterComponentsButton = ({ onToggle, ...restProps }: IProps) => {
   return (
     <Tooltip
       title="Show only important columns"

@@ -18,6 +18,7 @@ import { Theme } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
+import includes from "lodash/includes";
 import isNumber from "lodash/isNumber";
 import map from "lodash/map";
 import round from "lodash/round";
@@ -25,7 +26,7 @@ import unzip from "lodash/unzip";
 import zipObject from "lodash/zipObject";
 import React, { useState } from "react";
 import { isLongNumber } from "src/utils";
-import { FilterButton } from "./";
+import { FilterComponentsButton } from "./";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
@@ -40,9 +41,9 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
 }));
 
 interface IProps {
-  title?: string;
   rows: Row[];
   columns: Column[];
+  title?: string;
   importantComponentsList?: string[];
 }
 
@@ -57,12 +58,11 @@ export const DXTable = ({
 
   function onFilterComponents() {
     if (importantComponentsList && importantComponentsList.length > 0) {
-      const currentColumnNames = columns.map(({ name }) => name);
-      const filteredCurrentColumnNames = currentColumnNames.filter(
-        name => !importantComponentsList.includes(name)
+      const columnNames = map(columns, ({ name }) => name).filter(
+        name => !includes(importantComponentsList, name)
       );
 
-      setHiddenColumnNames(filteredCurrentColumnNames);
+      setHiddenColumnNames(columnNames);
     }
   }
 
@@ -86,7 +86,7 @@ export const DXTable = ({
                   <div className={classes.toolbarContent}>
                     {title && <Typography variant="h6">{title}</Typography>}
                     {importantComponentsList && (
-                      <FilterButton onToggle={onFilterComponents} />
+                      <FilterComponentsButton onToggle={onFilterComponents} />
                     )}
                   </div>
                 )}
