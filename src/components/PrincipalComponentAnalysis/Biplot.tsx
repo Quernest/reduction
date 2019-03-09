@@ -145,41 +145,26 @@ export const Biplot = withStyles(styles)(
     protected gAxisRight: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
     public componentDidMount() {
-      const {
-        points,
-        eigenvectors,
-        variables,
-        xAxisLabel,
-        yAxisLabel
-      } = this.props;
-
       this.selectSVGElement();
       this.createDefs();
-      this.drawAxes(points, xAxisLabel, yAxisLabel);
-      this.drawPoints(points);
-      this.drawVectors(eigenvectors, variables);
+      this.drawAxes();
+      this.drawPoints();
+      this.drawVectors();
     }
 
     public componentDidUpdate(props: IProps) {
-      // redraw elements if axis changed
       if (
         this.props.xAxisLabel !== props.xAxisLabel ||
         this.props.yAxisLabel !== props.yAxisLabel
       ) {
-        const { xAxisLabel, yAxisLabel, points } = this.props;
-
-        // remove labels
         this.svg.select(`text#axis-x-label`).remove();
         this.svg.select(`text#axis-y-label`).remove();
-
-        // remove axes
         this.gAxisLeft.remove();
         this.gAxisTop.remove();
         this.gAxisRight.remove();
         this.gAxisBottom.remove();
 
-        // redraw axes
-        this.drawAxes(points, xAxisLabel, yAxisLabel);
+        this.drawAxes();
 
         // update zoom
         this.svg.call(
@@ -191,14 +176,25 @@ export const Biplot = withStyles(styles)(
       }
     }
 
-    public onZoom = () => {
-      const { eigenvectors, variables, points, classes } = this.props;
+    private onGetXScaleValue = (value: number): number => {
+      const { k } = this.state.transform;
+
+      return this.x(value * k);
+    };
+
+    private onGetYScaleValue = (value: number): number => {
+      const { k } = this.state.transform;
+
+      return this.y(value * k);
+    };
+
+    protected onZoom = () => {
+      const { classes } = this.props;
       const { transform } = d3.event;
 
       const newX = transform.rescaleX(this.x);
       const newY = transform.rescaleY(this.y);
 
-      // update state
       this.setState({
         transform
       });
@@ -206,11 +202,9 @@ export const Biplot = withStyles(styles)(
       // update view
       this.view.attr("transform", transform);
 
-      // update x axes
+      // update axes
       this.gAxisTop.call(this.axisTop.scale(newX));
       this.gAxisBottom.call(this.axisBottom.scale(newX));
-
-      // update y axes
       this.gAxisLeft.call(this.axisLeft.scale(newY));
       this.gAxisRight.call(this.axisRight.scale(newY));
 
@@ -219,23 +213,16 @@ export const Biplot = withStyles(styles)(
       this.view.selectAll(`text.${classes.variable}`).remove();
       this.view.selectAll(`circle.${classes.point}`).remove();
 
-      // redraw points
-      this.drawPoints(points);
-
-      // redraw vectors
-      this.drawVectors(eigenvectors, variables);
+      this.drawPoints();
+      this.drawVectors();
     };
 
-    public selectSVGElement(): void {
+    public selectSVGElement() {
       const { fullWidth, fullHeight, margin } = this.state;
 
       this.zoom = d3
         .zoom()
-        // zoom only with pressed shift key
-        // .filter(() => d3.event.shiftKey)
         .scaleExtent([1, 4])
-        // .translateExtent([[0, 0], [this.state.width, this.state.height]])
-        // .extent([[0, 0], [this.state.width, this.state.height]])
         .on("zoom", this.onZoom);
 
       this.svg = d3
@@ -246,22 +233,13 @@ export const Biplot = withStyles(styles)(
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-      /**
-       * append group with clip-path
-       */
       this.clip = this.svg.append("g").attr("clip-path", "url(#clip)");
-
-      /**
-       * append view
-       */
       this.view = this.clip.append("g").attr("pointer-events", "all");
     }
 
-    public createDefs(): void {
+    public createDefs() {
       const { width, height } = this.state;
       const defs = this.svg.append("defs");
-
-      // append markers for vectors
       const marker = defs
         .append("marker")
         .attr("id", "arrow")
@@ -275,7 +253,6 @@ export const Biplot = withStyles(styles)(
 
       marker.append("path").attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2");
 
-      // append clip-path
       defs
         .append("clipPath")
         .attr("id", "clip")
@@ -284,85 +261,55 @@ export const Biplot = withStyles(styles)(
         .attr("height", height);
     }
 
-    public drawAxes(
-      points: Points,
-      xAxisLabel: string,
-      yAxisLabel: string
-    ): void {
-      const { classes } = this.props;
+    public drawAxes = () => {
+      const {
+        classes,
+        points: [xPoints, yPoints]
+      } = this.props;
       const { width, height } = this.state;
-      const [xPoints, yPoints] = points;
 
-      /**
-       * max x axis value
-       */
-      const xMax: number = d3.max(xPoints) as number;
+      const xMax = d3.max(xPoints) || 0;
+      const yMax = d3.max(yPoints) || 0;
 
-      /**
-       * max y axis value
-       */
-      const yMax: number = d3.max(yPoints) as number;
-
-      // x scale
       this.x = d3
         .scaleLinear()
         .domain([-xMax, xMax])
         .rangeRound([0, width]);
-
-      // y scale
       this.y = d3
         .scaleLinear()
         .domain([yMax, -yMax])
         .rangeRound([0, height]);
-
-      // left axis
       this.axisLeft = d3.axisLeft(this.y);
-
-      // svg element of left axis
+      this.axisTop = d3.axisTop(this.x);
+      this.axisRight = d3.axisRight(this.y);
+      this.axisBottom = d3.axisBottom(this.x);
       this.gAxisLeft = this.svg
         .append("g")
         .attr("class", classes.axis)
         .attr("transform", `translate(0, 0)`)
         .call(this.axisLeft);
-
-      // top axis
-      this.axisTop = d3.axisTop(this.x);
-
-      // svg element of top axis
       this.gAxisTop = this.svg
         .append("g")
         .attr("class", classes.axis)
         .attr("transform", `translate(0, 0)`)
         .call(this.axisTop);
-
-      // right axis
-      this.axisRight = d3.axisRight(this.y);
-
-      // svg element of right axis
       this.gAxisRight = this.svg
         .append("g")
         .attr("class", classes.axis)
         .attr("transform", `translate(${width}, 0)`)
         .call(this.axisRight);
-
-      // bottom axis
-      this.axisBottom = d3.axisBottom(this.x);
-
-      // svg element of bottom axis
       this.gAxisBottom = this.svg
         .append("g")
         .attr("class", classes.axis)
         .attr("transform", `translate(0, ${height})`)
         .call(this.axisBottom);
+      this.drawAxesLabels();
+    };
 
-      this.drawAxesLabels(xAxisLabel, yAxisLabel);
-    }
-
-    private drawAxesLabels(xAxisLabel: string, yAxisLabel: string): void {
-      const { classes } = this.props;
+    private drawAxesLabels(): void {
+      const { classes, xAxisLabel, yAxisLabel } = this.props;
       const { width, height, margin } = this.state;
 
-      // bottom label
       this.svg
         .append("text")
         .attr("x", width / 2)
@@ -372,7 +319,6 @@ export const Biplot = withStyles(styles)(
         .attr("id", "axis-x-label")
         .text(xAxisLabel);
 
-      // left label
       this.svg
         .append("text")
         .attr("x", 0 - height / 2)
@@ -386,18 +332,12 @@ export const Biplot = withStyles(styles)(
 
     /**
      * draw points on 2d scatter
-     * @param points points for scatter plot
      */
-    public drawPoints(points: Points): void {
-      const { classes } = this.props;
-      const { k } = this.state.transform;
-
-      /**
-       * xPoints and yPoints always have same size
-       * so we can draw points in this way
-       * without transforming data to array of {x, y}
-       */
-      const [xPoints, yPoints] = points;
+    public drawPoints = () => {
+      const {
+        classes,
+        points: [xPoints, yPoints]
+      } = this.props;
 
       this.view
         .selectAll(`circle.${classes.point}`)
@@ -405,21 +345,20 @@ export const Biplot = withStyles(styles)(
         .enter()
         .append("circle")
         .attr("class", classes.point)
-        .attr("cx", (_: number, i: number): number => this.x(xPoints[i] * k))
-        .attr("cy", (_: number, i: number): number => this.y(yPoints[i] * k))
+        .attr("cx", (_, i) => this.onGetXScaleValue(xPoints[i]))
+        .attr("cy", (_, i) => this.onGetYScaleValue(yPoints[i]))
         .attr("r", 4);
-    }
+    };
 
     /**
-     * draw eigenvectors (component loadings)
-     * @param eigenvectors array of eigenvectors
-     * @param variables factor variables
+     * draw eigenvectors (loadings)
      */
-    public drawVectors(eigenvectors: Vectors, variables: string[]): void {
-      const { classes } = this.props;
-      const { k } = this.state.transform;
-      // the length of each points collection is equal
-      const [x1Points, y1Points, x2Points, y2Points] = eigenvectors;
+    public drawVectors = () => {
+      const {
+        classes,
+        variables,
+        eigenvectors: [x1Points, y1Points, x2Points, y2Points]
+      } = this.props;
 
       this.view
         .selectAll(`line.${classes.vector}`)
@@ -427,10 +366,10 @@ export const Biplot = withStyles(styles)(
         .enter()
         .append("line")
         .attr("class", classes.vector)
-        .attr("x1", (_: number, i: number): any => this.x(x1Points[i] * k))
-        .attr("y1", (_: number, i: number): any => this.y(y1Points[i] * k))
-        .attr("x2", (_: number, i: number): any => this.x(x2Points[i] * k))
-        .attr("y2", (_: number, i: number): any => this.y(y2Points[i] * k));
+        .attr("x1", (_, i) => this.onGetXScaleValue(x1Points[i]))
+        .attr("y1", (_, i) => this.onGetYScaleValue(y1Points[i]))
+        .attr("x2", (_, i) => this.onGetXScaleValue(x2Points[i]))
+        .attr("y2", (_, i) => this.onGetYScaleValue(y2Points[i]));
 
       this.view
         .selectAll(`text.${classes.variable}`)
@@ -438,33 +377,31 @@ export const Biplot = withStyles(styles)(
         .enter()
         .append("text")
         .attr("class", classes.variable)
-        .attr(
-          "transform",
-          (_: number, i: number): any => {
-            /**
-             * angle of current vector
-             */
-            const angle: number =
-              (Math.atan2(
-                this.y(y2Points[i] * k) - this.y(y1Points[i]),
-                this.x(x2Points[i] * k) - this.x(x1Points[i])
-              ) *
-                180) /
-              Math.PI;
+        .attr("transform", (_, i) => {
+          /**
+           * angle of current vector
+           */
+          const angle: number =
+            (Math.atan2(
+              this.onGetYScaleValue(y2Points[i]) -
+                this.onGetYScaleValue(y1Points[i]),
+              this.onGetXScaleValue(x2Points[i]) -
+                this.onGetXScaleValue(x1Points[i])
+            ) *
+              180) /
+            Math.PI;
 
-            /**
-             * distance from the end of arrow to the text (variable)
-             */
-            const dev: number = angle >= 0 ? 16 : -8;
+          /**
+           * distance from the end of arrow to the text (variable)
+           */
+          const dev: number = angle >= 0 ? 16 : -8;
 
-            // translate text position
-            return `translate(${this.x(x2Points[i] * k)},${this.y(
-              y2Points[i] * k
-            ) + dev})`;
-          }
-        )
-        .text((d: number, i: number): string => variables[i]);
-    }
+          return `translate(${this.onGetXScaleValue(
+            x2Points[i]
+          )},${this.onGetYScaleValue(y2Points[i]) + dev})`;
+        })
+        .text((_, i) => variables[i]);
+    };
 
     public render() {
       const { classes, title } = this.props;

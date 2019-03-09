@@ -74,3 +74,8 @@ export type Vectors = [
   // array of y2 values
   PointList
 ];
+
+export interface IBarData {
+  name: string;
+  value: number;
+}

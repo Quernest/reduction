@@ -1,10 +1,14 @@
-import { createStyles, Theme, withStyles } from "@material-ui/core/styles";
+import {
+  createStyles,
+  Theme,
+  withStyles,
+  WithStyles
+} from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
 import round from "lodash/round";
-import zipWith from "lodash/zipWith";
 import React, { Component } from "react";
-import { IChartState } from "src/models";
+import { IBarData, IChartState } from "src/models";
 
 const styles = ({ palette, spacing }: Theme) =>
   createStyles({
@@ -60,16 +64,11 @@ const styles = ({ palette, spacing }: Theme) =>
     }
   });
 
-interface IBarData {
-  component: string;
-  eigenvalue: number;
-}
-
-interface IProps {
+interface IProps extends WithStyles<typeof styles> {
   title?: string;
-  eigenvalues: number[];
-  variables: string[];
-  classes?: any;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
+  data: IBarData[];
 }
 
 export const Bar = withStyles(styles)(
@@ -106,28 +105,21 @@ export const Bar = withStyles(styles)(
       }
     };
 
+    private onScaleName = ({ name }: IBarData): number => {
+      return this.x(name) || 0;
+    };
+
+    private onScaleValue = ({ value }: IBarData): number => {
+      return this.y(value) || 0;
+    };
+
     public componentDidMount() {
-      const { eigenvalues, variables } = this.props;
-
-      /**
-       * formatted data which represents a collection of objects
-       * with provided keys and eigenvalues
-       */
-      const data = zipWith<string, number, IBarData>(
-        variables,
-        eigenvalues,
-        (component, eigenvalue) => ({
-          component,
-          eigenvalue
-        })
-      );
-
       this.selectSVGElement();
-      this.drawAxes(data);
-      this.drawBars(data);
+      this.drawAxes();
+      this.drawBars();
     }
 
-    public selectSVGElement(): void {
+    public selectSVGElement() {
       const { margin, fullWidth, fullHeight } = this.state;
 
       this.svg = d3
@@ -140,47 +132,40 @@ export const Bar = withStyles(styles)(
         .attr("transform", `translate(${margin.left},${margin.top})`);
     }
 
-    public drawAxes(data: IBarData[]): void {
-      const { classes } = this.props;
+    public drawAxes() {
+      const { classes, xAxisLabel, yAxisLabel, data } = this.props;
       const { width, height, margin } = this.state;
 
       this.x = d3
         .scaleBand()
         .range([0, width])
         .padding(0.25)
-        .domain(data.map((d: IBarData, i: number): any => `PC ${i + 1}`));
-
+        .domain(data.map(d => d.name));
       this.y = d3
         .scaleLinear()
         .range([height, 0])
-        .domain([0, d3.max(data, (d: IBarData): any => d.eigenvalue)]);
-
+        .domain([0, d3.max(data, d => d.value) || 0]);
       this.svg
         .append("g")
         .attr("class", classes.axis)
         .attr("transform", `translate(0, ${height})`)
         .call(d3.axisBottom(this.x));
-
       this.svg
         .append("g")
         .attr("class", classes.axis)
         .call(d3.axisLeft(this.y));
-
-      // y axis label
       this.svg
         .append("text")
-        .text("Variances")
+        .text(yAxisLabel || "Variances")
         .attr("transform", "rotate(-90)")
         .attr("x", 0 - height / 2)
         .attr("y", 0 - margin.left)
         .attr("dy", "1em")
         .attr("class", classes.axisLabel)
         .style("text-anchor", "middle");
-
-      // x axis label
       this.svg
         .append("text")
-        .text("Components")
+        .text(xAxisLabel || "Components")
         .attr("x", width / 2)
         .attr("y", height + margin.bottom)
         .attr("dy", "-0.5em")
@@ -188,40 +173,34 @@ export const Bar = withStyles(styles)(
         .style("text-anchor", "middle");
     }
 
-    public drawBars(data: IBarData[]): void {
-      const { classes } = this.props;
+    public drawBars = () => {
+      const { classes, data } = this.props;
       const { width, height } = this.state;
 
-      // draw bars based on data
       this.svg
         .selectAll(classes.bar)
         .data(data)
         .enter()
         .append("rect")
         .attr("class", classes.bar)
-        .attr("x", (d: IBarData, i: number): any => this.x(`PC ${i + 1}`))
+        .attr("x", this.onScaleName)
         .attr("width", this.x.bandwidth())
-        .attr("y", (d: IBarData): any => this.y(d.eigenvalue))
-        .attr("height", (d: IBarData) => height - this.y(d.eigenvalue));
+        .attr("y", this.onScaleValue)
+        .attr("height", d => height - this.onScaleValue(d));
 
-      /**
-       * the line based on the bar data
-       */
       const line: d3.Line<IBarData> = d3
         .line<IBarData>()
-        .x(
-          (d: IBarData, i: number): number => {
-            const x = this.x(`PC ${i + 1}`);
-            const bandWidth = this.x.bandwidth();
+        .x(d => {
+          const x = this.onScaleName(d);
+          const bandWidth = this.x.bandwidth();
 
-            if (x && bandWidth) {
-              return x + bandWidth / 2;
-            }
-
-            return 0;
+          if (x && bandWidth) {
+            return x + bandWidth / 2;
           }
-        )
-        .y((d: IBarData): number => this.y(d.eigenvalue))
+
+          return 0;
+        })
+        .y(this.onScaleValue)
         .curve(d3.curveMonotoneX);
 
       this.svg
@@ -233,14 +212,12 @@ export const Bar = withStyles(styles)(
         .attr("stroke-width", 2)
         .attr("stroke", "red");
 
-      // draw the path based on created line
       this.svg
         .append("path")
         .data([data])
         .attr("class", classes.line)
         .attr("d", line);
 
-      // add the scatterplot
       this.svg
         .selectAll(classes.dot)
         .data(data)
@@ -248,24 +225,21 @@ export const Bar = withStyles(styles)(
         .append("circle")
         .attr("class", classes.dot)
         .attr("r", 4)
-        .attr(
-          "cx",
-          (d: IBarData, i: number): number => {
-            const x = this.x(`PC ${i + 1}`);
-            const bandWidth = this.x.bandwidth();
+        .attr("cx", d => {
+          const x = this.onScaleName(d);
+          const bandWidth = this.x.bandwidth();
 
-            if (x && bandWidth) {
-              return x + bandWidth / 2;
-            }
-
-            return 0;
+          if (x && bandWidth) {
+            return x + bandWidth / 2;
           }
-        )
-        .attr("cy", (d: IBarData): number => this.y(d.eigenvalue));
+
+          return 0;
+        })
+        .attr("cy", this.onScaleValue);
 
       /**
        * create the text labels at the top of each bar
-       * the label is current component eigen value
+       * the label is current component eigenvalue
        */
       this.svg
         .selectAll(classes.label)
@@ -274,24 +248,21 @@ export const Bar = withStyles(styles)(
         .append("text")
         .attr("dy", "0.65em")
         .attr("class", classes.label)
-        .attr(
-          "x",
-          (d: IBarData, i: number): number => {
-            const x = this.x(`PC ${i + 1}`);
-            const bandWidth = this.x.bandwidth();
+        .attr("x", d => {
+          const x = this.onScaleName(d);
+          const bandWidth = this.x.bandwidth();
 
-            if (x && bandWidth) {
-              return x + bandWidth / 2;
-            }
-
-            return 0;
+          if (x && bandWidth) {
+            return x + bandWidth / 2;
           }
-        )
-        .attr("y", (d: IBarData): number => this.y(d.eigenvalue) - 16)
-        .text((d: IBarData): string => `${round(d.eigenvalue, 2)}`);
-    }
 
-    public render(): React.ReactNode {
+          return 0;
+        })
+        .attr("y", d => this.onScaleValue(d) - 16)
+        .text(d => `${round(d.value, 2)}`);
+    };
+
+    public render() {
       const { classes, title } = this.props;
       const { fullWidth, fullHeight } = this.state;
 
