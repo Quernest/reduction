@@ -9,120 +9,163 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import { Theme } from "@material-ui/core/styles";
+import {
+  createStyles,
+  Theme,
+  WithStyles,
+  withStyles
+} from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import DashboardIcon from "@material-ui/icons/Dashboard";
-import HomeIcon from "@material-ui/icons/Home";
 import MenuIcon from "@material-ui/icons/Menu";
-import TimeLineIcon from "@material-ui/icons/Timeline";
-import { makeStyles } from "@material-ui/styles";
-import React from "react";
-import { redirectTo } from "src/utils";
+import React, { Component } from "react";
+import { Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
+import compose from "recompose/compose";
+import { IRoute } from "src/router";
 
-const useStyles = makeStyles(({ breakpoints }: Theme) => ({
-  root: {
-    flexGrow: 1
-  },
-  grow: {
-    flexGrow: 1
-  },
-  wrap: {
-    width: "100%",
-    maxWidth: breakpoints.values.lg,
-    marginLeft: "auto",
-    marginRight: "auto"
-  },
-  menuButton: {
-    marginLeft: -12,
-    marginRight: 20
-  },
-  list: {
-    width: 250
-  }
-}));
-
-export const Header = () => {
-  const classes = useStyles();
-
-  const [state, setState] = React.useState({
-    isOpenDrawer: false
+const styles = ({ breakpoints }: Theme) =>
+  createStyles({
+    root: {
+      flexGrow: 1
+    },
+    grow: {
+      flexGrow: 1
+    },
+    wrap: {
+      width: "100%",
+      maxWidth: breakpoints.values.lg,
+      marginLeft: "auto",
+      marginRight: "auto"
+    },
+    menuButton: {
+      marginLeft: -12,
+      marginRight: 20
+    },
+    list: {
+      width: 250
+    }
   });
 
-  const toggleDrawer = (open: boolean) => () => {
-    setState({ ...state, isOpenDrawer: open });
+interface IProps extends WithStyles<typeof styles> {
+  routes: IRoute[];
+  location: Location;
+}
+
+interface IState {
+  isOpenDrawer: boolean;
+}
+
+class HeaderComponent extends Component<IProps, IState> {
+  public readonly state = {
+    isOpenDrawer: false
   };
 
-  return (
-    <header className={classes.root}>
-      <AppBar position="static">
-        <Toolbar>
-          <div className={classes.wrap}>
-            <Grid container={true} alignItems="center">
-              <Hidden mdUp={true}>
-                <IconButton
-                  onClick={toggleDrawer(true)}
-                  className={classes.menuButton}
-                  color="inherit"
-                  aria-label="Menu"
-                >
-                  <MenuIcon />
-                </IconButton>
-              </Hidden>
-              <Typography variant="h6" color="inherit" className={classes.grow}>
-                Reduction
-              </Typography>
-              <Hidden smDown={true}>
-                <Button {...redirectTo("/")} variant="text" color="inherit">
-                  Home
-                </Button>
-                <Button {...redirectTo("/pca")} variant="text" color="inherit">
-                  PCA
-                </Button>
-                <Button {...redirectTo("/som")} variant="text" color="inherit">
-                  SOM
-                </Button>
-              </Hidden>
-            </Grid>
-          </div>
-        </Toolbar>
-      </AppBar>
-      <Hidden mdUp={true}>
-        <Drawer open={state.isOpenDrawer} onClose={toggleDrawer(false)}>
-          <div
-            tabIndex={0}
-            role="button"
-            onClick={toggleDrawer(false)}
-            onKeyDown={toggleDrawer(false)}
+  protected toggleDrawer = (isOpenDrawer: boolean) => () => {
+    this.setState({
+      isOpenDrawer
+    });
+  };
+
+  public render(): JSX.Element {
+    const { classes, location, routes } = this.props;
+    const { isOpenDrawer } = this.state;
+
+    const links = routes.map(({ path, title }, i) => {
+      if (path && title) {
+        return (
+          <Button
+            key={i}
+            {...{
+              component: Link,
+              to: path,
+              replace: path === location.pathname
+            } as any}
+            variant="text"
+            color="inherit"
           >
-            {
+            {title || ""}
+          </Button>
+        );
+      }
+
+      return null;
+    });
+
+    const drawerLinks = routes.map(({ path, title, icon }, i) => {
+      if (path && title && icon) {
+        const Icon = icon;
+
+        return (
+          <ListItem
+            key={i}
+            {...{
+              component: Link,
+              to: path,
+              replace: path === location.pathname
+            } as any}
+            button={true}
+          >
+            <ListItemIcon>
+              <Icon />
+            </ListItemIcon>
+            <ListItemText primary={title} />
+          </ListItem>
+        );
+      }
+
+      return null;
+    });
+
+    return (
+      <header className={classes.root}>
+        <AppBar position="static">
+          <Toolbar>
+            <div className={classes.wrap}>
+              <Grid container={true} alignItems="center">
+                <Hidden mdUp={true}>
+                  <IconButton
+                    onClick={this.toggleDrawer(true)}
+                    className={classes.menuButton}
+                    color="inherit"
+                    aria-label="Menu"
+                  >
+                    <MenuIcon />
+                  </IconButton>
+                </Hidden>
+                <Typography
+                  variant="h6"
+                  color="inherit"
+                  className={classes.grow}
+                >
+                  Reduction
+                </Typography>
+                <Hidden smDown={true}>{links}</Hidden>
+              </Grid>
+            </div>
+          </Toolbar>
+        </AppBar>
+        <Hidden mdUp={true}>
+          <Drawer open={isOpenDrawer} onClose={this.toggleDrawer(false)}>
+            <div
+              tabIndex={0}
+              role="button"
+              onClick={this.toggleDrawer(false)}
+              onKeyDown={this.toggleDrawer(false)}
+            >
               <div className={classes.list}>
-                <List>
-                  <ListItem {...redirectTo("/")} button={true}>
-                    <ListItemIcon>
-                      <HomeIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Home" />
-                  </ListItem>
-                  <ListItem {...redirectTo("/pca")} button={true}>
-                    <ListItemIcon>
-                      <TimeLineIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="PCA" />
-                  </ListItem>
-                  <ListItem {...redirectTo("/som")} button={true}>
-                    <ListItemIcon>
-                      <DashboardIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="SOM" />
-                  </ListItem>
-                </List>
+                <List>{drawerLinks}</List>
                 <Divider />
               </div>
-            }
-          </div>
-        </Drawer>
-      </Hidden>
-    </header>
-  );
-};
+            </div>
+          </Drawer>
+        </Hidden>
+      </header>
+    );
+  }
+}
+
+export const Header = compose<IProps, any>(
+  withRouter,
+  withStyles(styles)
+)(HeaderComponent);

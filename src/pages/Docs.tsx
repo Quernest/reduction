@@ -19,19 +19,13 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   }
 }));
 
-interface IProps {
-  location: Location;
-}
-
-export const NoMatch = ({ location }: IProps): JSX.Element => {
+export const Docs = (): JSX.Element => {
   const classes = useStyles();
 
   return (
     <div className={classes.root}>
       <div className={classes.wrap}>
-        <Typography variant="headline" color="textSecondary">
-          404. No match found for <code>{location.pathname}</code>
-        </Typography>
+        <Typography variant="body1">In development</Typography>
       </div>
     </div>
   );

@@ -7,9 +7,9 @@ const ctx: Worker = self as any;
 ctx.addEventListener(
   "message",
   (event: MessageEvent) => {
-    const { values, variables }: IParsedCSV = event.data;
+    const { values }: IParsedCSV = event.data;
 
-    const pca: IPCA = new PCA(values, variables);
+    const pca: IPCA = new PCA(values);
 
     const {
       dataset,

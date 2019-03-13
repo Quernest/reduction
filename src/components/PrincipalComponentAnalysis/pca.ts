@@ -26,7 +26,7 @@ export class PCA implements IPCA {
   public readonly linearCombinations: number[][];
   public readonly analysis: IEigenAnalysis;
 
-  public constructor(dataset: number[][], variables: string[]) {
+  public constructor(dataset: number[][]) {
     // copy the dataset
     this.dataset = dataset;
 

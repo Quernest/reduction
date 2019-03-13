@@ -1,5 +1,4 @@
 import Divider from "@material-ui/core/Divider";
-import Link from "@material-ui/core/Link";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -69,18 +68,6 @@ export const Info = (): JSX.Element => {
           </ListItemText>
         </ListItem>
       </List>
-      <Divider className={classes.divider} />
-      <Typography variant="body1" paragraph={true}>
-        Download one of the{" "}
-        <Link
-          href="https://www.dropbox.com/sh/9r60z7yu8u61bo9/AACv3-4qRYQy0dibBrBvNscGa?dl=0"
-          variant="inherit"
-          color="primary"
-        >
-          example datasets
-        </Link>{" "}
-        and try it now
-      </Typography>
       <Divider className={classes.divider} />
     </div>
   );
