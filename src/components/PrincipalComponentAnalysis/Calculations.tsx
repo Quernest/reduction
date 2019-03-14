@@ -6,8 +6,7 @@ import includes from "lodash/includes";
 import unzip from "lodash/unzip";
 import React, { useMemo } from "react";
 import { DXTable, generateColumns, generateRows } from "src/components";
-import { IPCACalculations } from "src/models";
-import { IParsedCSV } from "src/utils";
+import { IParsedCSV, IPCACalculations } from "src/models";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {

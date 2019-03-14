@@ -15,8 +15,7 @@ import {
   UploadControls,
   VisualizeControls
 } from "src/components";
-import { IPCACalculations } from "src/models";
-import { IParsedCSV } from "src/utils";
+import { IParsedCSV, IPCACalculations } from "src/models";
 import CalculateWorker from "worker-loader!src/components/PrincipalComponentAnalysis/calculate.worker";
 import UploadWorker from "worker-loader!src/components/PrincipalComponentAnalysis/upload.worker";
 

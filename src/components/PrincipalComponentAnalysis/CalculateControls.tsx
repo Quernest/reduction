@@ -6,7 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import React, { useMemo } from "react";
 import { DXTable, generateColumns, generateRows } from "src/components";
-import { IParsedCSV } from "src/utils";
+import { IParsedCSV } from "src/models";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {

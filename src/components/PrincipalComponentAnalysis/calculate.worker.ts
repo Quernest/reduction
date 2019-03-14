@@ -1,5 +1,4 @@
-import { IPCA, IPCACalculations } from "src/models";
-import { IParsedCSV } from 'src/utils';
+import { IParsedCSV, IPCA, IPCACalculations } from "src/models";
 import { PCA } from "./pca";
 
 const ctx: Worker = self as any;

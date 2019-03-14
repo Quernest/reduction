@@ -1,4 +1,4 @@
 import map from "lodash/map";
 
-export const getColumn = (arr: number[][], n: number) =>
-  map(arr, (x: number[]) => x[n]);
+export const getColumn = <T>(arr: number[][], n: number): T[] =>
+  map<any, T>(arr, x => x[n]);
