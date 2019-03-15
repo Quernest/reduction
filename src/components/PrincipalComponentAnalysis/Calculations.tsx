@@ -3,6 +3,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import filter from "lodash/filter";
 import includes from "lodash/includes";
+import round from "lodash/round";
 import unzip from "lodash/unzip";
 import React, { useMemo } from "react";
 import { DXTable, generateColumns, generateRows } from "src/components";
@@ -55,36 +56,6 @@ export const Calculations = ({
     linearCombinations
   } = calculations;
   const { tailedVariables, variables, observations, values } = parsedFile;
-  // const [onlyImportantComponents, showImportantComponents] = useState<boolean>(
-  //   false
-  // );
-
-  // function toggleImportantComponents() {
-  //   showImportantComponents(!onlyImportantComponents);
-  // }
-
-  // function tableFilter(
-  //   components: number[] = [],
-  //   arr: any[] = [],
-  //   hasFirstColumn?: boolean
-  // ) {
-  //   if (!components || components.length === 0) {
-  //     return arr;
-  //   }
-
-  //   const offset = hasFirstColumn ? 1 : 0;
-  //   const filtered = [];
-
-  //   if (hasFirstColumn) {
-  //     filtered.push(arr[0]);
-  //   }
-
-  //   components.forEach(component => {
-  //     filtered.push(arr[component + offset]);
-  //   });
-
-  //   return filtered;
-  // }
 
   const DatasetTable = useMemo(() => {
     const columns = generateColumns(variables);
@@ -145,13 +116,14 @@ export const Calculations = ({
           </Typography>
           <Typography variant="body1" gutterBottom={true}>
             All <strong>{tailedVariables.length}</strong> components explain{" "}
-            <strong>{totalProportion}%</strong> variation of the data
+            <strong>{round(totalProportion, 1)}%</strong> variation of the data
           </Typography>
           <Typography variant="body1" gutterBottom={true}>
             <strong>{importantComponents.length}</strong> component
             {importantComponents.length > 1 ? "s" : ""} have eigenvalue
             {importantComponents.length > 1 ? "s" : ""} above 1 and explain{" "}
-            <strong>{importantComponentsVariance}%</strong> of variation.
+            <strong>{round(importantComponentsVariance, 1)}%</strong> of
+            variation.
           </Typography>
         </div>
       </div>
@@ -187,6 +159,7 @@ export const Calculations = ({
           importantComponentsList={importantComponentsList}
           rows={rows}
           columns={columns}
+          intervalFilter={true}
         />
       </div>
     );

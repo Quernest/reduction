@@ -26,17 +26,25 @@ import unzip from "lodash/unzip";
 import zipObject from "lodash/zipObject";
 import React, { useState } from "react";
 import { isLongNumber } from "src/utils";
-import { FilterComponentsButton } from "./";
+import { Cell, FilterComponentsButton, IntervalInput } from "./";
 
-const useStyles = makeStyles(({ spacing }: Theme) => ({
+const useStyles = makeStyles(({ spacing, breakpoints }: Theme) => ({
   root: {
     flexGrow: 1
   },
   toolbarContent: {
     display: "flex",
-    justifyContent: "space-between",
     alignItems: "center",
     flexGrow: 1
+  },
+  title: {
+    marginRight: "auto",
+    [breakpoints.down("sm")]: {
+      fontSize: 14
+    },
+    [breakpoints.down("md")]: {
+      fontSize: 16
+    }
   }
 }));
 
@@ -45,16 +53,19 @@ interface IProps {
   columns: Column[];
   title?: string;
   importantComponentsList?: string[];
+  intervalFilter?: boolean;
 }
 
 export const DXTable = ({
   title,
   rows,
   columns,
-  importantComponentsList
+  importantComponentsList,
+  intervalFilter
 }: IProps): JSX.Element => {
   const classes = useStyles();
   const [hiddenColumnNames, setHiddenColumnNames] = useState<string[]>([]);
+  const [interval, setInterval] = useState<number>(0);
 
   function onFilterComponents() {
     if (importantComponentsList && importantComponentsList.length > 0) {
@@ -62,9 +73,23 @@ export const DXTable = ({
         name => !includes(importantComponentsList, name)
       );
 
-      setHiddenColumnNames(columnNames);
+      if (hiddenColumnNames.length === 0) {
+        setHiddenColumnNames(columnNames);
+      } else {
+        setHiddenColumnNames([]);
+      }
     }
   }
+
+  function onChangeInterval({
+    target: { value }
+  }: React.ChangeEvent<HTMLInputElement>) {
+    setInterval(Number(value));
+  }
+
+  const CellComponent = (props: Table.DataCellProps) => (
+    <Cell interval={interval} {...props} />
+  );
 
   return (
     <div className={classes.root}>
@@ -72,7 +97,7 @@ export const DXTable = ({
         <Grid rows={rows} columns={columns}>
           <PagingState defaultCurrentPage={0} defaultPageSize={5} />
           <IntegratedPaging />
-          <Table />
+          <Table {...intervalFilter && { cellComponent: CellComponent }} />
           <TableHeaderRow />
           <TableColumnVisibility
             hiddenColumnNames={hiddenColumnNames}
@@ -84,7 +109,17 @@ export const DXTable = ({
               <TemplateConnector>
                 {({}) => (
                   <div className={classes.toolbarContent}>
-                    {title && <Typography variant="h6">{title}</Typography>}
+                    {title && (
+                      <Typography className={classes.title} variant="h6">
+                        {title}
+                      </Typography>
+                    )}
+                    {intervalFilter && (
+                      <IntervalInput
+                        onChange={onChangeInterval}
+                        interval={interval}
+                      />
+                    )}
                     {importantComponentsList && (
                       <FilterComponentsButton onToggle={onFilterComponents} />
                     )}

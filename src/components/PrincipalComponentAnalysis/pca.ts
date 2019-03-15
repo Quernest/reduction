@@ -182,7 +182,7 @@ export class PCA implements IPCA {
     /**
      * total proportion of variance explained
      */
-    const totalProportion: number = round(math.sum(proportion), 1);
+    const totalProportion: number = math.sum(proportion);
 
     /**
      * Cumulative proportion of variance explained
