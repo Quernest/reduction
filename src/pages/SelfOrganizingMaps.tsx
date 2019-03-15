@@ -12,10 +12,15 @@ import round from "lodash/round";
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import compose from "recompose/compose";
-import { HexagonalGrid, SOMControls } from "src/components";
-import { gspData } from "src/data";
-import { IHexagonalGridDimensions, ISOMData, ISOMOptions } from "src/models";
+import {
+  ErrorMessage,
+  HexagonalGrid,
+  SOMControls,
+  UploadControls
+} from "src/components";
+import { IHexagonalGridDimensions, IParsedCSV, ISOMOptions } from "src/models";
 import CalculateWorker from "worker-loader!src/components/SelfOrganizingMaps/calculate.worker";
+import UploadWorker from "worker-loader!src/components/SelfOrganizingMaps/upload.worker";
 
 const styles = ({ spacing, breakpoints }: Theme) =>
   createStyles({
@@ -51,6 +56,8 @@ const styles = ({ spacing, breakpoints }: Theme) =>
 interface IProps extends WithStyles<typeof styles> {}
 
 interface IState {
+  file: File | undefined;
+  parsedFile: IParsedCSV;
   uploading: boolean;
   uploaded: boolean;
   calculating: boolean;
@@ -60,23 +67,25 @@ interface IState {
   neurons: Neuron[];
   topographicError: number;
   quantizationError: number;
-  data: ISOMData;
   positions: Array<[number, number]>;
   umatrix: number[];
   currentVariableIndex: number;
+  error?: string;
 }
 
 class SelfOrganizingMapsPage extends Component<IProps, IState> {
   protected calculateWorker: Worker;
+  protected uploadWorker: Worker;
 
   public readonly state: IState = {
+    file: undefined,
     uploading: false,
     uploaded: false,
     calculating: false,
     calculated: false,
     dimensions: {
-      columns: 16,
-      rows: 8
+      columns: 32,
+      rows: 16
     },
     options: {
       maxStep: 100,
@@ -93,11 +102,17 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     /**
      * uploaded and parsed dataset
      */
-    data: gspData,
+    parsedFile: {
+      observations: [],
+      variables: [],
+      tailedVariables: [],
+      values: []
+    },
     /**
      * is equal index of variable in variables array
      */
-    currentVariableIndex: 0
+    currentVariableIndex: 0,
+    error: undefined
   };
 
   public componentDidMount() {
@@ -109,6 +124,12 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
   }
 
   protected initWorkers() {
+    this.uploadWorker = new UploadWorker();
+    this.uploadWorker.addEventListener(
+      "message",
+      this.onGetUploadWorkerMessage,
+      false
+    );
     this.calculateWorker = new CalculateWorker();
     this.calculateWorker.addEventListener(
       "message",
@@ -118,6 +139,12 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
   }
 
   protected destroyWorkers() {
+    this.uploadWorker.terminate();
+    this.uploadWorker.removeEventListener(
+      "message",
+      this.onGetUploadWorkerMessage,
+      false
+    );
     this.calculateWorker.terminate();
     this.calculateWorker.removeEventListener(
       "message",
@@ -131,7 +158,11 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     newOptions: ISOMOptions
   ) => {
     this.setState({ dimensions: newDimensions, options: newOptions });
-    this.startCalculating(this.state.data.values, newDimensions, newOptions);
+    this.startCalculating(
+      this.state.parsedFile.values,
+      newDimensions,
+      newOptions
+    );
   };
 
   protected onGetCalculateWorkerMessage = ({
@@ -147,6 +178,54 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
       calculated: true
     });
   };
+
+  protected onGetUploadWorkerMessage = ({
+    data: { error, parsedFile }
+  }: MessageEvent) => {
+    if (error) {
+      this.setState({
+        error,
+        uploaded: false,
+        uploading: false
+      });
+    } else {
+      this.clearErrors();
+      this.setState({
+        parsedFile,
+        uploaded: true,
+        uploading: false
+      });
+    }
+  };
+
+  protected onChangeFile = (chosenFile?: File, error?: string): void => {
+    if (error) {
+      this.setState({
+        error
+      });
+    } else {
+      this.clearErrors();
+      this.setState({
+        file: chosenFile
+      });
+    }
+  };
+
+  protected onUploadFile = (): void => {
+    const { file } = this.state;
+
+    this.setState({ uploading: true });
+    this.uploadWorker.postMessage(file);
+  };
+
+  protected onCancelFile = (): void => {
+    this.clearErrors();
+    this.setState({
+      file: undefined
+    });
+  };
+
+  private clearErrors = () => this.setState({ error: undefined });
 
   /**
    * change variable index handler
@@ -169,6 +248,8 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
   public render(): JSX.Element {
     const { classes } = this.props;
     const {
+      uploaded,
+      uploading,
       calculating,
       calculated,
       dimensions,
@@ -176,10 +257,12 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
       neurons,
       umatrix,
       positions,
-      data: { observations, variables },
+      parsedFile: { observations, tailedVariables },
       currentVariableIndex,
       quantizationError,
-      topographicError
+      topographicError,
+      error,
+      file
     } = this.state;
 
     return (
@@ -189,15 +272,17 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
             Self-Organizing Maps
           </Typography>
           <Divider className={classes.divider} />
-          <SOMControls
-            options={options}
-            dimensions={dimensions}
-            onSubmit={this.onControlsSubmit}
-            onChangeVariable={this.onChangeVariable}
-            currentVariableIndex={currentVariableIndex}
-            variables={variables}
-            loading={calculating}
-          />
+          {uploaded && (
+            <SOMControls
+              options={options}
+              dimensions={dimensions}
+              onSubmit={this.onControlsSubmit}
+              onChangeVariable={this.onChangeVariable}
+              currentVariableIndex={currentVariableIndex}
+              variables={tailedVariables}
+              loading={calculating}
+            />
+          )}
           {calculated && (
             <div className={classes.maps}>
               <div className={classes.errors}>
@@ -224,7 +309,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
                 currentVariableIndex={currentVariableIndex}
                 positions={positions}
                 observations={observations}
-                variables={variables}
+                variables={tailedVariables}
               />
               <HexagonalGrid
                 title="U-matrix"
@@ -234,6 +319,18 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
               />
             </div>
           )}
+          {!uploaded && !calculated && (
+            <>
+              <UploadControls
+                file={file}
+                onUpload={this.onUploadFile}
+                onChange={this.onChangeFile}
+                onCancel={this.onCancelFile}
+                uploading={uploading}
+              />
+            </>
+          )}
+          {error && <ErrorMessage text={error} />}
         </div>
       </div>
     );

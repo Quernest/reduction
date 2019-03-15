@@ -2,7 +2,6 @@ export * from "./Bar";
 export * from "./Biplot";
 export * from "./pca";
 export * from "./Calculations";
-export * from "./UploadControls";
 export * from "./CalculateControls";
 export * from "./VisualizeControls";
 export * from "./Charts";

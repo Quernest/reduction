@@ -3,3 +3,4 @@ export * from "./PrincipalComponentAnalysis";
 export * from "./SelfOrganizingMaps";
 export * from "./Errors";
 export * from "./Tables";
+export * from "./Controls";
