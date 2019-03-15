@@ -1,6 +1,6 @@
 # Reduction
 
-> web application for using and testing dimensionaliy reduction algorithms
+> web application for using and testing dimensionality reduction algorithms
 
 ### There are plans to realise next algorithms:
 
