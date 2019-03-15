@@ -26,8 +26,16 @@ ctx.addEventListener("message", (event: MessageEvent) => {
 
       try {
         /**
-         * data validation
+         * data validations
          */
+        const instance = head<any[]>(data);
+
+        if (instance && instance.length < 3) {
+          throw new Error(
+            "the dataset must contain observations column and more than 2 variables"
+          );
+        }
+
         forEach(data, (row: Array<string | number>, rowIndex) => {
           forEach(row, (cell, cellIndex) => {
             /**
@@ -56,6 +64,18 @@ ctx.addEventListener("message", (event: MessageEvent) => {
                 `the dataset has "string" value in (${++rowIndex} row, ${++cellIndex} cell). It must be a number.`
               );
             }
+
+            /**
+             * check observation names
+             */
+            if (cellIndex === 0 && !isString(cell)) {
+              throw new Error(
+                `no observation names or they are wrong.
+                Make sure that all names and meanings of observations are completed.
+                The names of the observers must be only strings.
+                `
+              );
+            }
           });
         });
 
@@ -70,12 +90,7 @@ ctx.addEventListener("message", (event: MessageEvent) => {
         const observations = getColumn<string>(tailedData, 0);
 
         if (!observations || observations.length === 0) {
-          throw new Error(
-            `no observation names.
-          Make sure that all names and meanings of observations are completed.
-          The names of the observers must be only strings.
-          `
-          );
+          throw new Error(`observations are empty`);
         } else {
           parsedFile.observations = observations;
         }
@@ -90,8 +105,8 @@ ctx.addEventListener("message", (event: MessageEvent) => {
          */
         let tailedVariables: string[] = [];
 
-        if (!variables || variables.length < 2) {
-          throw new Error("the dataset must contain more than 2 variables");
+        if (!variables || variables.length === 0) {
+          throw new Error("variables are empty");
         } else {
           tailedVariables = tail(variables);
           parsedFile.variables = variables;
@@ -104,7 +119,7 @@ ctx.addEventListener("message", (event: MessageEvent) => {
         const values = map(tailedData, d => tail<number>(d));
 
         if (!values || values.length === 0) {
-          throw new Error(`the dataset must contain values`);
+          throw new Error(`the dataset values are empty`);
         } else {
           parsedFile.values = values;
         }
