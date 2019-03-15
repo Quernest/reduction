@@ -10,7 +10,7 @@ import round from "lodash/round";
 import React, { Component } from "react";
 import { IBarData, IChartState } from "src/models";
 
-const styles = ({ palette, spacing }: Theme) =>
+const styles = ({ palette, spacing, typography }: Theme) =>
   createStyles({
     root: {
       width: "100%"
@@ -33,19 +33,19 @@ const styles = ({ palette, spacing }: Theme) =>
       height: "100%"
     },
     axis: {
-      fontSize: 16,
-      fontFamily: "Roboto, sans-serif"
+      fontSize: typography.fontSize,
+      fontFamily: typography.fontFamily
     },
     axisLabel: {
-      fontSize: 16,
-      fontFamily: "Roboto, sans-serif"
+      fontSize: typography.fontSize,
+      fontFamily: typography.fontFamily
     },
     bar: {
       fill: palette.primary.main
     },
     barValue: {
-      fontSize: 16,
-      fontFamily: "Roboto, sans-serif"
+      fontSize: typography.fontSize,
+      fontFamily: typography.fontFamily
     },
     line: {
       fill: "none",
@@ -59,8 +59,8 @@ const styles = ({ palette, spacing }: Theme) =>
     },
     label: {
       textAnchor: "start",
-      fontSize: 16,
-      fontFamily: "Roboto, sans-serif"
+      fontSize: typography.fontSize,
+      fontFamily: typography.fontFamily
     }
   });
 

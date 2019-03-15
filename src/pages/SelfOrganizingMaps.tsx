@@ -268,7 +268,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     return (
       <div className={classes.root}>
         <div className={classes.wrap}>
-          <Typography variant="h5" paragraph={true}>
+          <Typography variant="h5" gutterBottom={true}>
             Self-Organizing Maps
           </Typography>
           <Divider className={classes.divider} />

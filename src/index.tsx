@@ -12,7 +12,9 @@ import { AppRouter } from "./router";
 
 const theme = createMuiTheme({
   typography: {
-    useNextVariants: true
+    useNextVariants: true,
+    // use the system font instead of the default Roboto font.
+    fontFamily: ["K2D", "sans-serif"].join(",")
   }
 });
 

@@ -30,7 +30,7 @@ export const Home = () => {
       <div className={classes.wrap}>
         <Grid container={true} alignItems="flex-start" spacing={24}>
           <Grid item={true} xs={12} md={6}>
-            <Typography variant="h5" paragraph={true}>
+            <Typography variant="h5" gutterBottom={true}>
               Principal Component Analysis
             </Typography>
             <Typography variant="body1" paragraph={true}>
@@ -45,7 +45,7 @@ export const Home = () => {
             </Button>
           </Grid>
           <Grid item={true} xs={12} md={6}>
-            <Typography variant="h5" paragraph={true}>
+            <Typography variant="h5" gutterBottom={true}>
               Self-Organizing Map
             </Typography>
             <Typography variant="body1" paragraph={true}>

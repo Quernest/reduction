@@ -5,14 +5,13 @@ import * as d3 from "d3";
 import React from "react";
 import { IChartState, Points, Vectors } from "src/models";
 
-const styles = ({ spacing }: Theme) =>
+const styles = ({ spacing, typography }: Theme) =>
   createStyles({
     root: {
       width: "100%"
     },
     title: {
-      marginTop: spacing.unit * 2,
-      marginBottom: spacing.unit
+      marginTop: spacing.unit * 2
     },
     svgContainer: {
       position: "relative",
@@ -28,17 +27,17 @@ const styles = ({ spacing }: Theme) =>
       height: "100%"
     },
     axis: {
-      fontSize: 16,
-      fontFamily: "Roboto, sans-serif"
+      fontSize: typography.fontSize,
+      fontFamily: typography.fontFamily
     },
     axisLabel: {
-      fontSize: 16,
-      fontFamily: "Roboto, sans-serif",
+      fontSize: typography.fontSize,
+      fontFamily: typography.fontFamily,
       textAnchor: "middle"
     },
     variable: {
-      fontSize: 16,
-      fontFamily: "Roboto, sans-serif",
+      fontSize: typography.fontSize,
+      fontFamily: typography.fontFamily,
       textAnchor: "middle"
     },
     vector: {
@@ -52,6 +51,7 @@ const styles = ({ spacing }: Theme) =>
   });
 
 interface IProps {
+  theme: Theme;
   title?: string;
   points: Points;
   eigenvectors: Vectors;
@@ -72,7 +72,7 @@ interface IState {
 /**
  * Biplot of score variables
  */
-export const Biplot = withStyles(styles)(
+export const Biplot = withStyles(styles, { withTheme: true })(
   class extends React.Component<IProps, IChartState & IState> {
     public static readonly defaultProps = {
       xAxisLabel: "x",
@@ -357,7 +357,8 @@ export const Biplot = withStyles(styles)(
       const {
         classes,
         variables,
-        eigenvectors: [x1Points, y1Points, x2Points, y2Points]
+        eigenvectors: [x1Points, y1Points, x2Points, y2Points],
+        theme
       } = this.props;
 
       this.view
@@ -394,7 +395,10 @@ export const Biplot = withStyles(styles)(
           /**
            * distance from the end of arrow to the text (variable)
            */
-          const dev: number = angle >= 0 ? 16 : -8;
+          const dev: number =
+            angle >= 0
+              ? theme.typography.fontSize
+              : -(theme.typography.fontSize / 2);
 
           return `translate(${this.onGetXScaleValue(
             x2Points[i]
