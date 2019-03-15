@@ -1,5 +1,6 @@
 import { Table } from "@devexpress/dx-react-grid-material-ui";
 import { makeStyles } from "@material-ui/styles";
+import isNumber from "lodash/isNumber";
 import React from "react";
 
 const useStyles = makeStyles({
@@ -18,7 +19,9 @@ interface IProps extends Table.DataCellProps {
 const HighlightedCell = (props: IProps) => {
   const classes = useStyles();
   const { value, interval } = props;
-  const inInterval = interval && (value <= -interval || value >= interval);
+
+  const inInterval =
+    isNumber(value) && interval && (value <= -interval || value >= interval);
 
   return (
     <Table.Cell

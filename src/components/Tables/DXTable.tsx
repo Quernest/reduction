@@ -41,9 +41,6 @@ const useStyles = makeStyles(({ spacing, breakpoints }: Theme) => ({
     marginRight: "auto",
     [breakpoints.down("sm")]: {
       fontSize: 14
-    },
-    [breakpoints.down("md")]: {
-      fontSize: 16
     }
   }
 }));
