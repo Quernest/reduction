@@ -1,6 +1,6 @@
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
-import FilterListIcon from "@material-ui/icons/FilterList";
+import ViewCompactIcon from "@material-ui/icons/ViewCompact";
 import React, { MouseEvent } from "react";
 
 interface IProps {
@@ -15,7 +15,7 @@ export const FilterComponentsButton = ({ onToggle, ...restProps }: IProps) => {
       enterDelay={300}
     >
       <IconButton onClick={onToggle} {...restProps}>
-        <FilterListIcon />
+        <ViewCompactIcon />
       </IconButton>
     </Tooltip>
   );

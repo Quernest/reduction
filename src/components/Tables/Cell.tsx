@@ -21,7 +21,7 @@ const HighlightedCell = (props: IProps) => {
   const { value, interval } = props;
 
   const inInterval =
-    isNumber(value) && interval && (value <= -interval || value >= interval);
+    isNumber(value) && (value <= -interval || value >= interval);
 
   return (
     <Table.Cell

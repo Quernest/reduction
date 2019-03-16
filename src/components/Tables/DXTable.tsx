@@ -24,7 +24,7 @@ import map from "lodash/map";
 import round from "lodash/round";
 import unzip from "lodash/unzip";
 import zipObject from "lodash/zipObject";
-import React, { useState } from "react";
+import React, { MouseEvent, useState } from "react";
 import { isLongNumber } from "src/utils";
 import { Cell, FilterComponentsButton, IntervalInput } from "./";
 
@@ -63,6 +63,7 @@ export const DXTable = ({
   const classes = useStyles();
   const [hiddenColumnNames, setHiddenColumnNames] = useState<string[]>([]);
   const [interval, setInterval] = useState<number>(0);
+  const [isOpenIntervalInput, toggleIntervalInput] = useState<boolean>(false);
 
   function onFilterComponents() {
     if (importantComponentsList && importantComponentsList.length > 0) {
@@ -84,7 +85,15 @@ export const DXTable = ({
     setInterval(Number(value));
   }
 
-  const CellComponent = (props: Table.DataCellProps) => (
+  function onOpenIntervalInput(e: MouseEvent<HTMLElement>) {
+    toggleIntervalInput(true);
+  }
+
+  function onCloseIntervalInput(e: MouseEvent<HTMLElement>) {
+    toggleIntervalInput(false);
+  }
+
+  const CellWrapper = (props: Table.DataCellProps) => (
     <Cell interval={interval} {...props} />
   );
 
@@ -94,7 +103,11 @@ export const DXTable = ({
         <Grid rows={rows} columns={columns}>
           <PagingState defaultCurrentPage={0} defaultPageSize={5} />
           <IntegratedPaging />
-          <Table {...intervalFilter && { cellComponent: CellComponent }} />
+          <Table
+            {...intervalFilter &&
+              interval &&
+              isOpenIntervalInput && { cellComponent: CellWrapper }}
+          />
           <TableHeaderRow />
           <TableColumnVisibility
             hiddenColumnNames={hiddenColumnNames}
@@ -113,6 +126,9 @@ export const DXTable = ({
                     )}
                     {intervalFilter && (
                       <IntervalInput
+                        isOpen={isOpenIntervalInput}
+                        onOpen={onOpenIntervalInput}
+                        onClose={onCloseIntervalInput}
                         onChange={onChangeInterval}
                         interval={interval}
                       />
