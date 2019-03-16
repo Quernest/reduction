@@ -1,4 +1,4 @@
-export * from "./Bar";
+export * from "./BarChart";
 export * from "./Biplot";
 export * from "./pca";
 export * from "./Calculations";

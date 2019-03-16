@@ -1,6 +1,4 @@
 import { Theme } from "@material-ui/core";
-import Divider from "@material-ui/core/Divider";
-import Hidden from "@material-ui/core/Hidden";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
 import zipWith from "lodash/zipWith";
@@ -13,7 +11,7 @@ import {
   Vectors
 } from "src/models";
 import { getColumn } from "src/utils";
-import { Bar, Biplot } from "./";
+import { BarChart, Biplot } from "./";
 
 interface IProps {
   calculations: IPCACalculations;
@@ -24,10 +22,6 @@ interface IProps {
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
     flexGrow: 1
-  },
-  divider: {
-    marginTop: spacing.unit * 2,
-    marginBottom: spacing.unit * 2
   }
 }));
 
@@ -73,7 +67,7 @@ export const Charts = ({
     );
 
     return (
-      <Bar
+      <BarChart
         title="Scree plot of eigenvalues"
         data={data}
         xAxisLabel="Components"
@@ -85,9 +79,6 @@ export const Charts = ({
   return (
     <div className={classes.root}>
       {memoizedBiplot}
-      <Hidden smUp={true}>
-        <Divider className={classes.divider} />
-      </Hidden>
       {memoizedBar}
     </div>
   );

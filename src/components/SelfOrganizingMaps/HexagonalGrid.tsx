@@ -1,4 +1,4 @@
-import { createStyles, withStyles, WithStyles } from "@material-ui/core";
+import { createStyles, Theme, withStyles, WithStyles } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
 import { max, range } from "d3-array";
@@ -26,43 +26,44 @@ import * as math from "mathjs";
 import React, { Component, createRef, RefObject } from "react";
 import { IHexagonalGridDimensions, IHexagonParameters } from "src/models";
 
-const styles = createStyles({
-  root: {
-    flexGrow: 1
-  },
-  title: {
-    marginTop: 16,
-    marginBottom: 8
-  },
-  container: {
-    position: "relative"
-  },
-  canvas: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    padding: 0,
-    margin: 0,
-    width: "100%",
-    height: "auto",
-    border: "1px solid #eee"
-  },
-  tooltip: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    fontSize: 16,
-    fontFamily: "Roboto, sans-serif",
-    userSelect: "none",
-    pointerEvents: "none",
-    whiteSpace: "nowrap",
-    color: "#fff",
-    zIndex: 10,
-    opacity: 0,
-    textShadow:
-      "1px 1px 0 rgba(0,0,0,0.5), 1px -1px 0 rgba(0,0,0,0.5), -1px 1px 0 rgba(0,0,0,0.5), -1px -1px 0 rgba(0,0,0,0.5), 1px 0px 0 rgba(0,0,0,0.5), 0px 1px 0 rgba(0,0,0,0.5), -1px 0px 0 rgba(0,0,0,0.5), 0px -1px 0 rgba(0,0,0,0.5)"
-  }
-});
+const styles = ({ typography }: Theme) =>
+  createStyles({
+    root: {
+      flexGrow: 1
+    },
+    title: {
+      marginTop: 16,
+      marginBottom: 8
+    },
+    container: {
+      position: "relative"
+    },
+    canvas: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      padding: 0,
+      margin: 0,
+      width: "100%",
+      height: "auto",
+      border: "1px solid #eee"
+    },
+    tooltip: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      fontSize: typography.fontSize,
+      fontFamily: typography.fontFamily,
+      userSelect: "none",
+      pointerEvents: "none",
+      whiteSpace: "nowrap",
+      color: "#fff",
+      zIndex: 10,
+      opacity: 0,
+      textShadow:
+        "1px 1px 0 rgba(0,0,0,0.5), 1px -1px 0 rgba(0,0,0,0.5), -1px 1px 0 rgba(0,0,0,0.5), -1px -1px 0 rgba(0,0,0,0.5), 1px 0px 0 rgba(0,0,0,0.5), 0px 1px 0 rgba(0,0,0,0.5), -1px 0px 0 rgba(0,0,0,0.5), 0px -1px 0 rgba(0,0,0,0.5)"
+    }
+  });
 
 interface IPosition extends SimulationNodeDatum {
   name?: string;

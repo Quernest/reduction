@@ -5,7 +5,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import { makeStyles } from "@material-ui/styles";
-import React from "react";
+import React, { ChangeEvent, createRef, MouseEvent, RefObject } from "react";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {
@@ -39,12 +39,17 @@ interface IProps {
   onCancel: () => void;
 }
 
-export const UploadControls = (props: IProps): JSX.Element => {
+export const UploadControls = ({
+  uploading,
+  onUpload,
+  onCancel,
+  onChange,
+  file
+}: IProps): JSX.Element => {
   const classes = useStyles();
-  const { uploading } = props;
-  const fileInput: React.RefObject<HTMLInputElement> = React.createRef();
+  const fileInput: RefObject<HTMLInputElement> = createRef();
 
-  const onChoose = (event: any): void => {
+  const onChoose = (event: MouseEvent<HTMLElement>): void => {
     const input = fileInput.current;
 
     if (input) {
@@ -52,7 +57,7 @@ export const UploadControls = (props: IProps): JSX.Element => {
     }
   };
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+  const onChangeFile = (event: ChangeEvent<HTMLInputElement>): void => {
     const files: FileList | null = event.target.files;
 
     if (files) {
@@ -73,15 +78,15 @@ export const UploadControls = (props: IProps): JSX.Element => {
 
         // return the error if it's not accepted extension
         if (exts.indexOf(ext) < 0) {
-          props.onChange(
+          onChange(
             undefined,
-            `Invalid file selected, valid files are of [${exts.toString()}] types.`
+            `invalid file selected, valid files are of [${exts.toString()}] types.`
           );
         } else {
-          props.onChange(chosenFile);
+          onChange(chosenFile);
         }
       } else {
-        props.onChange(undefined, "getting file error");
+        onChange(undefined, "getting file error");
       }
 
       // reset input
@@ -94,7 +99,7 @@ export const UploadControls = (props: IProps): JSX.Element => {
     <div className={classes.root}>
       <input
         ref={fileInput}
-        onChange={onChange}
+        onChange={onChangeFile}
         type="file"
         multiple={false}
         hidden={true}
@@ -117,8 +122,8 @@ export const UploadControls = (props: IProps): JSX.Element => {
             <Button
               variant="contained"
               color="primary"
-              disabled={!props.file || uploading}
-              onClick={props.onUpload}
+              disabled={!file || uploading}
+              onClick={onUpload}
               fullWidth={true}
             >
               Upload
@@ -130,10 +135,10 @@ export const UploadControls = (props: IProps): JSX.Element => {
           </div>
         </Grid>
         <Grid item={true} xs={12}>
-          {props.file && !uploading && (
+          {file && !uploading && (
             <Chip
-              label={props.file.name}
-              onDelete={props.onCancel}
+              label={file.name}
+              onDelete={onCancel}
               className={classes.chip}
             />
           )}
