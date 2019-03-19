@@ -219,7 +219,7 @@ class BiplotBase extends Component<IProps, IState> {
 
     this.zoom = d3
       .zoom()
-      .scaleExtent([1, 4])
+      .scaleExtent([1 / 2, 5])
       .on("zoom", this.onZoom);
 
     this.svg = d3

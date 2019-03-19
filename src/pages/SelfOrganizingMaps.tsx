@@ -88,10 +88,10 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
       rows: 16
     },
     options: {
-      maxStep: 100,
+      maxStep: 1000,
       minLearningCoef: 0.3,
       maxLearningCoef: 0.7,
-      minNeighborhood: 0.4,
+      minNeighborhood: 0.5,
       maxNeighborhood: 1
     },
     neurons: [],
