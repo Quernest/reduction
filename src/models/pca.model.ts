@@ -20,7 +20,7 @@ export interface IEigens {
 }
 
 export interface IPCA {
-  dataset: number[][];
+  originalDataset: number[][];
   adjustedDataset: number[][];
   covariance: number[][];
   eigens: IEigens;
@@ -30,7 +30,7 @@ export interface IPCA {
   /**
    * get mean-adjusted data - PCA (maximizing variance)
    */
-  adjustDataset(dataset: number[][]): number[][];
+  adjustDataset(originalDataset: number[][]): number[][];
 
   /**
    * compute a covariance matrix from the adjusted dataset
@@ -61,7 +61,7 @@ export interface IPCA {
 }
 
 export interface IPCACalculations {
-  dataset: number[][];
+  originalDataset: number[][];
   adjustedDataset: number[][];
   covariance: number[][];
   eigens: IEigens;

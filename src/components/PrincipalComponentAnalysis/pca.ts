@@ -19,19 +19,19 @@ try {
  * @see https://en.wikipedia.org/wiki/Principal_component_analysis
  */
 export class PCA implements IPCA {
-  public readonly dataset: number[][];
+  public readonly originalDataset: number[][];
   public readonly adjustedDataset: number[][];
   public readonly covariance: number[][];
   public readonly eigens: IEigens;
   public readonly linearCombinations: number[][];
   public readonly analysis: IEigenAnalysis;
 
-  public constructor(dataset: number[][]) {
+  public constructor(data: number[][]) {
     // copy the dataset
-    this.dataset = dataset;
+    this.originalDataset = data;
 
     // step 1
-    this.adjustedDataset = this.adjustDataset(this.dataset);
+    this.adjustedDataset = this.adjustDataset(this.originalDataset);
 
     // step 2
     this.covariance = this.computeCovariance(this.adjustedDataset);

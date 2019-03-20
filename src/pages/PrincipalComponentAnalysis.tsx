@@ -15,7 +15,12 @@ import {
   UploadControls,
   VisualizeControls
 } from "src/components";
-import { IParsedCSV, IPCACalculations } from "src/models";
+import {
+  IDataset,
+  IDatasetRequiredColumnsIndexes,
+  IFilePreview,
+  IPCACalculations
+} from "src/models";
 import CalculateWorker from "worker-loader!src/components/PrincipalComponentAnalysis/calculate.worker";
 import UploadWorker from "worker-loader!src/components/PrincipalComponentAnalysis/upload.worker";
 
@@ -67,6 +72,25 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
   const [file, setFile] = React.useState<File | undefined>(undefined);
 
   /**
+   * processed file preview
+   */
+  const [filePreview, setFilePreview] = React.useState<IFilePreview>({
+    rows: [],
+    columns: []
+  });
+
+  /**
+   * parsed file preview
+   */
+  const [dataset, setDataset] = React.useState<IDataset>({
+    variables: [],
+    factors: [],
+    values: [],
+    types: [],
+    observations: []
+  });
+
+  /**
    * error string, component to display at the bottom of the page
    */
   const [error, setError] = React.useState<string | undefined>(undefined);
@@ -77,21 +101,11 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
   const [state, setState] = React.useState<IState>(initialState);
 
   /**
-   * processed file
-   */
-  const [parsedFile, setParsedFile] = React.useState<IParsedCSV>({
-    variables: [],
-    tailedVariables: [],
-    observations: [],
-    values: []
-  });
-
-  /**
    * object with the results of calculations
    * of the principal component method
    */
   const [calculations, setCalculations] = React.useState<IPCACalculations>({
-    dataset: [],
+    originalDataset: [],
     adjustedDataset: [],
     covariance: [],
     eigens: {
@@ -145,30 +159,44 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
     y: 1
   });
 
+  /**
+   * seelct required dataset columns
+   */
+  const [
+    datasetRequiredColumnsIdxs,
+    setDatasetRequiredColumnsIdxs
+  ] = React.useState<IDatasetRequiredColumnsIndexes>({
+    observationsIdx: 0,
+    typesIdx: undefined
+  });
+
   const { analysis } = calculations;
   const { uploading, uploaded, calculated, calculating, visualized } = state;
 
-  function cleanErrors() {
-    setError(undefined);
-  }
-
   // create workers on componentDidMount
   React.useEffect(() => {
-    const onUploadWorkerMsg = (event: MessageEvent) => {
+    function onUploadWorkerMsg(event: MessageEvent) {
       if (has(event.data, "error")) {
         setError(event.data.error);
         setState({ ...state, uploaded: false, uploading: false });
       } else {
         cleanErrors();
-        setParsedFile(event.data.parsedFile);
+        setFilePreview(event.data.filePreview);
         setState({ ...state, uploaded: true, uploading: false });
       }
-    };
+    }
 
-    const onCalculateWorkerMsg = (event: MessageEvent) => {
-      setCalculations(event.data);
-      setState({ ...state, calculated: true, calculating: false });
-    };
+    function onCalculateWorkerMsg(event: MessageEvent) {
+      if (has(event.data, "error")) {
+        setError(event.data.error);
+        setState({ ...state, calculated: false, calculating: false });
+      } else {
+        cleanErrors();
+        setDataset(event.data.dataset);
+        setCalculations(event.data.calculations);
+        setState({ ...state, calculated: true, calculating: false });
+      }
+    }
 
     if (isUndefined(uploadWorker)) {
       createUploadWorker(new UploadWorker());
@@ -199,48 +227,58 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
     };
   }, [uploadWorker, calculateWorker]);
 
-  const onChangeFile = (chosenFile?: File, err?: string): void => {
+  function onChangeFile(chosenFile?: File, err?: string) {
     if (err) {
       setError(err);
     } else {
       cleanErrors();
       setFile(chosenFile);
     }
-  };
+  }
 
-  const onUploadFile = (): void => {
+  function onUploadFile() {
     if (!isUndefined(uploadWorker)) {
       setState({ ...state, uploading: true });
       uploadWorker.postMessage(file);
     }
-  };
+  }
 
-  const onCancelFile = (): void => {
+  function onCancelFile() {
     cleanErrors();
     setFile(undefined);
-  };
+  }
 
-  const onCalculate = (): void => {
+  function onCalculate() {
     if (!isUndefined(calculateWorker)) {
       setState({ ...state, calculating: true });
-      calculateWorker.postMessage(parsedFile);
+      calculateWorker.postMessage({ datasetRequiredColumnsIdxs, filePreview });
     }
-  };
+  }
 
-  const onVisualize = (): void => {
+  function onVisualize() {
     setState({ ...state, visualized: true });
-  };
+  }
 
-  const onBack = (): void => {
+  function onBack() {
     setState({ ...state, visualized: false });
-  };
+  }
 
-  const onChangeSelectedComponents = (newSelectedComponents: {
+  function onChangeSelectedComponents(newSelectedComponents: {
     x: number;
     y: number;
-  }): void => {
+  }) {
     setSelectedComponents({ ...selectedComponents, ...newSelectedComponents });
-  };
+  }
+
+  function onChangeDatasetRequiredColumns(
+    newDatasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes
+  ) {
+    setDatasetRequiredColumnsIdxs(newDatasetRequiredColumnsIdxs);
+  }
+
+  function cleanErrors() {
+    setError(undefined);
+  }
 
   return (
     <div className={classes.root}>
@@ -264,18 +302,24 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
         )}
         {visualized && (
           <Charts
-            parsedFile={parsedFile}
+            dataset={dataset}
             calculations={calculations}
             selectedComponents={selectedComponents}
           />
         )}
         {calculated && !visualized && (
-          <Calculations parsedFile={parsedFile} calculations={calculations} />
+          <Calculations
+            datasetRequiredColumnsIdxs={datasetRequiredColumnsIdxs}
+            dataset={dataset}
+            calculations={calculations}
+          />
         )}
         {uploaded && !calculated && (
           <CalculateControls
-            parsedFile={parsedFile}
+            datasetRequiredColumnsIdxs={datasetRequiredColumnsIdxs}
+            filePreview={filePreview}
             onCalculate={onCalculate}
+            onChangeDatasetRequiredColumns={onChangeDatasetRequiredColumns}
             calculating={calculating}
           />
         )}

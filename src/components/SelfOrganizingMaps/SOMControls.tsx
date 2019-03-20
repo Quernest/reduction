@@ -8,7 +8,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import React, { Component, createRef, RefObject } from "react";
-import { VariableSelector } from "src/components";
+import { FactorSelector } from "src/components";
 import { IHexagonalGridDimensions, ISOMOptions } from "src/models";
 
 const styles = ({ spacing, palette }: Theme) =>
@@ -51,9 +51,9 @@ interface IProps extends WithStyles<typeof styles> {
     newDimensions: IHexagonalGridDimensions,
     newOptions: ISOMOptions
   ) => void;
-  variables: string[];
-  currentVariableIndex: number;
-  onChangeVariable: (variableIndex: number) => void;
+  factors: string[];
+  currentFactorIdx: number;
+  onChangeFactor: (variableIndex: number) => void;
   loading?: boolean;
 }
 
@@ -138,9 +138,9 @@ export const SOMControls = withStyles(styles)(
           minNeighborhood,
           maxNeighborhood
         },
-        onChangeVariable,
-        variables,
-        currentVariableIndex
+        onChangeFactor,
+        factors,
+        currentFactorIdx
       } = this.props;
 
       return (
@@ -361,10 +361,10 @@ export const SOMControls = withStyles(styles)(
                   <Grid item={true} xs={12} sm={4} md={2}>
                     <Grid container={true} spacing={16}>
                       <Grid item={true} xs={12}>
-                        <VariableSelector
-                          onChangeVariable={onChangeVariable}
-                          currentVariableIndex={currentVariableIndex}
-                          variables={variables}
+                        <FactorSelector
+                          onChangeFactor={onChangeFactor}
+                          currentFactorIdx={currentFactorIdx}
+                          factors={factors}
                           disabled={loading}
                         />
                       </Grid>

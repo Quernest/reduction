@@ -14,43 +14,43 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
 }));
 
 interface IProps {
-  variables: string[];
-  currentVariableIndex: number;
-  onChangeVariable: (variableIndex: number) => void;
+  factors: string[];
+  currentFactorIdx: number;
+  onChangeFactor: (factorIdx: number) => void;
   disabled?: boolean;
 }
 
-export const VariableSelector = ({
-  variables,
-  currentVariableIndex,
-  onChangeVariable,
+export const FactorSelector = ({
+  factors,
+  currentFactorIdx,
+  onChangeFactor,
   disabled
 }: IProps): JSX.Element => {
   const classes = useStyles();
 
   function handleChange(event: ChangeEvent<HTMLSelectElement>) {
-    const variableIndex: number = Number(event.target.value);
+    const idx: number = Number(event.target.value);
 
-    onChangeVariable(variableIndex);
+    onChangeFactor(idx);
   }
 
   return (
     <>
       <FormControl fullWidth={true} className={classes.formControl}>
-        <InputLabel htmlFor="variable">var</InputLabel>
+        <InputLabel htmlFor="factor">factor</InputLabel>
         <Select
           fullWidth={true}
           disabled={disabled}
-          value={currentVariableIndex}
+          value={currentFactorIdx}
           onChange={handleChange}
           inputProps={{
-            id: "variable"
+            id: "factor"
           }}
         >
-          {variables &&
-            map(variables, (variable, i) => (
+          {factors &&
+            map(factors, (factor, i) => (
               <MenuItem value={i} key={i}>
-                {variable}
+                {factor}
               </MenuItem>
             ))}
         </Select>

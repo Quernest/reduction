@@ -1,3 +1,3 @@
 export * from "./SOMControls";
 export * from "./HexagonalGrid";
-export * from "./VariableSelector";
+export * from "./FactorSelector";

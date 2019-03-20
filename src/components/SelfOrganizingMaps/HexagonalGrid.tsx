@@ -10,7 +10,7 @@ import {
   Simulation,
   SimulationNodeDatum
 } from "d3-force";
-import { scaleLinear } from "d3-scale";
+import { scaleBand, scaleLinear } from "d3-scale";
 import {
   interpolateBlues,
   interpolateGreys,
@@ -67,6 +67,7 @@ const styles = ({ typography }: Theme) =>
 
 interface IPosition extends SimulationNodeDatum {
   name?: string;
+  type?: string;
 }
 
 interface IProps extends WithStyles {
@@ -77,8 +78,9 @@ interface IProps extends WithStyles {
   umatrix?: number[];
   positions?: number[][];
   observations?: string[];
-  variables?: string[];
-  currentVariableIndex?: number;
+  factors?: string[];
+  types?: string[];
+  currentFactorIdx?: number;
 }
 
 interface IState {
@@ -145,7 +147,7 @@ export const HexagonalGrid = withStyles(styles)(
     };
 
     public componentDidMount() {
-      const { positions, observations } = this.props;
+      const { positions, observations, types } = this.props;
       const { columns, rows } = this.props.dimensions;
       const { r, R, d, D } = this.computeHexagonParameters();
 
@@ -161,14 +163,14 @@ export const HexagonalGrid = withStyles(styles)(
           if (!isUndefined(positions) && !isUndefined(observations)) {
             this.createTooltip();
             this.initUpperCanvas(this.upperCanvasReference);
-            this.drawPositions(positions, observations);
+            this.drawPositions(positions, observations, types);
           }
         }
       );
     }
 
     public componentDidUpdate(prevProps: IProps, prevState: IState) {
-      if (prevProps.currentVariableIndex !== this.props.currentVariableIndex) {
+      if (prevProps.currentFactorIdx !== this.props.currentFactorIdx) {
         this.clearCtxRect(this.lowerCtx);
         this.drawHexagons();
       }
@@ -295,7 +297,7 @@ export const HexagonalGrid = withStyles(styles)(
      * draw grid of hexagons and optional heatmap or umatrix
      */
     public drawHexagons() {
-      const { currentVariableIndex, neurons, heatmap, umatrix } = this.props;
+      const { currentFactorIdx, neurons, heatmap, umatrix } = this.props;
 
       const generatePathLine = ([x, y]: [number, number]) => {
         const sX = this.scaleGrid(x);
@@ -317,8 +319,8 @@ export const HexagonalGrid = withStyles(styles)(
 
         this.lowerCtx.beginPath();
 
-        if (v && heatmap && !isUndefined(currentVariableIndex)) {
-          this.lowerCtx.fillStyle = interpolateBlues(v[currentVariableIndex]);
+        if (v && heatmap && !isUndefined(currentFactorIdx)) {
+          this.lowerCtx.fillStyle = interpolateBlues(v[currentFactorIdx]);
         } else if (umatrix) {
           this.lowerCtx.fillStyle = interpolateGreys(umatrix[i]);
         } else {
@@ -338,14 +340,19 @@ export const HexagonalGrid = withStyles(styles)(
      * @param positions result from the SOM mapping process, array of arrays with x and y positions
      * @param observations array of observations
      */
-    public drawPositions(positions: number[][], observations: string[]) {
+    public drawPositions(
+      positions: number[][],
+      observations: string[],
+      types?: string[]
+    ) {
       const { d } = this.state.hexagonParameters;
 
-      const input = positions.map<IPosition>(([x, y], index) => ({
+      const input = map<number[], IPosition>(positions, ([x, y], index) => ({
         index,
         x,
         y,
-        name: observations[index]
+        name: observations[index],
+        type: types ? types[index] : undefined
       }));
 
       /**
@@ -364,12 +371,14 @@ export const HexagonalGrid = withStyles(styles)(
       const posInterval = map(means, mean => mean / maxMean);
 
       // classify by type (add type to input and pass as param)
-      // const scaleColor = scaleBand()
-      //   .domain(observations)
-      //   .range([0, 1]);
+      const scaleColor = scaleBand();
 
-      // const getColor = (name: string) =>
-      //   interpolateSpectral(scaleColor(name) as number);
+      if (types) {
+        scaleColor.domain(types).range([0, 1]);
+      }
+
+      const getColor = (type: string) =>
+        interpolateSpectral(scaleColor(type) as number);
 
       const getX = ({ x }: IPosition) => {
         return this.scaleGrid(x as number);
@@ -392,13 +401,15 @@ export const HexagonalGrid = withStyles(styles)(
         .on("tick", () => {
           this.clearCtxRect(this.upperCtx);
 
-          input.forEach(({ x, y }: IPosition, i) => {
+          input.forEach(({ x, y, type }: IPosition, i) => {
             if (!x || !y) {
               return;
             }
 
             this.upperCtx.beginPath();
-            this.upperCtx.fillStyle = interpolateSpectral(posInterval[i]);
+            this.upperCtx.fillStyle = type
+              ? getColor(type)
+              : interpolateSpectral(posInterval[i]);
             this.upperCtx.arc(x, y, r, 0, 2 * Math.PI);
             this.upperCtx.strokeStyle = "#8395a7";
             this.upperCtx.stroke();
@@ -454,10 +465,12 @@ export const HexagonalGrid = withStyles(styles)(
 
           // if node is not undefined and has name
           if (node && node.name) {
-            const { name } = node;
+            const { name, type } = node;
+
+            const tooltipText = type ? `${name}, type: ${type}` : name;
 
             // add text
-            this.tooltip.text(name);
+            this.tooltip.text(tooltipText);
 
             // because tooltip initializes with width = 0
             if (tooltipRect.width) {

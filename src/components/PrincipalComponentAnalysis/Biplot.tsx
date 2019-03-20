@@ -36,7 +36,7 @@ const styles = ({ spacing, typography }: Theme) =>
       fontFamily: typography.fontFamily,
       textAnchor: "middle"
     },
-    variable: {
+    factor: {
       fontSize: typography.fontSize,
       fontFamily: typography.fontFamily,
       textAnchor: "middle"
@@ -56,7 +56,7 @@ interface IProps {
   title?: string;
   points: Points;
   eigenvectors: Vectors;
-  variables: string[];
+  factors: string[];
   classes?: any;
   xAxisLabel: string;
   yAxisLabel: string;
@@ -207,7 +207,7 @@ class BiplotBase extends Component<IProps, IState> {
 
     // remove created elements
     this.view.selectAll(`line.${classes.vector}`).remove();
-    this.view.selectAll(`text.${classes.variable}`).remove();
+    this.view.selectAll(`text.${classes.factor}`).remove();
     this.view.selectAll(`circle.${classes.point}`).remove();
 
     this.drawPoints();
@@ -353,7 +353,7 @@ class BiplotBase extends Component<IProps, IState> {
   public drawVectors = () => {
     const {
       classes,
-      variables,
+      factors,
       eigenvectors: [x1Points, y1Points, x2Points, y2Points],
       theme
     } = this.props;
@@ -370,11 +370,11 @@ class BiplotBase extends Component<IProps, IState> {
       .attr("y2", (_, i) => this.onGetYScaleValue(y2Points[i]));
 
     this.view
-      .selectAll(`text.${classes.variable}`)
+      .selectAll(`text.${classes.factor}`)
       .data(x1Points)
       .enter()
       .append("text")
-      .attr("class", classes.variable)
+      .attr("class", classes.factor)
       .attr("transform", (_, i) => {
         /**
          * angle of current vector
@@ -390,7 +390,7 @@ class BiplotBase extends Component<IProps, IState> {
           Math.PI;
 
         /**
-         * distance from the end of arrow to the text (variable)
+         * distance from the end of arrow to the text (factor)
          */
         const dev: number =
           angle >= 0
@@ -401,7 +401,7 @@ class BiplotBase extends Component<IProps, IState> {
           x2Points[i]
         )},${this.onGetYScaleValue(y2Points[i]) + dev})`;
       })
-      .text((_, i) => variables[i]);
+      .text((_, i) => factors[i]);
   };
 
   public render() {

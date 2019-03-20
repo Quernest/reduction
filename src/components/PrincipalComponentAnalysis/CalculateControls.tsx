@@ -5,8 +5,13 @@ import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import React, { useMemo } from "react";
-import { DXTable, generateColumns, generateRows } from "src/components";
-import { IParsedCSV } from "src/models";
+import {
+  DatasetControls,
+  DXTable,
+  generateColumns,
+  generateRows
+} from "src/components";
+import { IDatasetRequiredColumnsIndexes, IFilePreview } from "src/models";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {
@@ -30,23 +35,29 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
 
 interface IProps {
   calculating?: boolean;
-  parsedFile: IParsedCSV;
+  filePreview: IFilePreview;
+  datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
   onCalculate: () => void;
+  onChangeDatasetRequiredColumns: (
+    newDatasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes
+  ) => void;
 }
 
 export const CalculateControls = ({
   calculating,
-  parsedFile: { variables, observations, values },
+  filePreview,
+  onChangeDatasetRequiredColumns,
+  datasetRequiredColumnsIdxs,
   onCalculate
 }: IProps) => {
   const classes = useStyles();
 
   const DatasetTable = useMemo(() => {
-    const columns = generateColumns(variables);
-    const rows = generateRows([observations, ...values], variables);
+    const columns = generateColumns(filePreview.columns);
+    const rows = generateRows(filePreview.rows, filePreview.columns);
 
-    return <DXTable title="Dataset" rows={rows} columns={columns} />;
-  }, [observations, values, variables]);
+    return <DXTable title="Dataset preview" rows={rows} columns={columns} />;
+  }, [filePreview]);
 
   return (
     <div className={classes.root}>
@@ -69,6 +80,14 @@ export const CalculateControls = ({
               <CircularProgress size={24} className={classes.buttonProgress} />
             )}
           </div>
+        </Grid>
+        <Grid item={true} xs={12}>
+          <DatasetControls
+            rows={filePreview.rows}
+            columns={filePreview.columns}
+            onChange={onChangeDatasetRequiredColumns}
+            datasetRequiredColumnsIdxs={datasetRequiredColumnsIdxs}
+          />
         </Grid>
         <Grid item={true} xs={12}>
           {DatasetTable}

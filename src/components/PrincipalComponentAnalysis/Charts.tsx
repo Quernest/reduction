@@ -5,7 +5,7 @@ import zipWith from "lodash/zipWith";
 import React, { useMemo } from "react";
 import {
   IBarData,
-  IParsedCSV,
+  IDataset,
   IPCACalculations,
   Points,
   Vectors
@@ -15,7 +15,7 @@ import { BarChart, Biplot } from "./";
 
 interface IProps {
   calculations: IPCACalculations;
-  parsedFile: IParsedCSV;
+  dataset: IDataset;
   selectedComponents: { x: number; y: number };
 }
 
@@ -31,7 +31,7 @@ export const Charts = ({
     eigens,
     analysis: { components }
   },
-  parsedFile: { tailedVariables },
+  dataset: { factors },
   selectedComponents: { x, y }
 }: IProps) => {
   const classes = useStyles();
@@ -46,15 +46,15 @@ export const Charts = ({
 
     return (
       <Biplot
-        title="Biplot of score variables"
+        title="Biplot of factors score"
         eigenvectors={vectors}
-        variables={tailedVariables}
+        factors={factors}
         xAxisLabel={components[x]}
         yAxisLabel={components[y]}
         points={points}
       />
     );
-  }, [adjustedDataset, eigens.E.x, x, y, components, tailedVariables]);
+  }, [adjustedDataset, eigens.E.x, x, y, components, factors]);
 
   const memoizedBar = useMemo(() => {
     const data = zipWith<string, number, IBarData>(

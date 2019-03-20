@@ -1,6 +1,4 @@
-export interface IParsedCSV {
-  variables: string[];
-  tailedVariables: string[];
-  observations: string[];
-  values: number[][];
+export interface IFilePreview {
+  rows: any[][];
+  columns: any[];
 }

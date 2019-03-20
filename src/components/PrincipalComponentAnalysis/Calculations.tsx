@@ -3,11 +3,17 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import filter from "lodash/filter";
 import includes from "lodash/includes";
+import isUndefined from "lodash/isUndefined";
 import round from "lodash/round";
 import unzip from "lodash/unzip";
 import React, { useMemo } from "react";
 import { DXTable, generateColumns, generateRows } from "src/components";
-import { IParsedCSV, IPCACalculations } from "src/models";
+import {
+  IDataset,
+  IDatasetRequiredColumnsIndexes,
+  IPCACalculations
+} from "src/models";
+import { insert } from "src/utils";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {
@@ -31,13 +37,15 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
 }));
 
 interface IProps {
-  parsedFile: IParsedCSV;
+  dataset: IDataset;
   calculations: IPCACalculations;
+  datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
 }
 
 export const Calculations = ({
-  parsedFile,
-  calculations
+  dataset,
+  calculations,
+  datasetRequiredColumnsIdxs: { observationsIdx, typesIdx }
 }: IProps): JSX.Element => {
   const classes = useStyles();
   const {
@@ -55,40 +63,92 @@ export const Calculations = ({
     },
     linearCombinations
   } = calculations;
-  const { tailedVariables, variables, observations, values } = parsedFile;
+  const { factors, variables, types, observations, values } = dataset;
 
   const DatasetTable = useMemo(() => {
+    let rowsValues = [...values];
+
+    /**
+     * there is a substitution of columns for variables,
+     * if a variable with the selected type exists and it
+     * is after the observation variable, then we insert
+     * the array of types first, if not otherwise
+     *
+     * it is necessary for the correct position
+     * todo: improve this code
+     */
+    if (!isUndefined(typesIdx) && types) {
+      if (observationsIdx > typesIdx) {
+        rowsValues = insert(rowsValues, typesIdx, types);
+        rowsValues = insert(rowsValues, observationsIdx, observations);
+      } else {
+        rowsValues = insert(rowsValues, observationsIdx, observations);
+        rowsValues = insert(rowsValues, typesIdx, types);
+      }
+    } else {
+      /**
+       * add observations to the specific position
+       */
+      rowsValues = insert(rowsValues, observationsIdx, observations);
+    }
+
     const columns = generateColumns(variables);
-    const rows = generateRows([observations, ...values], variables);
+    const rows = generateRows(rowsValues, variables);
 
     return (
       <div className={classes.tableBox}>
         <DXTable title="Original dataset" rows={rows} columns={columns} />
       </div>
     );
-  }, [observations, values, variables]);
+  }, [observations, values, types, variables]);
 
   const AdjustedDatasetTable = useMemo(() => {
+    let rowsValues = [...adjustedDataset];
+
+    /**
+     * there is a substitution of columns for variables,
+     * if a variable with the selected type exists and it
+     * is after the observation variable, then we insert
+     * the array of types first, if not otherwise
+     *
+     * it is necessary for the correct position
+     * todo: improve this code
+     */
+    if (!isUndefined(typesIdx) && types) {
+      if (observationsIdx > typesIdx) {
+        rowsValues = insert(rowsValues, typesIdx, types);
+        rowsValues = insert(rowsValues, observationsIdx, observations);
+      } else {
+        rowsValues = insert(rowsValues, observationsIdx, observations);
+        rowsValues = insert(rowsValues, typesIdx, types);
+      }
+    } else {
+      /**
+       * add observations to the specific position
+       */
+      rowsValues = insert(rowsValues, observationsIdx, observations);
+    }
+
     const columns = generateColumns(variables);
-    const rows = generateRows([observations, ...adjustedDataset], variables);
+    const rows = generateRows(rowsValues, variables);
 
     return (
       <div className={classes.tableBox}>
         <DXTable title="Adjusted dataset" rows={rows} columns={columns} />
       </div>
     );
-  }, [observations, adjustedDataset, variables]);
+  }, [observations, adjustedDataset, types, variables]);
 
   const CovarianceTable = useMemo(() => {
-    const columns = generateColumns(tailedVariables);
-    const rows = generateRows(covariance, tailedVariables);
+    const columns = generateColumns(factors);
+    const rows = generateRows(covariance, factors);
 
     return (
       <div className={classes.tableBox}>
         <DXTable title="Covariance matrix" rows={rows} columns={columns} />
       </div>
     );
-  }, [covariance, tailedVariables]);
+  }, [covariance, factors]);
 
   const AnalysisTable = useMemo(() => {
     const columnNames = [
@@ -112,10 +172,10 @@ export const Calculations = ({
         <div className={classes.analysisInfo}>
           <Typography variant="body1" gutterBottom={true}>
             Number of components equal to total number of variables:{" "}
-            <strong>{tailedVariables.length}</strong>
+            <strong>{factors.length}</strong>
           </Typography>
           <Typography variant="body1" gutterBottom={true}>
-            All <strong>{tailedVariables.length}</strong> components explain{" "}
+            All <strong>{factors.length}</strong> components explain{" "}
             <strong>{round(totalProportion, 1)}%</strong> variation of the data
           </Typography>
           <Typography variant="body1" gutterBottom={true}>
@@ -142,7 +202,7 @@ export const Calculations = ({
     const columns = generateColumns(columnNames);
 
     const rows = generateRows(
-      [tailedVariables, ...unzip<number>(eigens.E.x)],
+      [factors, ...unzip<number>(eigens.E.x)],
       columnNames
     );
 
@@ -163,10 +223,10 @@ export const Calculations = ({
         />
       </div>
     );
-  }, [eigens.E.x, tailedVariables, importantComponents]);
+  }, [eigens.E.x, factors, importantComponents]);
 
   const LinearCombinationsTable = useMemo(() => {
-    const columnNames = [variables[0], ...components];
+    const columnNames = [variables[observationsIdx], ...components];
     const columns = generateColumns(columnNames);
     const rows = generateRows(
       [observations, ...linearCombinations],

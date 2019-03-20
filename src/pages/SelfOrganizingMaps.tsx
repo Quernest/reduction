@@ -13,12 +13,22 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import compose from "recompose/compose";
 import {
+  DatasetControls,
+  DXTable,
   ErrorMessage,
+  generateColumns,
+  generateRows,
   HexagonalGrid,
   SOMControls,
   UploadControls
 } from "src/components";
-import { IHexagonalGridDimensions, IParsedCSV, ISOMOptions } from "src/models";
+import {
+  IDataset,
+  IDatasetRequiredColumnsIndexes,
+  IFilePreview,
+  IHexagonalGridDimensions,
+  ISOMOptions
+} from "src/models";
 import CalculateWorker from "worker-loader!src/components/SelfOrganizingMaps/calculate.worker";
 import UploadWorker from "worker-loader!src/components/SelfOrganizingMaps/upload.worker";
 
@@ -57,7 +67,9 @@ interface IProps extends WithStyles<typeof styles> {}
 
 interface IState {
   file: File | undefined;
-  parsedFile: IParsedCSV;
+  filePreview: IFilePreview;
+  datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
+  dataset: IDataset;
   uploading: boolean;
   uploaded: boolean;
   calculating: boolean;
@@ -69,7 +81,7 @@ interface IState {
   quantizationError: number;
   positions: Array<[number, number]>;
   umatrix: number[];
-  currentVariableIndex: number;
+  currentFactorIdx: number;
   error?: string;
 }
 
@@ -79,6 +91,21 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
 
   public readonly state: IState = {
     file: undefined,
+    filePreview: {
+      rows: [],
+      columns: []
+    },
+    dataset: {
+      observations: [],
+      variables: [],
+      factors: [],
+      values: [],
+      types: []
+    },
+    datasetRequiredColumnsIdxs: {
+      observationsIdx: 0,
+      typesIdx: undefined
+    },
     uploading: false,
     uploaded: false,
     calculating: false,
@@ -99,19 +126,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     umatrix: [],
     topographicError: 0,
     quantizationError: 0,
-    /**
-     * uploaded and parsed dataset
-     */
-    parsedFile: {
-      observations: [],
-      variables: [],
-      tailedVariables: [],
-      values: []
-    },
-    /**
-     * is equal index of variable in variables array
-     */
-    currentVariableIndex: 0,
+    currentFactorIdx: 0,
     error: undefined
   };
 
@@ -157,30 +172,53 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     newDimensions: IHexagonalGridDimensions,
     newOptions: ISOMOptions
   ) => {
+    const { filePreview, datasetRequiredColumnsIdxs } = this.state;
+
     this.setState({ dimensions: newDimensions, options: newOptions });
     this.startCalculating(
-      this.state.parsedFile.values,
+      datasetRequiredColumnsIdxs,
+      filePreview,
       newDimensions,
       newOptions
     );
   };
 
   protected onGetCalculateWorkerMessage = ({
-    data: { positions, umatrix, neurons, topographicError, quantizationError }
-  }: MessageEvent) => {
-    this.setState({
+    data: {
       positions,
       umatrix,
       neurons,
       topographicError,
       quantizationError,
-      calculating: false,
-      calculated: true
-    });
+      dataset,
+      error
+    }
+  }: MessageEvent) => {
+    if (error) {
+      this.setState({
+        error,
+        calculated: false,
+        calculating: false,
+        uploaded: false,
+        uploading: false
+      });
+    } else {
+      this.clearErrors();
+      this.setState({
+        dataset,
+        positions,
+        umatrix,
+        neurons,
+        topographicError,
+        quantizationError,
+        calculating: false,
+        calculated: true
+      });
+    }
   };
 
   protected onGetUploadWorkerMessage = ({
-    data: { error, parsedFile }
+    data: { error, filePreview }
   }: MessageEvent) => {
     if (error) {
       this.setState({
@@ -191,7 +229,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     } else {
       this.clearErrors();
       this.setState({
-        parsedFile,
+        filePreview,
         uploaded: true,
         uploading: false
       });
@@ -227,22 +265,33 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
 
   private clearErrors = () => this.setState({ error: undefined });
 
-  /**
-   * change variable index handler
-   */
-  protected onChangeVariable = (variableIndex: number) => {
+  protected onChangeFactor = (factorIdx: number) => {
     this.setState({
-      currentVariableIndex: variableIndex
+      currentFactorIdx: factorIdx
+    });
+  };
+
+  protected onChangeDatasetRequiredColumns = (
+    newDatasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes
+  ) => {
+    this.setState({
+      datasetRequiredColumnsIdxs: newDatasetRequiredColumnsIdxs
     });
   };
 
   public startCalculating(
-    data: number[][],
+    datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes,
+    filePreview: IFilePreview,
     dimensions: IHexagonalGridDimensions,
     options: ISOMOptions
   ) {
     this.setState({ calculated: false, calculating: true });
-    this.calculateWorker.postMessage({ data, dimensions, options });
+    this.calculateWorker.postMessage({
+      datasetRequiredColumnsIdxs,
+      filePreview,
+      dimensions,
+      options
+    });
   }
 
   public render(): JSX.Element {
@@ -257,13 +306,18 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
       neurons,
       umatrix,
       positions,
-      parsedFile: { observations, tailedVariables },
-      currentVariableIndex,
+      dataset: { observations, types, factors },
+      datasetRequiredColumnsIdxs,
+      filePreview,
+      currentFactorIdx,
       quantizationError,
       topographicError,
       error,
       file
     } = this.state;
+
+    const previewColumns = generateColumns(filePreview.columns);
+    const previewRows = generateRows(filePreview.rows, filePreview.columns);
 
     return (
       <div className={classes.root}>
@@ -277,11 +331,27 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
               options={options}
               dimensions={dimensions}
               onSubmit={this.onControlsSubmit}
-              onChangeVariable={this.onChangeVariable}
-              currentVariableIndex={currentVariableIndex}
-              variables={tailedVariables}
+              onChangeFactor={this.onChangeFactor}
+              currentFactorIdx={currentFactorIdx}
+              factors={factors}
               loading={calculating}
             />
+          )}
+          {uploaded && !calculated && (
+            <>
+              <DatasetControls
+                rows={filePreview.rows}
+                columns={filePreview.columns}
+                onChange={this.onChangeDatasetRequiredColumns}
+                datasetRequiredColumnsIdxs={datasetRequiredColumnsIdxs}
+                disabled={calculating}
+              />
+              <DXTable
+                title="Dataset preview"
+                rows={previewRows}
+                columns={previewColumns}
+              />
+            </>
           )}
           {calculated && (
             <div className={classes.maps}>
@@ -306,10 +376,11 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
                 neurons={neurons}
                 dimensions={dimensions}
                 heatmap={true}
-                currentVariableIndex={currentVariableIndex}
+                currentFactorIdx={currentFactorIdx}
                 positions={positions}
                 observations={observations}
-                variables={tailedVariables}
+                factors={factors}
+                types={types}
               />
               <HexagonalGrid
                 title="U-matrix"
