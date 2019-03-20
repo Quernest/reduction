@@ -337,14 +337,13 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
               loading={calculating}
             />
           )}
-          {uploaded && !calculated && (
+          {uploaded && !calculated && !calculating && (
             <>
               <DatasetControls
                 rows={filePreview.rows}
                 columns={filePreview.columns}
                 onChange={this.onChangeDatasetRequiredColumns}
                 datasetRequiredColumnsIdxs={datasetRequiredColumnsIdxs}
-                disabled={calculating}
               />
               <DXTable
                 title="Dataset preview"
