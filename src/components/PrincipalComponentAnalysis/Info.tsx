@@ -1,7 +1,7 @@
 import Divider from "@material-ui/core/Divider";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
+// import List from "@material-ui/core/List";
+// import ListItem from "@material-ui/core/ListItem";
+// import ListItemText from "@material-ui/core/ListItemText";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import React from "react";
@@ -22,11 +22,10 @@ export const Info = (): JSX.Element => {
     <div className={classes.root}>
       <Divider className={classes.divider} />
       <Typography variant="body1" paragraph={true}>
-        This application is designed to process two-dimensional data arrays
-        using the principal component analysis algorithm.
+        Process two-dimensional data arrays using principal component analysis.
       </Typography>
       <Divider className={classes.divider} />
-      <Typography variant="body1">
+      {/* <Typography variant="body1">
         To use the application you need to do next steps:
       </Typography>
       <List>
@@ -68,7 +67,7 @@ export const Info = (): JSX.Element => {
           </ListItemText>
         </ListItem>
       </List>
-      <Divider className={classes.divider} />
+      <Divider className={classes.divider} /> */}
     </div>
   );
 };

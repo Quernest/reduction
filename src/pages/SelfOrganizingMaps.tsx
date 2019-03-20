@@ -391,6 +391,10 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
           )}
           {!uploaded && !calculated && (
             <>
+              <Typography variant="body1" paragraph={true}>
+                Process two-dimensional data arrays using self-organizing maps.
+              </Typography>
+              <Divider className={classes.divider} />
               <UploadControls
                 file={file}
                 onUpload={this.onUploadFile}
