@@ -185,6 +185,8 @@ class PCAPageBase extends Component<IProps, IState> {
     if (error) {
       this.setState({
         error,
+        uploaded: false,
+        uploading: false,
         calculated: false,
         calculating: false
       });
