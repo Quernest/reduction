@@ -29,7 +29,7 @@ export const NoMatch = ({ location }: IProps): JSX.Element => {
   return (
     <div className={classes.root}>
       <div className={classes.wrap}>
-        <Typography variant="headline" color="textSecondary">
+        <Typography variant="h1" color="textSecondary">
           404. No match found for <code>{location.pathname}</code>
         </Typography>
       </div>

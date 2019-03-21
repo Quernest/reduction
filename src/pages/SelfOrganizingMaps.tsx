@@ -51,7 +51,7 @@ const styles = ({ spacing, breakpoints }: Theme) =>
       flexGrow: 1
     },
     divider: {
-      marginBottom: spacing.unit * 2
+      marginBottom: spacing.unit * 3
     },
     maps: {
       marginTop: spacing.unit,
@@ -66,7 +66,7 @@ const styles = ({ spacing, breakpoints }: Theme) =>
 interface IProps extends WithStyles<typeof styles> {}
 
 interface IState {
-  file: File | undefined;
+  file?: File;
   filePreview: IFilePreview;
   datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
   dataset: IDataset;
@@ -323,7 +323,6 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
       <div className={classes.root}>
         <div className={classes.wrap}>
           <Typography variant="h1">Self-Organizing Maps</Typography>
-          <Divider className={classes.divider} />
           {uploaded && (
             <SOMControls
               options={options}

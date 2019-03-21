@@ -2,7 +2,7 @@ import { SvgIconProps } from "@material-ui/core/SvgIcon";
 import BookIcon from "@material-ui/icons/Book";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import HomeIcon from "@material-ui/icons/Home";
-import TimeLineIcon from "@material-ui/icons/Timeline";
+import MultilineChartIcon from "@material-ui/icons/MultilineChart";
 import { RouteProps } from "react-router";
 import {
   Docs,
@@ -29,7 +29,7 @@ export const routes: IRoute[] = [
     path: "/pca",
     title: "PCA",
     component: PrincipalComponentAnalysis,
-    icon: TimeLineIcon
+    icon: MultilineChartIcon
   },
   {
     title: "SOM",

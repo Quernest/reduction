@@ -107,7 +107,9 @@ class HeaderComponent extends Component<IProps, IState> {
             button={true}
           >
             <ListItemIcon>
-              <Icon />
+              <Icon
+                color={path === location.pathname ? "primary" : "inherit"}
+              />
             </ListItemIcon>
             <ListItemText primary={title} />
           </ListItem>
@@ -118,7 +120,7 @@ class HeaderComponent extends Component<IProps, IState> {
     });
 
     return (
-      <header className={classes.root}>
+      <div className={classes.root}>
         <AppBar position="static">
           <Toolbar>
             <div className={classes.wrap}>
@@ -160,7 +162,7 @@ class HeaderComponent extends Component<IProps, IState> {
             </div>
           </Drawer>
         </Hidden>
-      </header>
+      </div>
     );
   }
 }

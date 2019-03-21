@@ -1,3 +1,4 @@
+import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -11,7 +12,6 @@ import {
   Calculations,
   Charts,
   ErrorMessage,
-  Info,
   UploadControls,
   VisualizeControls
 } from "src/components";
@@ -44,6 +44,9 @@ const useStyles = makeStyles(({ spacing, breakpoints }: Theme) => ({
   back: {
     marginLeft: -spacing.unit,
     marginRight: spacing.unit
+  },
+  divider: {
+    marginBottom: spacing.unit * 3
   }
 }));
 
@@ -325,7 +328,11 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
         )}
         {!uploaded && !calculated && (
           <>
-            <Info />
+            <Typography variant="body1" paragraph={true}>
+              Process two-dimensional data arrays using principal component
+              analysis.
+            </Typography>
+            <Divider className={classes.divider} />
             <UploadControls
               file={file}
               onUpload={onUploadFile}

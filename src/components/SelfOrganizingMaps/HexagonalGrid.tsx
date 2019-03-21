@@ -26,10 +26,11 @@ import * as math from "mathjs";
 import React, { Component, createRef, RefObject } from "react";
 import { IHexagonalGridDimensions, IHexagonParameters } from "src/models";
 
-const styles = ({ typography }: Theme) =>
+const styles = ({ typography, spacing }: Theme) =>
   createStyles({
     root: {
-      flexGrow: 1
+      flexGrow: 1,
+      marginBottom: spacing.unit * 3
     },
     title: {
       marginTop: 16,

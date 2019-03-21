@@ -7,6 +7,7 @@ import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
+import isEmpty from "lodash/isEmpty";
 import React, { Component, createRef, RefObject } from "react";
 import { FactorSelector } from "src/components";
 import { IHexagonalGridDimensions, ISOMOptions } from "src/models";
@@ -361,12 +362,14 @@ export const SOMControls = withStyles(styles)(
                   <Grid item={true} xs={12} sm={4} md={2}>
                     <Grid container={true} spacing={16}>
                       <Grid item={true} xs={12}>
-                        <FactorSelector
-                          onChangeFactor={onChangeFactor}
-                          currentFactorIdx={currentFactorIdx}
-                          factors={factors}
-                          disabled={loading}
-                        />
+                        {!isEmpty(factors) && (
+                          <FactorSelector
+                            onChangeFactor={onChangeFactor}
+                            currentFactorIdx={currentFactorIdx}
+                            factors={factors}
+                            disabled={loading}
+                          />
+                        )}
                       </Grid>
                     </Grid>
                   </Grid>
