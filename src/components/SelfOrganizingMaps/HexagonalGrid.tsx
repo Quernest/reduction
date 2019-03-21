@@ -508,7 +508,7 @@ export const HexagonalGrid = withStyles(styles)(
       return (
         <div className={classes.root}>
           {title && (
-            <Typography variant="body1" className={classes.title}>
+            <Typography variant="h2" className={classes.title}>
               {title}
             </Typography>
           )}

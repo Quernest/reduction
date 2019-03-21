@@ -176,14 +176,13 @@ export const Calculations = ({
           </Typography>
           <Typography variant="body1" gutterBottom={true}>
             All <strong>{factors.length}</strong> components explain{" "}
-            <strong>{round(totalProportion, 1)}%</strong> variation of the data
+            <strong>{round(totalProportion)}%</strong> variation of the data
           </Typography>
           <Typography variant="body1" gutterBottom={true}>
             <strong>{importantComponents.length}</strong> component
             {importantComponents.length > 1 ? "s" : ""} have eigenvalue
             {importantComponents.length > 1 ? "s" : ""} above 1 and explain{" "}
-            <strong>{round(importantComponentsVariance, 1)}%</strong> of
-            variation.
+            <strong>{round(importantComponentsVariance)}%</strong> of variation.
           </Typography>
         </div>
       </div>

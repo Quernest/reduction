@@ -67,7 +67,7 @@ ctx.addEventListener(
        */
       if (requiredVariablesCount + minFactorsCount > columns.length) {
         throw new Error(`
-          the number of factors must be more than ${minFactorsCount}
+          the number of factors must be equal to or more than ${minFactorsCount}
           (taking into account the variable with observations and types if types are indicated)
         `);
       }
@@ -104,7 +104,7 @@ ctx.addEventListener(
       forEach(rows, (row, i) => {
         if (requiredVariablesCount + minFactorsCount > row.length) {
           throw new Error(
-            `the number of observations must be more than ${minObservationsCount}`
+            `the number of observations must be equal to or more than ${minObservationsCount}`
           );
         }
 

@@ -29,10 +29,22 @@ export const Home = () => {
     <div className={classes.root}>
       <div className={classes.wrap}>
         <Grid container={true} alignItems="flex-start" spacing={24}>
-          <Grid item={true} xs={12} md={6}>
-            <Typography variant="h5" gutterBottom={true}>
-              Principal Component Analysis
+          <Grid item={true} xs={12}>
+            <Typography variant="h1">What is "reduction" ?</Typography>
+            <Typography variant="body1" paragraph={true}>
+              In statistics, machine learning, and information theory,
+              dimensionality reduction or dimension reduction is the process of
+              reducing the number of random variables under consideration by
+              obtaining a set of principal variables. It can be divided into
+              feature selection and feature extraction.
             </Typography>
+            <Typography variant="body1" paragraph={true}>
+              This application is designed for using and testing data reduction
+              algorithms.
+            </Typography>
+          </Grid>
+          <Grid item={true} xs={12} md={6}>
+            <Typography variant="h2">Principal Component Analysis</Typography>
             <Typography variant="body1" paragraph={true}>
               Principal component analysis (PCA) is a statistical procedure that
               uses an orthogonal transformation to convert a set of observations
@@ -45,9 +57,7 @@ export const Home = () => {
             </Button>
           </Grid>
           <Grid item={true} xs={12} md={6}>
-            <Typography variant="h5" gutterBottom={true}>
-              Self-Organizing Map
-            </Typography>
+            <Typography variant="h2">Self-Organizing Map</Typography>
             <Typography variant="body1" paragraph={true}>
               A self-organizing map (SOM) or self-organizing feature map (SOFM)
               is a type of artificial neural network (ANN) that is trained using

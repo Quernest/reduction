@@ -322,9 +322,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
     return (
       <div className={classes.root}>
         <div className={classes.wrap}>
-          <Typography variant="h5" gutterBottom={true}>
-            Self-Organizing Maps
-          </Typography>
+          <Typography variant="h1">Self-Organizing Maps</Typography>
           <Divider className={classes.divider} />
           {uploaded && (
             <SOMControls

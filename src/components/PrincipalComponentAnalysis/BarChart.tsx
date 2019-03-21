@@ -268,11 +268,7 @@ class BarChartBase extends Component<IProps, IChartState> {
     return (
       <div className={classes.root}>
         {title && (
-          <Typography
-            className={classes.title}
-            variant="h6"
-            gutterBottom={true}
-          >
+          <Typography className={classes.title} variant="h2">
             {title}
           </Typography>
         )}

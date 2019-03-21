@@ -283,7 +283,7 @@ export const PrincipalComponentAnalysis = (): JSX.Element => {
   return (
     <div className={classes.root}>
       <div className={classes.wrap}>
-        <Typography variant="h5" gutterBottom={true}>
+        <Typography variant="h1">
           {visualized && (
             <IconButton className={classes.back} onClick={onBack}>
               <ArrowBackIcon />

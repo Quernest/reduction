@@ -4,19 +4,11 @@
  */
 import "./bootstrap";
 
-import { createMuiTheme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
 import React from "react";
 import ReactDOM from "react-dom";
 import { AppRouter } from "./router";
-
-const theme = createMuiTheme({
-  typography: {
-    useNextVariants: true,
-    // use the system font instead of the default Roboto font.
-    fontFamily: ["K2D", "sans-serif"].join(",")
-  }
-});
+import { theme } from "./theme";
 
 ReactDOM.render(
   <ThemeProvider theme={theme}>

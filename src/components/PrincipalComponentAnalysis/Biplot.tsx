@@ -411,7 +411,7 @@ class BiplotBase extends Component<IProps, IState> {
     return (
       <div className={classes.root}>
         {title && (
-          <Typography className={classes.title} variant="h6">
+          <Typography className={classes.title} variant="h2">
             {title}
           </Typography>
         )}
