@@ -11,7 +11,7 @@ import {
   IPCA,
   IPCACalculations
 } from "src/models";
-import { PCA } from "./pca";
+import { PCA } from "src/utils/pca";
 
 const ctx: Worker = self as any;
 

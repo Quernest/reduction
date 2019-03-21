@@ -4,13 +4,7 @@ import DashboardIcon from "@material-ui/icons/Dashboard";
 import HomeIcon from "@material-ui/icons/Home";
 import MultilineChartIcon from "@material-ui/icons/MultilineChart";
 import { RouteProps } from "react-router";
-import {
-  Docs,
-  Home,
-  NoMatch,
-  PrincipalComponentAnalysis,
-  SelfOrganizingMaps
-} from "../pages";
+import { Docs, Home, NoMatch, PCAPage, SOMPage } from "../pages";
 
 export interface IRoute extends RouteProps {
   title?: string;
@@ -28,13 +22,13 @@ export const routes: IRoute[] = [
   {
     path: "/pca",
     title: "PCA",
-    component: PrincipalComponentAnalysis,
+    component: PCAPage,
     icon: MultilineChartIcon
   },
   {
     title: "SOM",
     path: "/som",
-    component: SelfOrganizingMaps,
+    component: SOMPage,
     icon: DashboardIcon
   },
   {

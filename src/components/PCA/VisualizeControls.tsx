@@ -8,12 +8,11 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { Theme } from "@material-ui/core/styles";
 import Tooltip from "@material-ui/core/Tooltip";
-import BarChartIcon from "@material-ui/icons/BarChartOutlined";
 import ThreeSixtyIcon from "@material-ui/icons/ThreeSixty";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
 import React, { ChangeEvent, MouseEvent } from "react";
-import { IEigenAnalysis } from "src/models";
+import { IPCACalculations } from "src/models";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
@@ -33,39 +32,31 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
 }));
 
 interface IProps {
-  visualized?: boolean;
-  analysis: IEigenAnalysis;
+  calculations: IPCACalculations;
   selectedComponents: {
     x: number;
     y: number;
   };
-  onChangeSelectedComponents: (newSelectedComponents: {
-    x: number;
-    y: number;
-  }) => void;
-  onVisualize: () => void;
+  onChange: (selectedComponents: { x: number; y: number }) => void;
 }
 
 export const VisualizeControls = ({
-  analysis: { proportion, components },
+  calculations: {
+    analysis: { proportion, components }
+  },
   selectedComponents,
-  onChangeSelectedComponents,
-  onVisualize,
-  visualized
+  onChange
 }: IProps) => {
   const classes = useStyles();
 
-  const onChangeSelect = (event: ChangeEvent<HTMLSelectElement>) => {
+  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = event.target;
 
-    onChangeSelectedComponents({ ...selectedComponents, [name]: value });
+    onChange({ ...selectedComponents, [name]: value });
   };
 
   const onSwap = (event: MouseEvent<HTMLElement>) => {
-    const x: number = selectedComponents.y;
-    const y: number = selectedComponents.x;
-
-    onChangeSelectedComponents({ x, y });
+    onChange({ x: selectedComponents.y, y: selectedComponents.x });
   };
 
   return (
@@ -77,7 +68,7 @@ export const VisualizeControls = ({
               <InputLabel htmlFor="x">Axis X</InputLabel>
               <Select
                 value={selectedComponents.x}
-                onChange={onChangeSelect}
+                onChange={handleChange}
                 disabled={proportion.length === 2}
                 inputProps={{
                   name: "x",
@@ -101,7 +92,7 @@ export const VisualizeControls = ({
               <InputLabel htmlFor="y">Axis Y</InputLabel>
               <Select
                 value={selectedComponents.y}
-                onChange={onChangeSelect}
+                onChange={handleChange}
                 disabled={proportion.length === 2}
                 inputProps={{
                   name: "y",
@@ -133,17 +124,6 @@ export const VisualizeControls = ({
                 <ThreeSixtyIcon />
               </IconButton>
             </Tooltip>
-            {!visualized && (
-              <Tooltip title="Visualize">
-                <IconButton
-                  aria-label="Visualize"
-                  onClick={onVisualize}
-                  className={classes.button}
-                >
-                  <BarChartIcon />
-                </IconButton>
-              </Tooltip>
-            )}
             <Hidden smUp={true}>
               <Divider />
             </Hidden>

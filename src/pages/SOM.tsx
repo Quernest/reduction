@@ -10,7 +10,7 @@ import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
 import round from "lodash/round";
 import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
+import { RouteComponentProps, withRouter } from "react-router-dom";
 import compose from "recompose/compose";
 import {
   DatasetControls,
@@ -29,8 +29,8 @@ import {
   IHexagonalGridDimensions,
   ISOMOptions
 } from "src/models";
-import CalculateWorker from "worker-loader!src/components/SelfOrganizingMaps/calculate.worker";
-import UploadWorker from "worker-loader!src/components/SelfOrganizingMaps/upload.worker";
+import CalculateWorker from "worker-loader!src/components/SOM/calculate.worker";
+import UploadWorker from "worker-loader!src/components/SOM/upload.worker";
 
 const styles = ({ spacing, breakpoints }: Theme) =>
   createStyles({
@@ -63,7 +63,7 @@ const styles = ({ spacing, breakpoints }: Theme) =>
     }
   });
 
-interface IProps extends WithStyles<typeof styles> {}
+interface IProps extends WithStyles<typeof styles>, RouteComponentProps {}
 
 interface IState {
   file?: File;
@@ -85,7 +85,7 @@ interface IState {
   error?: string;
 }
 
-class SelfOrganizingMapsPage extends Component<IProps, IState> {
+class SOMPageBase extends Component<IProps, IState> {
   protected calculateWorker: Worker;
   protected uploadWorker: Worker;
 
@@ -408,7 +408,7 @@ class SelfOrganizingMapsPage extends Component<IProps, IState> {
   }
 }
 
-export const SelfOrganizingMaps = compose<IProps, {}>(
+export const SOMPage = compose<IProps, any>(
   withRouter,
   withStyles(styles)
-)(SelfOrganizingMapsPage);
+)(SOMPageBase);
