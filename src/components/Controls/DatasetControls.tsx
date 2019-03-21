@@ -43,7 +43,10 @@ export const DatasetControls = ({
   function handleChange(event: ChangeEvent<HTMLSelectElement>) {
     const { name, value } = event.target;
 
-    onChange({ ...datasetRequiredColumnsIdxs, [name]: value });
+    onChange({
+      ...datasetRequiredColumnsIdxs,
+      [name]: value !== "" ? value : undefined
+    });
   }
 
   return (

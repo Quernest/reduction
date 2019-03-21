@@ -53,7 +53,7 @@ interface IProps extends WithStyles<typeof styles> {
   ) => void;
   factors: string[];
   currentFactorIdx: number;
-  onChangeFactor: (variableIndex: number) => void;
+  onChangeFactor: (factorIdx: number) => void;
   loading?: boolean;
 }
 
