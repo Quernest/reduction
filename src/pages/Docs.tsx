@@ -96,8 +96,10 @@ export const Docs = (): JSX.Element => {
           wines described by the average ratings of a set of experts on their
           hedonic dimension, how much the wine goes with dessert, and how much
           the wine goes with meat. Each wine is also described by its price, its
-          sugar and alcohol content, and its acidity. Another describes the GDP
-          of the United States of America.
+          sugar and alcohol content, and its acidity. Another describes gross
+          state product from Lattin, Carroll, and Green (2003). Data are for 50
+          observations (U.S. states) and 13 categories (ag, mining, trade, etc.)
+          for the gross state product expressed as shares.
         </Typography>
       </div>
     </div>

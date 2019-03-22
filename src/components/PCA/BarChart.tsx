@@ -11,13 +11,16 @@ import React, { Component } from "react";
 import compose from "recompose/compose";
 import { IBarData, IChartState } from "src/models";
 
-const styles = ({ palette, spacing, typography }: Theme) =>
+const styles = ({ palette, spacing, typography, breakpoints }: Theme) =>
   createStyles({
     root: {
       width: "100%"
     },
     title: {
-      marginTop: spacing.unit * 2
+      marginTop: spacing.unit * 2,
+      [breakpoints.down("sm")]: {
+        fontSize: 16
+      }
     },
     svgContainer: {
       position: "relative",
@@ -268,7 +271,7 @@ class BarChartBase extends Component<IProps, IChartState> {
     return (
       <div className={classes.root}>
         {title && (
-          <Typography className={classes.title} variant="h2">
+          <Typography className={classes.title} variant="h6">
             {title}
           </Typography>
         )}

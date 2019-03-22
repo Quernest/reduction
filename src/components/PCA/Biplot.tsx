@@ -6,13 +6,16 @@ import React, { Component } from "react";
 import compose from "recompose/compose";
 import { IChartState, Points, Vectors } from "src/models";
 
-const styles = ({ spacing, typography }: Theme) =>
+const styles = ({ spacing, typography, breakpoints }: Theme) =>
   createStyles({
     root: {
       width: "100%"
     },
     title: {
-      marginTop: spacing.unit * 2
+      marginTop: spacing.unit * 2,
+      [breakpoints.down("sm")]: {
+        fontSize: 16
+      }
     },
     svgContainer: {
       position: "relative",
@@ -411,7 +414,7 @@ class BiplotBase extends Component<IProps, IState> {
     return (
       <div className={classes.root}>
         {title && (
-          <Typography className={classes.title} variant="h2">
+          <Typography className={classes.title} variant="h6">
             {title}
           </Typography>
         )}

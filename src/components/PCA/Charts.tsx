@@ -46,7 +46,7 @@ export const Charts = ({
 
     return (
       <Biplot
-        title="Biplot of factors score"
+        title="Biplot of principal component scores"
         eigenvectors={vectors}
         factors={factors}
         xAxisLabel={components[x]}

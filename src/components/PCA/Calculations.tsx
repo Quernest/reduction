@@ -3,7 +3,6 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import filter from "lodash/filter";
 import includes from "lodash/includes";
-import isUndefined from "lodash/isUndefined";
 import round from "lodash/round";
 import unzip from "lodash/unzip";
 import React, { useMemo } from "react";
@@ -13,7 +12,6 @@ import {
   IDatasetRequiredColumnsIndexes,
   IPCACalculations
 } from "src/models";
-import { insert } from "src/utils";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {
@@ -43,14 +41,8 @@ interface IProps {
 }
 
 export const Calculations = ({
-  dataset,
-  calculations,
-  datasetRequiredColumnsIdxs: { observationsIdx, typesIdx }
-}: IProps): JSX.Element => {
-  const classes = useStyles();
-  const {
-    adjustedDataset,
-    covariance,
+  dataset: { factors, variables, observations },
+  calculations: {
     eigens,
     analysis: {
       proportion,
@@ -62,93 +54,10 @@ export const Calculations = ({
       cumulative
     },
     linearCombinations
-  } = calculations;
-  const { factors, variables, types, observations, values } = dataset;
-
-  const DatasetTable = useMemo(() => {
-    let rowsValues = [...values];
-
-    /**
-     * there is a substitution of columns for variables,
-     * if a variable with the selected type exists and it
-     * is after the observation variable, then we insert
-     * the array of types first, if not otherwise
-     *
-     * it is necessary for the correct position
-     * todo: improve this code
-     */
-    if (!isUndefined(typesIdx) && types) {
-      if (observationsIdx > typesIdx) {
-        rowsValues = insert(rowsValues, typesIdx, types);
-        rowsValues = insert(rowsValues, observationsIdx, observations);
-      } else {
-        rowsValues = insert(rowsValues, observationsIdx, observations);
-        rowsValues = insert(rowsValues, typesIdx, types);
-      }
-    } else {
-      /**
-       * add observations to the specific position
-       */
-      rowsValues = insert(rowsValues, observationsIdx, observations);
-    }
-
-    const columns = generateColumns(variables);
-    const rows = generateRows(rowsValues, variables);
-
-    return (
-      <div className={classes.tableBox}>
-        <DXTable title="Original dataset" rows={rows} columns={columns} />
-      </div>
-    );
-  }, [observations, values, types, variables]);
-
-  const AdjustedDatasetTable = useMemo(() => {
-    let rowsValues = [...adjustedDataset];
-
-    /**
-     * there is a substitution of columns for variables,
-     * if a variable with the selected type exists and it
-     * is after the observation variable, then we insert
-     * the array of types first, if not otherwise
-     *
-     * it is necessary for the correct position
-     * todo: improve this code
-     */
-    if (!isUndefined(typesIdx) && types) {
-      if (observationsIdx > typesIdx) {
-        rowsValues = insert(rowsValues, typesIdx, types);
-        rowsValues = insert(rowsValues, observationsIdx, observations);
-      } else {
-        rowsValues = insert(rowsValues, observationsIdx, observations);
-        rowsValues = insert(rowsValues, typesIdx, types);
-      }
-    } else {
-      /**
-       * add observations to the specific position
-       */
-      rowsValues = insert(rowsValues, observationsIdx, observations);
-    }
-
-    const columns = generateColumns(variables);
-    const rows = generateRows(rowsValues, variables);
-
-    return (
-      <div className={classes.tableBox}>
-        <DXTable title="Adjusted dataset" rows={rows} columns={columns} />
-      </div>
-    );
-  }, [observations, adjustedDataset, types, variables]);
-
-  const CovarianceTable = useMemo(() => {
-    const columns = generateColumns(factors);
-    const rows = generateRows(covariance, factors);
-
-    return (
-      <div className={classes.tableBox}>
-        <DXTable title="Covariance matrix" rows={rows} columns={columns} />
-      </div>
-    );
-  }, [covariance, factors]);
+  },
+  datasetRequiredColumnsIdxs: { observationsIdx }
+}: IProps): JSX.Element => {
+  const classes = useStyles();
 
   const AnalysisTable = useMemo(() => {
     const columnNames = [
@@ -224,7 +133,7 @@ export const Calculations = ({
     );
   }, [eigens.E.x, factors, importantComponents]);
 
-  const LinearCombinationsTable = useMemo(() => {
+  const PredictionsTable = useMemo(() => {
     const columnNames = [variables[observationsIdx], ...components];
     const columns = generateColumns(columnNames);
     const rows = generateRows(
@@ -244,7 +153,7 @@ export const Calculations = ({
     return (
       <div className={classes.tableBox}>
         <DXTable
-          title="Linear Combinations"
+          title="Predicted principal components"
           rows={rows}
           columns={columns}
           importantComponentsList={importantComponentsList}
@@ -256,12 +165,9 @@ export const Calculations = ({
   return (
     <div className={classes.root}>
       <div className={classes.tables}>
-        {DatasetTable}
-        {AdjustedDatasetTable}
-        {CovarianceTable}
         {AnalysisTable}
         {LoadingsTable}
-        {LinearCombinationsTable}
+        {PredictionsTable}
       </div>
     </div>
   );

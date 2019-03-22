@@ -26,15 +26,17 @@ import * as math from "mathjs";
 import React, { Component, createRef, RefObject } from "react";
 import { IHexagonalGridDimensions, IHexagonParameters } from "src/models";
 
-const styles = ({ typography, spacing }: Theme) =>
+const styles = ({ typography, spacing, breakpoints }: Theme) =>
   createStyles({
     root: {
       flexGrow: 1,
       marginBottom: spacing.unit * 3
     },
     title: {
-      marginTop: 16,
-      marginBottom: 8
+      marginTop: spacing.unit * 2,
+      [breakpoints.down("sm")]: {
+        fontSize: 16
+      }
     },
     container: {
       position: "relative"
@@ -509,7 +511,7 @@ export const HexagonalGrid = withStyles(styles)(
       return (
         <div className={classes.root}>
           {title && (
-            <Typography variant="h2" className={classes.title}>
+            <Typography variant="h6" className={classes.title}>
               {title}
             </Typography>
           )}
