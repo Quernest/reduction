@@ -63,7 +63,7 @@ export const Home = () => {
               various numerical values) into a set of values of linearly
               uncorrelated variables called principal components.
             </Typography>
-            <Button {...redirectTo("/pca")} color="primary" variant="outlined">
+            <Button {...redirectTo("/pca")} color="primary" variant="contained">
               Try it
             </Button>
           </Grid>
@@ -80,7 +80,7 @@ export const Home = () => {
               the training samples, called a map, and is therefore a method to
               do dimensionality reduction.
             </Typography>
-            <Button {...redirectTo("/som")} color="primary" variant="outlined">
+            <Button {...redirectTo("/som")} color="primary" variant="contained">
               Try it
             </Button>
           </Grid>

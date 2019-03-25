@@ -4,10 +4,9 @@ const defaultTheme = createMuiTheme({
   typography: {
     useNextVariants: true,
     fontSize: 16
-    // use the system font instead of the default Roboto font.
-    // fontFamily: ["K2D", "sans-serif"].join(",")
   }
 });
+
 const { typography, breakpoints, spacing } = defaultTheme;
 
 export const theme = createMuiTheme({
