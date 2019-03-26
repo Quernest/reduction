@@ -29,8 +29,8 @@ import {
   IHexagonalGridDimensions,
   ISOMOptions
 } from "src/models";
-import CalculateWorker from "worker-loader!src/components/SOM/calculate.worker";
-import UploadWorker from "worker-loader!src/components/SOM/upload.worker";
+import CalculateWorker from "worker-loader!src/workers/SOM/calculate.worker";
+import UploadWorker from "worker-loader!src/workers/SOM/upload.worker";
 
 const styles = ({ spacing, breakpoints }: Theme) =>
   createStyles({

@@ -23,8 +23,8 @@ import {
   IFilePreview,
   IPCACalculations
 } from "src/models";
-import CalculateWorker from "worker-loader!src/components/PCA/calculate.worker";
-import UploadWorker from "worker-loader!src/components/PCA/upload.worker";
+import CalculateWorker from "worker-loader!src/workers/PCA/calculate.worker";
+import UploadWorker from "worker-loader!src/workers/PCA/upload.worker";
 
 const styles = ({ spacing, breakpoints }: Theme) =>
   createStyles({
