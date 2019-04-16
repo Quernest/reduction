@@ -4,12 +4,7 @@ import { HashRouter as Router, Route, Switch } from "react-router-dom";
 import { Header } from "src/components";
 import { routes } from "./";
 
-/**
- * AppRouter is component which contains all page routes
- * and provide a wrapper for the react-router-dom library
- * @param props any
- */
-export const AppRouter = (props: any): JSX.Element => {
+export const AppRouter = () => {
   const routeComponents = map(routes, (route, i) => (
     <Route key={i} {...route} />
   ));

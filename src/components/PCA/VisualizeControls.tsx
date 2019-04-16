@@ -11,7 +11,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import ThreeSixtyIcon from "@material-ui/icons/ThreeSixty";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
-import React, { ChangeEvent, MouseEvent } from "react";
+import * as React from "react";
 import { IPCACalculations } from "src/models";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
@@ -31,7 +31,7 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
   }
 }));
 
-interface IProps {
+interface IVisualizeControlsProps {
   calculations: IPCACalculations;
   selectedComponents: {
     x: number;
@@ -40,22 +40,22 @@ interface IProps {
   onChange: (selectedComponents: { x: number; y: number }) => void;
 }
 
-export const VisualizeControls = ({
+export const VisualizeControls: React.FC<IVisualizeControlsProps> = ({
   calculations: {
     analysis: { proportion, components }
   },
   selectedComponents,
   onChange
-}: IProps) => {
+}) => {
   const classes = useStyles();
 
-  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
     const { name, value } = event.target;
 
     onChange({ ...selectedComponents, [name]: value });
   };
 
-  const onSwap = (event: MouseEvent<HTMLElement>) => {
+  function onSwap(event: React.MouseEvent<HTMLElement, MouseEvent>) {
     onChange({ x: selectedComponents.y, y: selectedComponents.x });
   };
 

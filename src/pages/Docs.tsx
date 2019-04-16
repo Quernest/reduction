@@ -3,7 +3,7 @@ import Link from "@material-ui/core/Link";
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
-import React from "react";
+import * as React from "react";
 
 const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   root: {
@@ -33,7 +33,7 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   }
 }));
 
-export const Docs = (): JSX.Element => {
+export const Docs = () => {
   const classes = useStyles();
 
   return (

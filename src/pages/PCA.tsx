@@ -6,7 +6,7 @@ import {
   WithStyles
 } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import React, { Component } from "react";
+import * as React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import compose from "recompose/compose";
 import {
@@ -46,9 +46,9 @@ const styles = ({ spacing, breakpoints }: Theme) =>
     }
   });
 
-interface IProps extends WithStyles<typeof styles>, RouteComponentProps {}
+interface IPCAPageProps extends WithStyles<typeof styles>, RouteComponentProps {}
 
-interface IState {
+interface IPCAPageState {
   file?: File;
   filePreview: IFilePreview;
   dataset: IDataset;
@@ -65,11 +65,11 @@ interface IState {
   error?: string;
 }
 
-class PCAPageBase extends Component<IProps, IState> {
+class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
   protected uploadWorker: Worker;
   protected calculateWorker: Worker;
 
-  public readonly state: IState = {
+  public readonly state: IPCAPageState = {
     file: undefined,
     filePreview: {
       rows: [],
@@ -332,7 +332,7 @@ class PCAPageBase extends Component<IProps, IState> {
   }
 }
 
-export const PCAPage = compose<IProps, any>(
+export const PCAPage = compose<IPCAPageProps, any>(
   withRouter,
   withStyles(styles)
 )(PCAPageBase);

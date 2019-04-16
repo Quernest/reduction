@@ -5,7 +5,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import { makeStyles } from "@material-ui/styles";
-import React, { ChangeEvent, createRef, MouseEvent, RefObject } from "react";
+import * as React from "react";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {
@@ -31,7 +31,7 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   }
 }));
 
-interface IProps {
+interface IUploadControlsProps {
   file?: File;
   uploading?: boolean;
   onChange: (chosenFile?: File, error?: string) => void;
@@ -39,25 +39,25 @@ interface IProps {
   onCancel: () => void;
 }
 
-export const UploadControls = ({
+export const UploadControls: React.FC<IUploadControlsProps> = ({
   uploading,
   onUpload,
   onCancel,
   onChange,
   file
-}: IProps): JSX.Element => {
+}) => {
   const classes = useStyles();
-  const fileInput: RefObject<HTMLInputElement> = createRef();
+  const fileInput: React.RefObject<HTMLInputElement> = React.createRef();
 
-  const onChoose = (event: MouseEvent<HTMLElement>): void => {
+  function onChoose(event: React.MouseEvent<HTMLElement, MouseEvent>) {
     const input = fileInput.current;
 
     if (input) {
       input.click();
     }
-  };
+  }
 
-  const onChangeFile = (event: ChangeEvent<HTMLInputElement>): void => {
+  function onChangeFile(event: React.ChangeEvent<HTMLInputElement>) {
     const files: FileList | null = event.target.files;
 
     if (files) {
@@ -93,7 +93,7 @@ export const UploadControls = ({
       // to be able to upload the same file again if it was canceled
       event.target.value = "";
     }
-  };
+  }
 
   return (
     <div className={classes.root}>

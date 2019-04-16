@@ -24,11 +24,11 @@ import map from "lodash/map";
 import round from "lodash/round";
 import unzip from "lodash/unzip";
 import zipObject from "lodash/zipObject";
-import React, { MouseEvent, useState } from "react";
+import * as React from "react";
 import { isLongNumber } from "src/utils";
 import { Cell, FilterComponentsButton, IntervalInput } from "./";
 
-const useStyles = makeStyles(({ spacing, breakpoints }: Theme) => ({
+const useStyles = makeStyles(({ breakpoints }: Theme) => ({
   root: {
     flexGrow: 1
   },
@@ -45,7 +45,7 @@ const useStyles = makeStyles(({ spacing, breakpoints }: Theme) => ({
   }
 }));
 
-interface IProps {
+interface IDXTableProps {
   rows: Row[];
   columns: Column[];
   title?: string;
@@ -53,17 +53,17 @@ interface IProps {
   intervalFilter?: boolean;
 }
 
-export const DXTable = ({
+export const DXTable: React.FC<IDXTableProps> = ({
   title,
   rows,
   columns,
   importantComponentsList,
   intervalFilter
-}: IProps): JSX.Element => {
+}) => {
   const classes = useStyles();
-  const [hiddenColumnNames, setHiddenColumnNames] = useState<string[]>([]);
-  const [interval, setInterval] = useState<number>(0);
-  const [isOpenIntervalInput, toggleIntervalInput] = useState<boolean>(false);
+  const [hiddenColumnNames, setHiddenColumnNames] = React.useState<string[]>([]);
+  const [interval, setInterval] = React.useState<number>(0);
+  const [isOpenIntervalInput, toggleIntervalInput] = React.useState<boolean>(false);
 
   function onFilterComponents() {
     if (importantComponentsList && importantComponentsList.length > 0) {
@@ -85,15 +85,15 @@ export const DXTable = ({
     setInterval(Number(value));
   }
 
-  function onOpenIntervalInput(e: MouseEvent<HTMLElement>) {
+  function onOpenIntervalInput(event: React.MouseEvent<HTMLElement>) {
     toggleIntervalInput(true);
   }
 
-  function onCloseIntervalInput(e: MouseEvent<HTMLElement>) {
+  function onCloseIntervalInput(event: React.MouseEvent<HTMLElement>) {
     toggleIntervalInput(false);
   }
 
-  const CellWrapper = (props: Table.DataCellProps) => (
+  const CellWrapper: React.FC<Table.DataCellProps> = (props) => (
     <Cell interval={interval} {...props} />
   );
 

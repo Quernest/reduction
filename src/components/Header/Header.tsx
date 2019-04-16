@@ -18,7 +18,7 @@ import {
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import MenuIcon from "@material-ui/icons/Menu";
-import React, { Component } from "react";
+import * as React from "react";
 import { Link } from "react-router-dom";
 import { withRouter } from "react-router-dom";
 import compose from "recompose/compose";
@@ -47,16 +47,16 @@ const styles = ({ breakpoints }: Theme) =>
     }
   });
 
-interface IProps extends WithStyles<typeof styles> {
+interface IHeaderBaseProps extends WithStyles<typeof styles> {
   routes: IRoute[];
   location: Location;
 }
 
-interface IState {
+interface IHeaderBaseState {
   isOpenDrawer: boolean;
 }
 
-class HeaderComponent extends Component<IProps, IState> {
+class HeaderBase extends React.Component<IHeaderBaseProps, IHeaderBaseState> {
   public readonly state = {
     isOpenDrawer: false
   };
@@ -67,7 +67,7 @@ class HeaderComponent extends Component<IProps, IState> {
     });
   };
 
-  public render(): JSX.Element {
+  public render() {
     const { classes, location, routes } = this.props;
     const { isOpenDrawer } = this.state;
 
@@ -167,7 +167,7 @@ class HeaderComponent extends Component<IProps, IState> {
   }
 }
 
-export const Header = compose<IProps, any>(
+export const Header = compose<IHeaderBaseProps, any>(
   withRouter,
   withStyles(styles)
-)(HeaderComponent);
+)(HeaderBase);

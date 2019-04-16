@@ -4,7 +4,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import ClearIcon from "@material-ui/icons/Clear";
 import LinearScaleIcon from "@material-ui/icons/LinearScale";
 import { makeStyles } from "@material-ui/styles";
-import React from "react";
+import * as React from "react";
 
 const useStyles = makeStyles({
   input: {
@@ -12,7 +12,7 @@ const useStyles = makeStyles({
   }
 });
 
-interface IProps {
+interface IIntervalInputProps {
   onOpen: (e: React.MouseEvent<HTMLElement>) => void;
   onClose: (e: React.MouseEvent<HTMLElement>) => void;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -20,14 +20,13 @@ interface IProps {
   isOpen: boolean;
 }
 
-export const IntervalInput = ({
+export const IntervalInput: React.FC<IIntervalInputProps> = ({
   onOpen,
   onClose,
   onChange,
   interval,
   isOpen,
-  ...restProps
-}: IProps) => {
+}) => {
   const classes = useStyles();
 
   if (isOpen) {

@@ -1,7 +1,7 @@
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
-import React from "react";
+import * as React from "react";
 
 const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   root: {
@@ -19,11 +19,11 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   }
 }));
 
-interface IProps {
+interface INoMatchProps {
   location: Location;
 }
 
-export const NoMatch = ({ location }: IProps): JSX.Element => {
+export const NoMatch: React.FC<INoMatchProps> = ({ location }) => {
   const classes = useStyles();
 
   return (

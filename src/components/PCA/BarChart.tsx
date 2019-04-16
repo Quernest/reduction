@@ -7,7 +7,7 @@ import {
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
 import round from "lodash/round";
-import React, { Component } from "react";
+import * as React from "react";
 import compose from "recompose/compose";
 import { IBarData, IChartState } from "src/models";
 
@@ -67,14 +67,14 @@ const styles = ({ palette, spacing, typography, breakpoints }: Theme) =>
     }
   });
 
-interface IProps extends WithStyles<typeof styles> {
+interface IBarChartProps extends WithStyles<typeof styles> {
   title?: string;
   xAxisLabel?: string;
   yAxisLabel?: string;
   data: IBarData[];
 }
 
-class BarChartBase extends Component<IProps, IChartState> {
+class BarChartBase extends React.Component<IBarChartProps, IChartState> {
   /**
    * main svg element
    */
@@ -286,4 +286,4 @@ class BarChartBase extends Component<IProps, IChartState> {
   }
 }
 
-export const BarChart = compose<IProps, any>(withStyles(styles))(BarChartBase);
+export const BarChart = compose<IBarChartProps, any>(withStyles(styles))(BarChartBase);

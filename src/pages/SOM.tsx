@@ -9,7 +9,7 @@ import {
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
 import round from "lodash/round";
-import React, { Component } from "react";
+import React from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import compose from "recompose/compose";
 import {
@@ -63,9 +63,9 @@ const styles = ({ spacing, breakpoints }: Theme) =>
     }
   });
 
-interface IProps extends WithStyles<typeof styles>, RouteComponentProps {}
+interface ISOMPageProps extends WithStyles<typeof styles>, RouteComponentProps {}
 
-interface IState {
+interface ISOMPageState {
   file?: File;
   filePreview: IFilePreview;
   datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
@@ -85,11 +85,11 @@ interface IState {
   error?: string;
 }
 
-class SOMPageBase extends Component<IProps, IState> {
+class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
   protected calculateWorker: Worker;
   protected uploadWorker: Worker;
 
-  public readonly state: IState = {
+  public readonly state: ISOMPageState = {
     file: undefined,
     filePreview: {
       rows: [],
@@ -294,7 +294,7 @@ class SOMPageBase extends Component<IProps, IState> {
     });
   }
 
-  public render(): JSX.Element {
+  public render() {
     const { classes } = this.props;
     const {
       uploaded,
@@ -408,7 +408,7 @@ class SOMPageBase extends Component<IProps, IState> {
   }
 }
 
-export const SOMPage = compose<IProps, any>(
+export const SOMPage = compose<ISOMPageProps, any>(
   withRouter,
   withStyles(styles)
 )(SOMPageBase);

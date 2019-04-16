@@ -1,7 +1,7 @@
 import { Table } from "@devexpress/dx-react-grid-material-ui";
 import { makeStyles } from "@material-ui/styles";
 import isNumber from "lodash/isNumber";
-import React from "react";
+import * as React from "react";
 
 const useStyles = makeStyles({
   highlightedCell: {
@@ -12,11 +12,11 @@ const useStyles = makeStyles({
   }
 });
 
-interface IProps extends Table.DataCellProps {
+interface ITableDataCellProps extends Table.DataCellProps {
   interval: number;
 }
 
-const HighlightedCell = (props: IProps) => {
+const HighlightedCell: React.FC<ITableDataCellProps> = (props) => {
   const classes = useStyles();
   const { value, interval } = props;
 
@@ -35,6 +35,6 @@ const HighlightedCell = (props: IProps) => {
   );
 };
 
-export const Cell = (props: IProps) => {
+export const Cell: React.FC<ITableDataCellProps> = (props) => {
   return <HighlightedCell {...props} />;
 };

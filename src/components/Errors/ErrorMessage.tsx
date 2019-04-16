@@ -1,7 +1,7 @@
 import { Theme } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
-import React from "react";
+import * as React from "react";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
@@ -11,11 +11,11 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
   }
 }));
 
-interface IProps {
+interface IErrorMessageProps {
   text?: string;
 }
 
-export const ErrorMessage = ({ text }: IProps): JSX.Element => {
+export const ErrorMessage: React.FC<IErrorMessageProps> = ({ text }) => {
   const classes = useStyles();
 
   return (

@@ -1,13 +1,13 @@
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import ViewCompactIcon from "@material-ui/icons/ViewCompact";
-import React, { MouseEvent } from "react";
+import * as React from "react";
 
-interface IProps {
-  onToggle: (e: MouseEvent<HTMLElement>) => void;
+interface IFilterComponentsButtonProps {
+  onToggle: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
-export const FilterComponentsButton = ({ onToggle, ...restProps }: IProps) => {
+export const FilterComponentsButton: React.FC<IFilterComponentsButtonProps> = ({ onToggle, ...restProps }) => {
   return (
     <Tooltip
       title="Show only important columns"

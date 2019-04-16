@@ -5,7 +5,7 @@ import filter from "lodash/filter";
 import includes from "lodash/includes";
 import round from "lodash/round";
 import unzip from "lodash/unzip";
-import React, { useMemo } from "react";
+import * as React from "react";
 import { DXTable, generateColumns, generateRows } from "src/components";
 import {
   IDataset,
@@ -34,13 +34,13 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   }
 }));
 
-interface IProps {
+interface ICalculationsProps {
   dataset: IDataset;
   calculations: IPCACalculations;
   datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
 }
 
-export const Calculations = ({
+export const Calculations: React.FC<ICalculationsProps> = ({
   dataset: { factors, variables, observations },
   calculations: {
     eigens,
@@ -56,10 +56,10 @@ export const Calculations = ({
     linearCombinations
   },
   datasetRequiredColumnsIdxs: { observationsIdx }
-}: IProps): JSX.Element => {
+}): JSX.Element => {
   const classes = useStyles();
 
-  const AnalysisTable = useMemo(() => {
+  const AnalysisTable = React.useMemo(() => {
     const columnNames = [
       "Component",
       "Eigenvalue",
@@ -105,7 +105,7 @@ export const Calculations = ({
     importantComponentsVariance
   ]);
 
-  const LoadingsTable = useMemo(() => {
+  const LoadingsTable = React.useMemo(() => {
     const columnNames = ["Loadings", ...components];
     const columns = generateColumns(columnNames);
 
@@ -133,7 +133,7 @@ export const Calculations = ({
     );
   }, [eigens.E.x, factors, importantComponents]);
 
-  const PredictionsTable = useMemo(() => {
+  const PredictionsTable = React.useMemo(() => {
     const columnNames = [variables[observationsIdx], ...components];
     const columns = generateColumns(columnNames);
     const rows = generateRows(

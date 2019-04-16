@@ -1,34 +1,33 @@
-import { Theme } from "@material-ui/core";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
-import React, { ChangeEvent } from "react";
+import * as React from "react";
 
-const useStyles = makeStyles(({ spacing }: Theme) => ({
+const useStyles = makeStyles({
   formControl: {
     minWidth: 100
   }
-}));
+});
 
-interface IProps {
+interface IFactorSelectorProps {
   factors: string[];
   currentFactorIdx: number;
   onChangeFactor: (factorIdx: number) => void;
   disabled?: boolean;
 }
 
-export const FactorSelector = ({
+export const FactorSelector: React.FC<IFactorSelectorProps> = ({
   factors,
   currentFactorIdx,
   onChangeFactor,
   disabled
-}: IProps): JSX.Element => {
+}) => {
   const classes = useStyles();
 
-  function handleChange(event: ChangeEvent<HTMLSelectElement>) {
+  function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
     const idx: number = Number(event.target.value);
 
     onChangeFactor(idx);

@@ -8,7 +8,7 @@ import Select from "@material-ui/core/Select";
 import { makeStyles } from "@material-ui/styles";
 import isUndefined from "lodash/isUndefined";
 import map from "lodash/map";
-import React, { ChangeEvent } from "react";
+import * as React from "react";
 import { IDatasetRequiredColumnsIndexes } from "src/models";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
@@ -21,7 +21,7 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
   }
 }));
 
-interface IProps {
+interface IDatasetControlsProps {
   rows: any[];
   columns: any[];
   datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
@@ -31,16 +31,16 @@ interface IProps {
   disabled?: boolean;
 }
 
-export const DatasetControls = ({
+export const DatasetControls: React.FC<IDatasetControlsProps> = ({
   rows,
   columns,
   datasetRequiredColumnsIdxs,
   onChange,
   disabled
-}: IProps) => {
+}) => {
   const classes = useStyles();
 
-  function handleChange(event: ChangeEvent<HTMLSelectElement>) {
+  function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
     const { name, value } = event.target;
 
     onChange({

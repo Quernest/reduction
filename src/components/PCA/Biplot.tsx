@@ -2,7 +2,7 @@ import Hidden from "@material-ui/core/Hidden";
 import { createStyles, Theme, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
-import React, { Component } from "react";
+import * as React from "react";
 import compose from "recompose/compose";
 import { IChartState, Points, Vectors } from "src/models";
 
@@ -54,7 +54,7 @@ const styles = ({ spacing, typography, breakpoints }: Theme) =>
     }
   });
 
-interface IProps {
+interface IBiplotProps {
   theme: Theme;
   title?: string;
   points: Points;
@@ -65,7 +65,7 @@ interface IProps {
   yAxisLabel: string;
 }
 
-interface IState extends IChartState {
+interface IBiplotState extends IChartState {
   transform: {
     k: number;
     x: number;
@@ -73,7 +73,7 @@ interface IState extends IChartState {
   };
 }
 
-class BiplotBase extends Component<IProps, IState> {
+class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
   public static readonly defaultProps = {
     xAxisLabel: "x",
     yAxisLabel: "y"
@@ -152,7 +152,7 @@ class BiplotBase extends Component<IProps, IState> {
     this.drawVectors();
   }
 
-  public componentDidUpdate(props: IProps) {
+  public componentDidUpdate(props: IBiplotProps) {
     if (
       this.props.xAxisLabel !== props.xAxisLabel ||
       this.props.yAxisLabel !== props.yAxisLabel
@@ -434,6 +434,6 @@ class BiplotBase extends Component<IProps, IState> {
   }
 }
 
-export const Biplot = compose<IProps, any>(
+export const Biplot = compose<IBiplotProps, any>(
   withStyles(styles, { withTheme: true })
 )(BiplotBase);

@@ -1,8 +1,7 @@
-import { Theme } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
 import zipWith from "lodash/zipWith";
-import React, { useMemo } from "react";
+import * as React from "react";
 import {
   IBarData,
   IDataset,
@@ -13,19 +12,19 @@ import {
 import { getColumn } from "src/utils";
 import { BarChart, Biplot } from "./";
 
-interface IProps {
+interface IChartsProps {
   calculations: IPCACalculations;
   dataset: IDataset;
   selectedComponents: { x: number; y: number };
 }
 
-const useStyles = makeStyles(({ spacing }: Theme) => ({
+const useStyles = makeStyles({
   root: {
     flexGrow: 1
   }
-}));
+});
 
-export const Charts = ({
+export const Charts: React.FC<IChartsProps> = ({
   calculations: {
     adjustedDataset,
     eigens,
@@ -33,10 +32,10 @@ export const Charts = ({
   },
   dataset: { factors },
   selectedComponents: { x, y }
-}: IProps) => {
+}) => {
   const classes = useStyles();
 
-  const memoizedBiplot = useMemo(() => {
+  const memoizedBiplot = React.useMemo(() => {
     const x2s = getColumn<number>(eigens.E.x, x);
     const y2s = getColumn<number>(eigens.E.x, y);
     const x1s = map(Array(x2s.length), () => 0);
@@ -56,7 +55,7 @@ export const Charts = ({
     );
   }, [adjustedDataset, eigens.E.x, x, y, components, factors]);
 
-  const memoizedBar = useMemo(() => {
+  const memoizedBar = React.useMemo(() => {
     const data = zipWith<string, number, IBarData>(
       components,
       eigens.lambda.x,
