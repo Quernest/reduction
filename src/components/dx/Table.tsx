@@ -9,7 +9,7 @@ import {
   ColumnChooser,
   Grid,
   PagingPanel,
-  Table,
+  Table as DXTable,
   TableColumnVisibility,
   TableHeaderRow,
   Toolbar
@@ -45,7 +45,7 @@ const useStyles = makeStyles(({ breakpoints }: Theme) => ({
   }
 }));
 
-interface IDXTableProps {
+interface ITableProps {
   rows: Row[];
   columns: Column[];
   title?: string;
@@ -53,7 +53,7 @@ interface IDXTableProps {
   intervalFilter?: boolean;
 }
 
-export const DXTable: React.FC<IDXTableProps> = ({
+export const Table: React.FC<ITableProps> = ({
   title,
   rows,
   columns,
@@ -97,7 +97,7 @@ export const DXTable: React.FC<IDXTableProps> = ({
     toggleIntervalInput(false);
   }
 
-  const CellWrapper: React.FC<Table.DataCellProps> = props => (
+  const CellWrapper: React.FC<DXTable.DataCellProps> = props => (
     <Cell interval={interval} {...props} />
   );
 
@@ -107,7 +107,7 @@ export const DXTable: React.FC<IDXTableProps> = ({
         <Grid rows={rows} columns={columns}>
           <PagingState defaultCurrentPage={0} defaultPageSize={5} />
           <IntegratedPaging />
-          <Table
+          <DXTable
             {...intervalFilter &&
               interval &&
               isOpenIntervalInput && { cellComponent: CellWrapper }}

@@ -14,7 +14,7 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import compose from "recompose/compose";
 import {
   DatasetControls,
-  DXTable,
+  Table,
   ErrorMessage,
   generateColumns,
   generateRows,
@@ -336,7 +336,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
                 onChange={this.onChangeDatasetRequiredColumns}
                 datasetRequiredColumnsIdxs={datasetRequiredColumnsIdxs}
               />
-              <DXTable
+              <Table
                 title="Dataset preview"
                 rows={previewRows}
                 columns={previewColumns}

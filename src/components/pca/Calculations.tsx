@@ -5,7 +5,7 @@ import filter from "lodash/filter";
 import includes from "lodash/includes";
 import round from "lodash/round";
 import React from "react";
-import { DXTable, generateColumns, generateRows } from "../";
+import { Table, generateColumns, generateRows } from "../";
 import { IDataset, IDatasetRequiredColumnsIndexes } from "../../models";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
@@ -51,7 +51,7 @@ export const Calculations: React.FC<ICalculationsProps> = ({
   importantComponents,
   components,
   datasetRequiredColumnsIdxs: { observationsIdx }
-}): JSX.Element => {
+}) => {
   const classes = useStyles();
 
   const AnalysisTable = React.useMemo(() => {
@@ -71,7 +71,7 @@ export const Calculations: React.FC<ICalculationsProps> = ({
 
     return (
       <div className={classes.tableBox}>
-        <DXTable title="Analysis" rows={rows} columns={columns} />
+        <Table title="Analysis" rows={rows} columns={columns} />
         <div className={classes.analysisInfo}>
           <Typography variant="body1" gutterBottom={true}>
             Number of components equal to total number of variables:{" "}
@@ -118,7 +118,7 @@ export const Calculations: React.FC<ICalculationsProps> = ({
 
     return (
       <div className={classes.tableBox}>
-        <DXTable
+        <Table
           title="Loadings (i.e., Q matrix)"
           importantComponentsList={importantComponentsList}
           rows={rows}
@@ -145,7 +145,7 @@ export const Calculations: React.FC<ICalculationsProps> = ({
 
     return (
       <div className={classes.tableBox}>
-        <DXTable
+        <Table
           title="Predicted principal components"
           rows={rows}
           columns={columns}

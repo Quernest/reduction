@@ -7,7 +7,7 @@ import { makeStyles } from "@material-ui/styles";
 import React from "react";
 import {
   DatasetControls,
-  DXTable,
+  Table,
   generateColumns,
   generateRows
 } from "../../components";
@@ -56,7 +56,7 @@ export const CalculateControls: React.FC<ICalculateControlsProps> = ({
     const columns = generateColumns(filePreview.columns);
     const rows = generateRows(filePreview.rows, filePreview.columns);
 
-    return <DXTable title="Dataset preview" rows={rows} columns={columns} />;
+    return <Table title="Dataset preview" rows={rows} columns={columns} />;
   }, [filePreview]);
 
   return (
