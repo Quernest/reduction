@@ -12,7 +12,6 @@ import ThreeSixtyIcon from "@material-ui/icons/ThreeSixty";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
 import * as React from "react";
-import { IPCACalculations } from "src/models";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
@@ -32,7 +31,7 @@ const useStyles = makeStyles(({ spacing }: Theme) => ({
 }));
 
 interface IVisualizeControlsProps {
-  calculations: IPCACalculations;
+  components: string[];
   selectedComponents: {
     x: number;
     y: number;
@@ -41,9 +40,7 @@ interface IVisualizeControlsProps {
 }
 
 export const VisualizeControls: React.FC<IVisualizeControlsProps> = ({
-  calculations: {
-    analysis: { proportion, components }
-  },
+  components,
   selectedComponents,
   onChange
 }) => {
@@ -69,21 +66,17 @@ export const VisualizeControls: React.FC<IVisualizeControlsProps> = ({
               <Select
                 value={selectedComponents.x}
                 onChange={handleChange}
-                disabled={proportion.length === 2}
+                disabled={components.length === 2}
                 inputProps={{
                   name: "x",
                   id: "x"
                 }}
               >
-                {map(
-                  proportion,
-                  (value: number, i: number) =>
-                    i !== selectedComponents.y && (
-                      <MenuItem key={i} value={i}>
-                        {components[i]} ({value}%)
-                      </MenuItem>
-                    )
-                )}
+                {map(components, (name, i) => i !== selectedComponents.y && (
+                  <MenuItem key={i} value={i}>
+                    {name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>
@@ -93,21 +86,17 @@ export const VisualizeControls: React.FC<IVisualizeControlsProps> = ({
               <Select
                 value={selectedComponents.y}
                 onChange={handleChange}
-                disabled={proportion.length === 2}
+                disabled={components.length === 2}
                 inputProps={{
                   name: "y",
                   id: "y"
                 }}
               >
-                {map(
-                  proportion,
-                  (value: number, i: number) =>
-                    i !== selectedComponents.x && (
-                      <MenuItem key={i} value={i}>
-                        {components[i]} ({value}%)
-                      </MenuItem>
-                    )
-                )}
+                {map(components, (name, i) => i !== selectedComponents.x && (
+                  <MenuItem key={i} value={i}>
+                    {name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>

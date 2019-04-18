@@ -1,43 +1,33 @@
-import { generateGrid, Kohonen } from "@seracio/kohonen";
 import filter from "lodash/filter";
 import forEach from "lodash/forEach";
 import includes from "lodash/includes";
 import isNull from "lodash/isNull";
 import isString from "lodash/isString";
+import map from 'lodash/map';
+import unzip from 'lodash/unzip';
 import isUndefined from "lodash/isUndefined";
-import unzip from "lodash/unzip";
 import {
   IDataset,
   IDatasetRequiredColumnsIndexes,
   IFilePreview,
-  IHexagonalGridDimensions,
-  ISOMOptions
 } from "src/models";
+// @ts-ignore
+import PCA from 'ml-pca';
+import Matrix from 'ml-matrix';
+// import zip from 'lodash/zip';
 
 const ctx: Worker = self as any;
-
-interface IEventData {
-  datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
-  filePreview: IFilePreview;
-  dimensions: IHexagonalGridDimensions;
-  options: ISOMOptions;
-}
 
 ctx.addEventListener(
   "message",
   (event: MessageEvent) => {
     const {
       datasetRequiredColumnsIdxs: { observationsIdx, typesIdx },
-      filePreview: { columns, rows },
-      dimensions,
-      options: {
-        maxStep,
-        minLearningCoef,
-        maxLearningCoef,
-        minNeighborhood,
-        maxNeighborhood
-      }
-    }: IEventData = event.data;
+      filePreview: { columns, rows }
+    }: {
+      datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
+      filePreview: IFilePreview;
+    } = event.data;
 
     /**
      * minimum number of variables for values
@@ -65,7 +55,6 @@ ctx.addEventListener(
      * for correct calculations and display of information
      * it is necessary to pass validations
      */
-
     try {
       const dataset: IDataset = {
         variables: [],
@@ -81,9 +70,9 @@ ctx.addEventListener(
        */
       if (requiredVariablesCount + minFactorsCount > columns.length) {
         throw new Error(`
-        the number of factors must be equal to or more than ${minFactorsCount}
-        (taking into account the variable with observations and types if types are indicated)
-      `);
+          the number of factors must be equal to or more than ${minFactorsCount}
+          (taking into account the variable with observations and types if types are indicated)
+        `);
       }
 
       /**
@@ -129,7 +118,7 @@ ctx.addEventListener(
           if (isNull(value)) {
             throw new Error(
               `value is required in the ${i + 1} row / ${j +
-                requiredVariablesCount} cell.`
+              requiredVariablesCount} cell.`
             );
           }
 
@@ -139,9 +128,9 @@ ctx.addEventListener(
           if (i !== observationsIdx && i !== typesIdx && isString(value)) {
             throw new Error(
               `value in the ${i + 1} row / ${j +
-                requiredVariablesCount} cell is string. It must be number.
-              If it is observation names or types select this columns
-              in selection menu.`
+              requiredVariablesCount} cell is string. It must be number.
+                If it is observation names or types select this columns
+                in selection menu.`
             );
           }
         });
@@ -168,27 +157,46 @@ ctx.addEventListener(
         }
       });
 
-      // run som
-      const k = new Kohonen({
-        neurons: generateGrid(dimensions.columns, dimensions.rows),
-        data: unzip(dataset.values),
-        maxStep,
-        minLearningCoef,
-        maxLearningCoef,
-        minNeighborhood,
-        maxNeighborhood
-      });
+      const unzipped = unzip(dataset.values);
+      const options = {
+        scale: true,
+        center: true,
+      };
+      const pca = new PCA(unzipped, options);
+      const explainedVariance: number[] = pca.getExplainedVariance();
+      const cumulativeVariance: number[] = pca.getCumulativeVariance();
+      const adjustedDataset: Matrix = pca._adjust(unzipped, options);
+      const loadings: Matrix = pca.getLoadings();
+      const predictions: Matrix = pca.predict(unzipped);
+      const eigenvalues: number[] = pca.getEigenvalues();
 
-      k.training();
+      /**
+       * components (component names, PC1, PC2... PCn)
+       */
+      const components = map(eigenvalues, (_, i) => `PC${++i}`);
+
+      /**
+       * components with eigenvalues higher than 1
+       */
+      const importantComponents: string[] = [];
+
+      forEach(eigenvalues, (eigenvalue, i) => {
+        if (eigenvalue >= 1) {
+          importantComponents[i] = components[i];
+        }
+      });
 
       ctx.postMessage({
         dataset,
-        positions: k.mapping(),
-        umatrix: k.umatrix(),
-        neurons: k.neurons,
-        topographicError: k.topographicError(),
-        quantizationError: k.quantizationError()
-      });
+        explainedVariance,
+        cumulativeVariance,
+        loadings: loadings.to2DArray(),
+        predictions: unzip(predictions.to2DArray()),
+        eigenvalues,
+        components,
+        importantComponents,
+        adjustedDataset: unzip(adjustedDataset.to2DArray())
+      })
     } catch (error) {
       ctx.postMessage({ error: error.message });
     }

@@ -10,21 +10,22 @@ import * as React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import compose from "recompose/compose";
 import {
-  CalculateControls,
-  Calculations,
-  Charts,
   ErrorMessage,
   UploadControls,
-  VisualizeControls
 } from "src/components";
+import {
+  VisualizeControls,
+  Calculations,
+  CalculateControls,
+  Charts,
+} from '.'
 import {
   IDataset,
   IDatasetRequiredColumnsIndexes,
   IFilePreview,
-  IPCACalculations
 } from "src/models";
-import CalculateWorker from "worker-loader!src/workers/PCA/calculate.worker";
-import UploadWorker from "worker-loader!src/workers/PCA/upload.worker";
+import CalculateWorker from "worker-loader!src/PCA/calculate.worker";
+import UploadWorker from "worker-loader!src/PCA/upload.worker";
 
 const styles = ({ spacing, breakpoints }: Theme) =>
   createStyles({
@@ -46,18 +47,25 @@ const styles = ({ spacing, breakpoints }: Theme) =>
     }
   });
 
-interface IPCAPageProps extends WithStyles<typeof styles>, RouteComponentProps {}
+interface IPCAPageProps extends WithStyles<typeof styles>, RouteComponentProps { }
 
 interface IPCAPageState {
   file?: File;
   filePreview: IFilePreview;
   dataset: IDataset;
   datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
-  calculations: IPCACalculations;
   selectedComponents: {
     x: number;
     y: number;
   };
+  explainedVariance: number[];
+  cumulativeVariance: number[];
+  adjustedDataset: number[][];
+  loadings: number[][];
+  predictions: number[][];
+  eigenvalues: number[];
+  components: string[];
+  importantComponents: string[];
   uploading: boolean;
   uploaded: boolean;
   calculating: boolean;
@@ -86,35 +94,18 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
       observationsIdx: 0,
       typesIdx: undefined
     },
-    calculations: {
-      originalDataset: [],
-      adjustedDataset: [],
-      covariance: [],
-      eigens: {
-        E: {
-          y: [],
-          x: []
-        },
-        lambda: {
-          x: [],
-          y: []
-        }
-      },
-      linearCombinations: [],
-      analysis: {
-        proportion: [],
-        cumulative: [],
-        differences: [],
-        totalProportion: 0,
-        importantComponents: [],
-        importantComponentsVariance: 0,
-        components: []
-      }
-    },
     selectedComponents: {
       x: 0,
       y: 1
     },
+    explainedVariance: [],
+    cumulativeVariance: [],
+    loadings: [],
+    predictions: [],
+    adjustedDataset: [],
+    components: [],
+    importantComponents: [],
+    eigenvalues: [],
     uploading: false,
     uploaded: false,
     calculating: false,
@@ -180,7 +171,18 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
   };
 
   protected onCalculateWorkerMsg = ({
-    data: { error, dataset, calculations }
+    data: {
+      error,
+      dataset,
+      explainedVariance,
+      cumulativeVariance,
+      adjustedDataset,
+      loadings,
+      predictions,
+      eigenvalues,
+      components,
+      importantComponents
+    }
   }: MessageEvent) => {
     if (error) {
       this.setState({
@@ -194,7 +196,14 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
       this.setState({
         error,
         dataset,
-        calculations,
+        explainedVariance,
+        cumulativeVariance,
+        adjustedDataset,
+        loadings,
+        predictions,
+        eigenvalues,
+        components,
+        importantComponents,
         calculated: true,
         calculating: false
       });
@@ -265,9 +274,16 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
       file,
       filePreview,
       dataset,
+      adjustedDataset,
       datasetRequiredColumnsIdxs,
-      calculations,
       selectedComponents,
+      explainedVariance,
+      cumulativeVariance,
+      importantComponents,
+      components,
+      eigenvalues,
+      predictions,
+      loadings,
       uploading,
       uploaded,
       calculating,
@@ -309,19 +325,28 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
           {calculated && (
             <>
               <VisualizeControls
-                calculations={calculations}
+                components={components}
                 onChange={this.onChangeSelectedComponents}
                 selectedComponents={selectedComponents}
               />
               <Charts
-                dataset={dataset}
-                calculations={calculations}
+                adjustedDataset={adjustedDataset}
+                factors={dataset.factors}
+                components={components}
+                loadings={loadings}
+                eigenvalues={eigenvalues}
                 selectedComponents={selectedComponents}
               />
               <Calculations
-                datasetRequiredColumnsIdxs={datasetRequiredColumnsIdxs}
                 dataset={dataset}
-                calculations={calculations}
+                loadings={loadings}
+                predictions={predictions}
+                eigenvalues={eigenvalues}
+                explainedVariance={explainedVariance}
+                cumulativeVariance={cumulativeVariance}
+                importantComponents={importantComponents}
+                components={components}
+                datasetRequiredColumnsIdxs={datasetRequiredColumnsIdxs}
               />
             </>
           )}

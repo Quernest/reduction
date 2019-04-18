@@ -4,17 +4,18 @@ import zipWith from "lodash/zipWith";
 import * as React from "react";
 import {
   IBarData,
-  IDataset,
-  IPCACalculations,
-  Points,
-  Vectors
+  Vectors,
+  Points
 } from "src/models";
 import { getColumn } from "src/utils";
 import { BarChart, Biplot } from "./";
 
 interface IChartsProps {
-  calculations: IPCACalculations;
-  dataset: IDataset;
+  factors: string[];
+  components: string[];
+  eigenvalues: number[];
+  loadings: number[][];
+  adjustedDataset: number[][];
   selectedComponents: { x: number; y: number };
 }
 
@@ -25,19 +26,18 @@ const useStyles = makeStyles({
 });
 
 export const Charts: React.FC<IChartsProps> = ({
-  calculations: {
-    adjustedDataset,
-    eigens,
-    analysis: { components }
-  },
-  dataset: { factors },
+  factors,
+  components,
+  loadings,
+  eigenvalues,
+  adjustedDataset,
   selectedComponents: { x, y }
 }) => {
   const classes = useStyles();
 
   const memoizedBiplot = React.useMemo(() => {
-    const x2s = getColumn<number>(eigens.E.x, x);
-    const y2s = getColumn<number>(eigens.E.x, y);
+    const x2s = getColumn<number>(loadings, x);
+    const y2s = getColumn<number>(loadings, y);
     const x1s = map(Array(x2s.length), () => 0);
     const y1s = map(Array(y2s.length), () => 0);
     const vectors: Vectors = [x1s, y1s, x2s, y2s];
@@ -53,12 +53,12 @@ export const Charts: React.FC<IChartsProps> = ({
         points={points}
       />
     );
-  }, [adjustedDataset, eigens.E.x, x, y, components, factors]);
+  }, [adjustedDataset, loadings, x, y, components, factors]);
 
   const memoizedBar = React.useMemo(() => {
     const data = zipWith<string, number, IBarData>(
       components,
-      eigens.lambda.x,
+      eigenvalues,
       (name, value) => ({
         name,
         value
@@ -73,7 +73,7 @@ export const Charts: React.FC<IChartsProps> = ({
         yAxisLabel="Variances"
       />
     );
-  }, [eigens.lambda.x, components]);
+  }, [eigenvalues, components]);
 
   return (
     <div className={classes.root}>

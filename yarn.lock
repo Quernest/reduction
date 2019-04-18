@@ -6434,7 +6434,7 @@ ml-array-rescale@^1.2.1:
     ml-array-max "^1.1.1"
     ml-array-min "^1.1.1"
 
-ml-matrix@^5.0.0:
+ml-matrix@^5.0.0, ml-matrix@^5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/ml-matrix/-/ml-matrix-5.3.0.tgz#2154902a3380f6a0874ab9a2539a09e873e8db92"
   integrity sha512-DuvdXYwfGRpM+7MVdvi/zSjiazn+8QPrACT3Xi0pQpYx5SXZ1WuFYwUDXTSmV9+hrCxRhrC4hrzesNcfjpvOsw==

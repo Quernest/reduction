@@ -18,8 +18,6 @@ import {
   ErrorMessage,
   generateColumns,
   generateRows,
-  HexagonalGrid,
-  SOMControls,
   UploadControls
 } from "src/components";
 import {
@@ -27,10 +25,10 @@ import {
   IDatasetRequiredColumnsIndexes,
   IFilePreview,
   IHexagonalGridDimensions,
-  ISOMOptions
 } from "src/models";
-import CalculateWorker from "worker-loader!src/workers/SOM/calculate.worker";
-import UploadWorker from "worker-loader!src/workers/SOM/upload.worker";
+import { HexagonalGrid, SOMControls, ISOMOptions } from '.';
+import CalculateWorker from "worker-loader!src/SOM/calculate.worker";
+import UploadWorker from "worker-loader!src/SOM/upload.worker";
 
 const styles = ({ spacing, breakpoints }: Theme) =>
   createStyles({
@@ -63,7 +61,7 @@ const styles = ({ spacing, breakpoints }: Theme) =>
     }
   });
 
-interface ISOMPageProps extends WithStyles<typeof styles>, RouteComponentProps {}
+interface ISOMPageProps extends WithStyles<typeof styles>, RouteComponentProps { }
 
 interface ISOMPageState {
   file?: File;

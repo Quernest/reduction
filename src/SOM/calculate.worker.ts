@@ -1,30 +1,43 @@
+import { generateGrid, Kohonen } from "@seracio/kohonen";
 import filter from "lodash/filter";
 import forEach from "lodash/forEach";
 import includes from "lodash/includes";
 import isNull from "lodash/isNull";
 import isString from "lodash/isString";
 import isUndefined from "lodash/isUndefined";
+import unzip from "lodash/unzip";
 import {
   IDataset,
   IDatasetRequiredColumnsIndexes,
   IFilePreview,
-  IPCA,
-  IPCACalculations
+  IHexagonalGridDimensions,
 } from "src/models";
-import { PCA } from "src/utils/pca";
+import { ISOMOptions } from '.';
 
 const ctx: Worker = self as any;
+
+interface IEventData {
+  datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
+  filePreview: IFilePreview;
+  dimensions: IHexagonalGridDimensions;
+  options: ISOMOptions;
+}
 
 ctx.addEventListener(
   "message",
   (event: MessageEvent) => {
     const {
       datasetRequiredColumnsIdxs: { observationsIdx, typesIdx },
-      filePreview: { columns, rows }
-    }: {
-      datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
-      filePreview: IFilePreview;
-    } = event.data;
+      filePreview: { columns, rows },
+      dimensions,
+      options: {
+        maxStep,
+        minLearningCoef,
+        maxLearningCoef,
+        minNeighborhood,
+        maxNeighborhood
+      }
+    }: IEventData = event.data;
 
     /**
      * minimum number of variables for values
@@ -52,6 +65,7 @@ ctx.addEventListener(
      * for correct calculations and display of information
      * it is necessary to pass validations
      */
+
     try {
       const dataset: IDataset = {
         variables: [],
@@ -67,9 +81,9 @@ ctx.addEventListener(
        */
       if (requiredVariablesCount + minFactorsCount > columns.length) {
         throw new Error(`
-          the number of factors must be equal to or more than ${minFactorsCount}
-          (taking into account the variable with observations and types if types are indicated)
-        `);
+        the number of factors must be equal to or more than ${minFactorsCount}
+        (taking into account the variable with observations and types if types are indicated)
+      `);
       }
 
       /**
@@ -115,7 +129,7 @@ ctx.addEventListener(
           if (isNull(value)) {
             throw new Error(
               `value is required in the ${i + 1} row / ${j +
-                requiredVariablesCount} cell.`
+              requiredVariablesCount} cell.`
             );
           }
 
@@ -125,9 +139,9 @@ ctx.addEventListener(
           if (i !== observationsIdx && i !== typesIdx && isString(value)) {
             throw new Error(
               `value in the ${i + 1} row / ${j +
-                requiredVariablesCount} cell is string. It must be number.
-                If it is observation names or types select this columns
-                in selection menu.`
+              requiredVariablesCount} cell is string. It must be number.
+              If it is observation names or types select this columns
+              in selection menu.`
             );
           }
         });
@@ -154,30 +168,27 @@ ctx.addEventListener(
         }
       });
 
-      /**
-       * run the principal component analysis
-       */
-      const pca: IPCA = new PCA(dataset.values);
+      // run som
+      const k = new Kohonen({
+        neurons: generateGrid(dimensions.columns, dimensions.rows),
+        data: unzip(dataset.values),
+        maxStep,
+        minLearningCoef,
+        maxLearningCoef,
+        minNeighborhood,
+        maxNeighborhood
+      });
 
-      const {
-        originalDataset,
-        covariance,
-        analysis,
-        eigens,
-        linearCombinations,
-        adjustedDataset
-      } = pca;
+      k.training();
 
-      const calculations: IPCACalculations = {
-        originalDataset,
-        analysis,
-        covariance,
-        eigens,
-        linearCombinations,
-        adjustedDataset
-      };
-
-      ctx.postMessage({ dataset, calculations });
+      ctx.postMessage({
+        dataset,
+        positions: k.mapping(),
+        umatrix: k.umatrix(),
+        neurons: k.neurons,
+        topographicError: k.topographicError(),
+        quantizationError: k.quantizationError()
+      });
     } catch (error) {
       ctx.postMessage({ error: error.message });
     }

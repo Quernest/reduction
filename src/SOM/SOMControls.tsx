@@ -9,8 +9,8 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import isEmpty from "lodash/isEmpty";
 import * as React from "react";
-import { FactorSelector } from "src/components";
-import { IHexagonalGridDimensions, ISOMOptions } from "src/models";
+import { FactorSelector, ISOMOptions } from ".";
+import { IHexagonalGridDimensions } from "src/models";
 
 const styles = ({ palette }: Theme) =>
   createStyles({

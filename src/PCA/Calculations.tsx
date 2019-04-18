@@ -4,16 +4,14 @@ import { makeStyles } from "@material-ui/styles";
 import filter from "lodash/filter";
 import includes from "lodash/includes";
 import round from "lodash/round";
-import unzip from "lodash/unzip";
 import * as React from "react";
 import { DXTable, generateColumns, generateRows } from "src/components";
 import {
   IDataset,
   IDatasetRequiredColumnsIndexes,
-  IPCACalculations
 } from "src/models";
 
-const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
+const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
     flexGrow: 1
   },
@@ -36,25 +34,25 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
 
 interface ICalculationsProps {
   dataset: IDataset;
-  calculations: IPCACalculations;
+  loadings: number[][];
+  predictions: number[][];
+  eigenvalues: number[];
+  explainedVariance: number[];
+  cumulativeVariance: number[];
+  importantComponents: string[];
+  components: string[];
   datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
 }
 
 export const Calculations: React.FC<ICalculationsProps> = ({
   dataset: { factors, variables, observations },
-  calculations: {
-    eigens,
-    analysis: {
-      proportion,
-      totalProportion,
-      importantComponents,
-      importantComponentsVariance,
-      differences,
-      components,
-      cumulative
-    },
-    linearCombinations
-  },
+  loadings,
+  predictions,
+  eigenvalues,
+  explainedVariance,
+  cumulativeVariance,
+  importantComponents,
+  components,
   datasetRequiredColumnsIdxs: { observationsIdx }
 }): JSX.Element => {
   const classes = useStyles();
@@ -63,15 +61,14 @@ export const Calculations: React.FC<ICalculationsProps> = ({
     const columnNames = [
       "Component",
       "Eigenvalue",
-      "Difference b/n eigenvalues",
-      "Proportion, %",
-      "Cumulative, %"
+      "Explained variance",
+      "Cumulative variance"
     ];
 
     const columns = generateColumns(columnNames);
 
     const rows = generateRows(
-      [components, eigens.lambda.x, differences, proportion, cumulative],
+      [components, eigenvalues, explainedVariance, cumulativeVariance],
       columnNames
     );
 
@@ -85,32 +82,31 @@ export const Calculations: React.FC<ICalculationsProps> = ({
           </Typography>
           <Typography variant="body1" gutterBottom={true}>
             All <strong>{factors.length}</strong> components explain{" "}
-            <strong>{round(totalProportion)}%</strong> variation of the data
+            <strong>{round(cumulativeVariance[cumulativeVariance.length - 1] * 100)}%</strong> variation of the data
           </Typography>
           <Typography variant="body1" gutterBottom={true}>
             <strong>{importantComponents.length}</strong> component
             {importantComponents.length > 1 ? "s" : ""} have eigenvalue
             {importantComponents.length > 1 ? "s" : ""} above 1 and explain{" "}
-            <strong>{round(importantComponentsVariance)}%</strong> of variation.
+            <strong>{round(cumulativeVariance[importantComponents.length - 1] * 100)}%</strong> of variation.
           </Typography>
         </div>
       </div>
     );
   }, [
-    eigens.lambda.x,
-    differences,
-    proportion,
-    totalProportion,
-    cumulative,
-    importantComponentsVariance
-  ]);
+      eigenvalues,
+      explainedVariance,
+      cumulativeVariance,
+      importantComponents,
+      factors,
+    ]);
 
   const LoadingsTable = React.useMemo(() => {
     const columnNames = ["Loadings", ...components];
     const columns = generateColumns(columnNames);
 
     const rows = generateRows(
-      [factors, ...unzip<number>(eigens.E.x)],
+      [factors, ...loadings],
       columnNames
     );
 
@@ -131,13 +127,13 @@ export const Calculations: React.FC<ICalculationsProps> = ({
         />
       </div>
     );
-  }, [eigens.E.x, factors, importantComponents]);
+  }, [loadings, factors, importantComponents]);
 
   const PredictionsTable = React.useMemo(() => {
     const columnNames = [variables[observationsIdx], ...components];
     const columns = generateColumns(columnNames);
     const rows = generateRows(
-      [observations, ...linearCombinations],
+      [observations, ...predictions],
       columnNames
     );
 
@@ -160,7 +156,7 @@ export const Calculations: React.FC<ICalculationsProps> = ({
         />
       </div>
     );
-  }, [observations, variables, linearCombinations, importantComponents]);
+  }, [observations, variables, predictions, importantComponents]);
 
   return (
     <div className={classes.root}>
