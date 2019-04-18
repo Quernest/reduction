@@ -4,12 +4,9 @@ import { makeStyles } from "@material-ui/styles";
 import filter from "lodash/filter";
 import includes from "lodash/includes";
 import round from "lodash/round";
-import * as React from "react";
-import { DXTable, generateColumns, generateRows } from "src/components";
-import {
-  IDataset,
-  IDatasetRequiredColumnsIndexes,
-} from "src/models";
+import React from "react";
+import { DXTable, generateColumns, generateRows } from "../";
+import { IDataset, IDatasetRequiredColumnsIndexes } from "../../models";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
@@ -82,33 +79,36 @@ export const Calculations: React.FC<ICalculationsProps> = ({
           </Typography>
           <Typography variant="body1" gutterBottom={true}>
             All <strong>{factors.length}</strong> components explain{" "}
-            <strong>{round(cumulativeVariance[cumulativeVariance.length - 1] * 100)}%</strong> variation of the data
+            <strong>
+              {round(cumulativeVariance[cumulativeVariance.length - 1] * 100)}%
+            </strong>{" "}
+            variation of the data
           </Typography>
           <Typography variant="body1" gutterBottom={true}>
             <strong>{importantComponents.length}</strong> component
             {importantComponents.length > 1 ? "s" : ""} have eigenvalue
             {importantComponents.length > 1 ? "s" : ""} above 1 and explain{" "}
-            <strong>{round(cumulativeVariance[importantComponents.length - 1] * 100)}%</strong> of variation.
+            <strong>
+              {round(cumulativeVariance[importantComponents.length - 1] * 100)}%
+            </strong>{" "}
+            of variation.
           </Typography>
         </div>
       </div>
     );
   }, [
-      eigenvalues,
-      explainedVariance,
-      cumulativeVariance,
-      importantComponents,
-      factors,
-    ]);
+    eigenvalues,
+    explainedVariance,
+    cumulativeVariance,
+    importantComponents,
+    factors
+  ]);
 
   const LoadingsTable = React.useMemo(() => {
     const columnNames = ["Loadings", ...components];
     const columns = generateColumns(columnNames);
 
-    const rows = generateRows(
-      [factors, ...loadings],
-      columnNames
-    );
+    const rows = generateRows([factors, ...loadings], columnNames);
 
     const importantComponentNames = filter(components, component =>
       includes(importantComponents, component)
@@ -132,10 +132,7 @@ export const Calculations: React.FC<ICalculationsProps> = ({
   const PredictionsTable = React.useMemo(() => {
     const columnNames = [variables[observationsIdx], ...components];
     const columns = generateColumns(columnNames);
-    const rows = generateRows(
-      [observations, ...predictions],
-      columnNames
-    );
+    const rows = generateRows([observations, ...predictions], columnNames);
 
     const importantComponentNames = filter(components, component =>
       includes(importantComponents, component)

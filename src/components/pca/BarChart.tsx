@@ -7,9 +7,9 @@ import {
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
 import round from "lodash/round";
-import * as React from "react";
+import React from "react";
 import compose from "recompose/compose";
-import { IBarData, IChartState } from "src/models";
+import { IBarData, IChartState } from "../../models";
 
 const styles = ({ palette, spacing, typography, breakpoints }: Theme) =>
   createStyles({
@@ -286,4 +286,6 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
   }
 }
 
-export const BarChart = compose<IBarChartProps, any>(withStyles(styles))(BarChartBase);
+export const BarChart = compose<IBarChartProps, any>(withStyles(styles))(
+  BarChartBase
+);

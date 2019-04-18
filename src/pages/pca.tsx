@@ -12,20 +12,18 @@ import compose from "recompose/compose";
 import {
   ErrorMessage,
   UploadControls,
-} from "src/components";
-import {
   VisualizeControls,
   Calculations,
   CalculateControls,
-  Charts,
-} from '.'
+  Charts
+} from "../components";
 import {
   IDataset,
   IDatasetRequiredColumnsIndexes,
-  IFilePreview,
-} from "src/models";
-import CalculateWorker from "worker-loader!src/PCA/calculate.worker";
-import UploadWorker from "worker-loader!src/PCA/upload.worker";
+  IFilePreview
+} from "../models";
+import PCAWorker from "worker-loader!../workers/pca.worker";
+import UploadWorker from "worker-loader!../workers/upload.worker";
 
 const styles = ({ spacing, breakpoints }: Theme) =>
   createStyles({
@@ -47,7 +45,9 @@ const styles = ({ spacing, breakpoints }: Theme) =>
     }
   });
 
-interface IPCAPageProps extends WithStyles<typeof styles>, RouteComponentProps { }
+interface IPCAPageProps
+  extends WithStyles<typeof styles>,
+    RouteComponentProps {}
 
 interface IPCAPageState {
   file?: File;
@@ -75,7 +75,7 @@ interface IPCAPageState {
 
 class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
   protected uploadWorker: Worker;
-  protected calculateWorker: Worker;
+  protected pcaWorker: Worker;
 
   public readonly state: IPCAPageState = {
     file: undefined,
@@ -128,12 +128,8 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
       this.onUploadWorkerMsg,
       false
     );
-    this.calculateWorker = new CalculateWorker();
-    this.calculateWorker.addEventListener(
-      "message",
-      this.onCalculateWorkerMsg,
-      false
-    );
+    this.pcaWorker = new PCAWorker();
+    this.pcaWorker.addEventListener("message", this.onPCAWorkerMsg, false);
   }
 
   protected destroyWorkers() {
@@ -143,12 +139,8 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
       this.onUploadWorkerMsg,
       false
     );
-    this.calculateWorker.terminate();
-    this.calculateWorker.removeEventListener(
-      "message",
-      this.onCalculateWorkerMsg,
-      false
-    );
+    this.pcaWorker.terminate();
+    this.pcaWorker.removeEventListener("message", this.onPCAWorkerMsg, false);
   }
 
   protected onUploadWorkerMsg = ({
@@ -170,7 +162,7 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
     }
   };
 
-  protected onCalculateWorkerMsg = ({
+  protected onPCAWorkerMsg = ({
     data: {
       error,
       dataset,
@@ -245,7 +237,7 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
       calculating: true
     });
 
-    this.calculateWorker.postMessage({
+    this.pcaWorker.postMessage({
       datasetRequiredColumnsIdxs,
       filePreview
     });

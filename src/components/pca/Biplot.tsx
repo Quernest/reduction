@@ -2,9 +2,9 @@ import Hidden from "@material-ui/core/Hidden";
 import { createStyles, Theme, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
-import * as React from "react";
+import React from "react";
 import compose from "recompose/compose";
-import { IChartState, Points, Vectors } from "src/models";
+import { IChartState, Points, Vectors } from "../../models";
 
 const styles = ({ spacing, typography, breakpoints }: Theme) =>
   createStyles({

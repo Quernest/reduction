@@ -33,7 +33,7 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   }
 }));
 
-export const Docs = () => {
+export const DocsPage = () => {
   const classes = useStyles();
 
   return (

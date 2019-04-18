@@ -8,9 +8,9 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import isEmpty from "lodash/isEmpty";
-import * as React from "react";
-import { FactorSelector, ISOMOptions } from ".";
-import { IHexagonalGridDimensions } from "src/models";
+import React from "react";
+import { FactorSelector } from ".";
+import { IHexagonalGridDimensions, ISOMOptions } from "../../models";
 
 const styles = ({ palette }: Theme) =>
   createStyles({

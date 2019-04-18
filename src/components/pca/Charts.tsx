@@ -1,14 +1,10 @@
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
 import zipWith from "lodash/zipWith";
-import * as React from "react";
-import {
-  IBarData,
-  Vectors,
-  Points
-} from "src/models";
-import { getColumn } from "src/utils";
-import { BarChart, Biplot } from "./";
+import React from "react";
+import { IBarData, Vectors, Points } from "../../models";
+import { getColumn } from "../../utils";
+import { BarChart, Biplot } from ".";
 
 interface IChartsProps {
   factors: string[];

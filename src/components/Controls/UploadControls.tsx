@@ -5,7 +5,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import { makeStyles } from "@material-ui/styles";
-import * as React from "react";
+import React from "react";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {

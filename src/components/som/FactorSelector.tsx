@@ -4,7 +4,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
-import * as React from "react";
+import React from "react";
 
 const useStyles = makeStyles({
   formControl: {

@@ -4,7 +4,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import ClearIcon from "@material-ui/icons/Clear";
 import LinearScaleIcon from "@material-ui/icons/LinearScale";
 import { makeStyles } from "@material-ui/styles";
-import * as React from "react";
+import React from "react";
 
 const useStyles = makeStyles({
   input: {
@@ -25,7 +25,7 @@ export const IntervalInput: React.FC<IIntervalInputProps> = ({
   onClose,
   onChange,
   interval,
-  isOpen,
+  isOpen
 }) => {
   const classes = useStyles();
 

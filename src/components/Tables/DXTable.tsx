@@ -24,9 +24,9 @@ import map from "lodash/map";
 import round from "lodash/round";
 import unzip from "lodash/unzip";
 import zipObject from "lodash/zipObject";
-import * as React from "react";
-import { isLongNumber } from "src/utils";
-import { Cell, FilterComponentsButton, IntervalInput } from "./";
+import React from "react";
+import { isLongNumber } from "../../utils";
+import { Cell, FilterComponentsButton, IntervalInput } from ".";
 
 const useStyles = makeStyles(({ breakpoints }: Theme) => ({
   root: {
@@ -61,9 +61,13 @@ export const DXTable: React.FC<IDXTableProps> = ({
   intervalFilter
 }) => {
   const classes = useStyles();
-  const [hiddenColumnNames, setHiddenColumnNames] = React.useState<string[]>([]);
+  const [hiddenColumnNames, setHiddenColumnNames] = React.useState<string[]>(
+    []
+  );
   const [interval, setInterval] = React.useState<number>(0);
-  const [isOpenIntervalInput, toggleIntervalInput] = React.useState<boolean>(false);
+  const [isOpenIntervalInput, toggleIntervalInput] = React.useState<boolean>(
+    false
+  );
 
   function onFilterComponents() {
     if (importantComponentsList && importantComponentsList.length > 0) {
@@ -93,7 +97,7 @@ export const DXTable: React.FC<IDXTableProps> = ({
     toggleIntervalInput(false);
   }
 
-  const CellWrapper: React.FC<Table.DataCellProps> = (props) => (
+  const CellWrapper: React.FC<Table.DataCellProps> = props => (
     <Cell interval={interval} {...props} />
   );
 

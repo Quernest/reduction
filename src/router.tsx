@@ -1,17 +1,14 @@
 import map from "lodash/map";
 import * as React from "react";
 import { HashRouter as Router, Route, Switch } from "react-router-dom";
-import { Header, NoMatch } from "src/components";
+import { Header } from "./components";
 import { SvgIconProps } from "@material-ui/core/SvgIcon";
 import BookIcon from "@material-ui/icons/Book";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import HomeIcon from "@material-ui/icons/Home";
 import MultilineChartIcon from "@material-ui/icons/MultilineChart";
 import { RouteProps } from "react-router";
-import { PCAPage } from './PCA';
-import { SOMPage } from './SOM';
-import { Docs } from './Docs';
-import { Home } from './Home';
+import { NoMatch, PCAPage, HomePage, DocsPage, SOMPage } from "./pages";
 
 export interface IRoute extends RouteProps {
   title?: string;
@@ -23,7 +20,7 @@ export const routes: IRoute[] = [
     exact: true,
     path: "/",
     title: "Home",
-    component: Home,
+    component: HomePage,
     icon: HomeIcon
   },
   {
@@ -41,7 +38,7 @@ export const routes: IRoute[] = [
   {
     title: "Docs",
     path: "/docs",
-    component: Docs,
+    component: DocsPage,
     icon: BookIcon
   },
   {

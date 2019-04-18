@@ -34,7 +34,7 @@ const useStyles = makeStyles(({ spacing, breakpoints }: Theme) => ({
   }
 }));
 
-export const Home = () => {
+export const HomePage = () => {
   const classes = useStyles();
 
   return (

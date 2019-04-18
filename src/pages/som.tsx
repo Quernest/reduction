@@ -18,17 +18,19 @@ import {
   ErrorMessage,
   generateColumns,
   generateRows,
-  UploadControls
-} from "src/components";
+  UploadControls,
+  HexagonalGrid,
+  SOMControls
+} from "../components";
 import {
   IDataset,
   IDatasetRequiredColumnsIndexes,
   IFilePreview,
   IHexagonalGridDimensions,
-} from "src/models";
-import { HexagonalGrid, SOMControls, ISOMOptions } from '.';
-import CalculateWorker from "worker-loader!src/SOM/calculate.worker";
-import UploadWorker from "worker-loader!src/SOM/upload.worker";
+  ISOMOptions
+} from "../models";
+import SOMWorker from "worker-loader!../workers/som.worker";
+import UploadWorker from "worker-loader!../workers/upload.worker";
 
 const styles = ({ spacing, breakpoints }: Theme) =>
   createStyles({
@@ -61,7 +63,9 @@ const styles = ({ spacing, breakpoints }: Theme) =>
     }
   });
 
-interface ISOMPageProps extends WithStyles<typeof styles>, RouteComponentProps { }
+interface ISOMPageProps
+  extends WithStyles<typeof styles>,
+    RouteComponentProps {}
 
 interface ISOMPageState {
   file?: File;
@@ -84,7 +88,7 @@ interface ISOMPageState {
 }
 
 class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
-  protected calculateWorker: Worker;
+  protected somWorker: Worker;
   protected uploadWorker: Worker;
 
   public readonly state: ISOMPageState = {
@@ -140,30 +144,22 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
     this.uploadWorker = new UploadWorker();
     this.uploadWorker.addEventListener(
       "message",
-      this.onGetUploadWorkerMessage,
+      this.onUploadWorkerMsg,
       false
     );
-    this.calculateWorker = new CalculateWorker();
-    this.calculateWorker.addEventListener(
-      "message",
-      this.onGetCalculateWorkerMessage,
-      false
-    );
+    this.somWorker = new SOMWorker();
+    this.somWorker.addEventListener("message", this.onSOMWorkerMsg, false);
   }
 
   protected destroyWorkers() {
     this.uploadWorker.terminate();
     this.uploadWorker.removeEventListener(
       "message",
-      this.onGetUploadWorkerMessage,
+      this.onUploadWorkerMsg,
       false
     );
-    this.calculateWorker.terminate();
-    this.calculateWorker.removeEventListener(
-      "message",
-      this.onGetCalculateWorkerMessage,
-      false
-    );
+    this.somWorker.terminate();
+    this.somWorker.removeEventListener("message", this.onSOMWorkerMsg, false);
   }
 
   protected onControlsSubmit = (
@@ -181,7 +177,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
     );
   };
 
-  protected onGetCalculateWorkerMessage = ({
+  protected onSOMWorkerMsg = ({
     data: {
       positions,
       umatrix,
@@ -215,7 +211,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
     }
   };
 
-  protected onGetUploadWorkerMessage = ({
+  protected onUploadWorkerMsg = ({
     data: { error, filePreview }
   }: MessageEvent) => {
     if (error) {
@@ -284,7 +280,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
     options: ISOMOptions
   ) {
     this.setState({ calculated: false, calculating: true });
-    this.calculateWorker.postMessage({
+    this.somWorker.postMessage({
       datasetRequiredColumnsIdxs,
       filePreview,
       dimensions,

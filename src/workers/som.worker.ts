@@ -11,8 +11,8 @@ import {
   IDatasetRequiredColumnsIndexes,
   IFilePreview,
   IHexagonalGridDimensions,
+  ISOMOptions
 } from "src/models";
-import { ISOMOptions } from '.';
 
 const ctx: Worker = self as any;
 
@@ -129,7 +129,7 @@ ctx.addEventListener(
           if (isNull(value)) {
             throw new Error(
               `value is required in the ${i + 1} row / ${j +
-              requiredVariablesCount} cell.`
+                requiredVariablesCount} cell.`
             );
           }
 
@@ -139,7 +139,7 @@ ctx.addEventListener(
           if (i !== observationsIdx && i !== typesIdx && isString(value)) {
             throw new Error(
               `value in the ${i + 1} row / ${j +
-              requiredVariablesCount} cell is string. It must be number.
+                requiredVariablesCount} cell is string. It must be number.
               If it is observation names or types select this columns
               in selection menu.`
             );

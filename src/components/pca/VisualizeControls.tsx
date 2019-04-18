@@ -11,7 +11,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import ThreeSixtyIcon from "@material-ui/icons/ThreeSixty";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
-import * as React from "react";
+import React from "react";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {
@@ -50,11 +50,11 @@ export const VisualizeControls: React.FC<IVisualizeControlsProps> = ({
     const { name, value } = event.target;
 
     onChange({ ...selectedComponents, [name]: value });
-  };
+  }
 
   function onSwap(event: React.MouseEvent<HTMLElement, MouseEvent>) {
     onChange({ x: selectedComponents.y, y: selectedComponents.x });
-  };
+  }
 
   return (
     <div className={classes.root}>
@@ -72,11 +72,15 @@ export const VisualizeControls: React.FC<IVisualizeControlsProps> = ({
                   id: "x"
                 }}
               >
-                {map(components, (name, i) => i !== selectedComponents.y && (
-                  <MenuItem key={i} value={i}>
-                    {name}
-                  </MenuItem>
-                ))}
+                {map(
+                  components,
+                  (name, i) =>
+                    i !== selectedComponents.y && (
+                      <MenuItem key={i} value={i}>
+                        {name}
+                      </MenuItem>
+                    )
+                )}
               </Select>
             </FormControl>
           </Grid>
@@ -92,11 +96,15 @@ export const VisualizeControls: React.FC<IVisualizeControlsProps> = ({
                   id: "y"
                 }}
               >
-                {map(components, (name, i) => i !== selectedComponents.x && (
-                  <MenuItem key={i} value={i}>
-                    {name}
-                  </MenuItem>
-                ))}
+                {map(
+                  components,
+                  (name, i) =>
+                    i !== selectedComponents.x && (
+                      <MenuItem key={i} value={i}>
+                        {name}
+                      </MenuItem>
+                    )
+                )}
               </Select>
             </FormControl>
           </Grid>

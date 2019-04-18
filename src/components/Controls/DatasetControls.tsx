@@ -8,8 +8,8 @@ import Select from "@material-ui/core/Select";
 import { makeStyles } from "@material-ui/styles";
 import isUndefined from "lodash/isUndefined";
 import map from "lodash/map";
-import * as React from "react";
-import { IDatasetRequiredColumnsIndexes } from "src/models";
+import React from "react";
+import { IDatasetRequiredColumnsIndexes } from "../../models";
 
 const useStyles = makeStyles(({ spacing }: Theme) => ({
   root: {

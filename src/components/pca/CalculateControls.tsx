@@ -4,14 +4,14 @@ import Grid from "@material-ui/core/Grid";
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
-import * as React from "react";
+import React from "react";
 import {
   DatasetControls,
   DXTable,
   generateColumns,
   generateRows
-} from "src/components";
-import { IDatasetRequiredColumnsIndexes, IFilePreview } from "src/models";
+} from "../../components";
+import { IDatasetRequiredColumnsIndexes, IFilePreview } from "../../models";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {

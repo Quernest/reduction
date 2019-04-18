@@ -1,7 +1,7 @@
 import { createStyles, Theme, withStyles, WithStyles } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
-import { max, range } from "d3-array";
+import { max, mean, range } from "d3-array";
 import {
   forceCollide,
   forceSimulation,
@@ -17,14 +17,13 @@ import {
   interpolateSpectral
 } from "d3-scale-chromatic";
 import { event, select, Selection } from "d3-selection";
-import "d3-selection-multi";
 import { line } from "d3-shape";
 import forEach from "lodash/forEach";
 import isUndefined from "lodash/isUndefined";
 import map from "lodash/map";
-import * as math from "mathjs";
-import * as React from "react";
-import { IHexagonalGridDimensions, IHexagonParameters } from "src/models";
+import reduce from "lodash/reduce";
+import React from "react";
+import { IHexagonalGridDimensions, IHexagonParameters } from "../../models";
 
 const styles = ({ typography, spacing, breakpoints }: Theme) =>
   createStyles({
@@ -92,7 +91,10 @@ interface IHexagonalGridState {
   hexagonParameters: IHexagonParameters;
 }
 
-class HexagonalGridBase extends React.Component<IHexagonalGridProps, IHexagonalGridState> {
+class HexagonalGridBase extends React.Component<
+  IHexagonalGridProps,
+  IHexagonalGridState
+> {
   /**
    * react reference object with lower canvas layer element
    */
@@ -171,7 +173,10 @@ class HexagonalGridBase extends React.Component<IHexagonalGridProps, IHexagonalG
     );
   }
 
-  public componentDidUpdate(prevProps: IHexagonalGridProps, prevState: IHexagonalGridState) {
+  public componentDidUpdate(
+    prevProps: IHexagonalGridProps,
+    prevState: IHexagonalGridState
+  ) {
     if (prevProps.currentFactorIdx !== this.props.currentFactorIdx) {
       this.clearCtxRect(this.lowerCtx);
       this.drawHexagons();
@@ -360,17 +365,21 @@ class HexagonalGridBase extends React.Component<IHexagonalGridProps, IHexagonalG
     /**
      * mean of each position
      */
-    const means: number[] = map(positions, pos => math.mean(pos));
+    const means = map(positions, pos => mean(pos));
 
     /**
      * max value of means array
      */
-    const maxMean: number = math.max(means);
+    const maxMean = reduce(
+      means,
+      (a, b) => (!isUndefined(b) ? Math.max(a, b) : 0),
+      0
+    );
 
     /**
      * positions represented in the interval from 0 to 1
      */
-    const posInterval = map(means, mean => mean / maxMean);
+    const posInterval = map(means, x => (!isUndefined(x) ? x / maxMean : 0));
 
     // classify by type (add type to input and pass as param)
     const scaleColor = scaleBand();
@@ -486,18 +495,17 @@ class HexagonalGridBase extends React.Component<IHexagonalGridProps, IHexagonalG
               canvasRect.width * scaleX - x <=
               (tooltipRect.width + offset) * scaleX;
 
-            this.tooltip.styles({
-              opacity: 1,
-              top: `${event.pageY - offset}px`,
-              left: climbs
+            this.tooltip.style("opacity", 1);
+            this.tooltip.style("top", `${event.pageY - offset}px`);
+            this.tooltip.style(
+              "left",
+              climbs
                 ? `${event.pageX - tooltipRect.width - offset}px`
                 : `${event.pageX + offset}px`
-            });
+            );
           }
         } else {
-          this.tooltip.text(null).styles({
-            opacity: 0
-          });
+          this.tooltip.text(null).style("opacity", 0);
         }
       });
     }
