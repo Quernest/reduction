@@ -6,6 +6,12 @@ export interface IDataset {
   types?: string[];
 }
 
+export interface IDatasetOptions {
+  minFactorsCount: number;
+  minObservationsCount: number;
+  requiredVariablesCount: number;
+}
+
 export interface IDatasetRequiredColumnsIndexes {
   observationsIdx: number;
   typesIdx?: number;
