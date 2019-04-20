@@ -9,6 +9,7 @@ import {
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
 import round from "lodash/round";
+import debounce from "lodash/debounce";
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import compose from "recompose/compose";
@@ -177,58 +178,62 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
     );
   };
 
-  protected onSOMWorkerMsg = ({
-    data: {
-      positions,
-      umatrix,
-      neurons,
-      topographicError,
-      quantizationError,
-      dataset,
-      error
-    }
-  }: MessageEvent) => {
-    if (error) {
-      this.setState({
-        error,
-        calculated: false,
-        calculating: false,
-        uploaded: false,
-        uploading: false
-      });
-    } else {
-      this.clearErrors();
-      this.setState({
-        dataset,
+  protected onSOMWorkerMsg = debounce(
+    ({
+      data: {
         positions,
         umatrix,
         neurons,
         topographicError,
         quantizationError,
-        calculating: false,
-        calculated: true
-      });
-    }
-  };
+        dataset,
+        error
+      }
+    }: MessageEvent) => {
+      if (error) {
+        this.setState({
+          error,
+          calculated: false,
+          calculating: false,
+          uploaded: false,
+          uploading: false
+        });
+      } else {
+        this.clearErrors();
+        this.setState({
+          dataset,
+          positions,
+          umatrix,
+          neurons,
+          topographicError,
+          quantizationError,
+          calculating: false,
+          calculated: true
+        });
+      }
+    },
+    700
+  );
 
-  protected onUploadWorkerMsg = ({
-    data: { error, filePreview }
-  }: MessageEvent) => {
-    if (error) {
-      this.setState({
-        error,
-        uploaded: false,
-        uploading: false
-      });
-    } else {
-      this.clearErrors();
-      this.setState({
-        filePreview,
-        uploaded: true,
-        uploading: false
-      });
-    }
-  };
+  protected onUploadWorkerMsg = debounce(
+    ({ data: { error, filePreview } }: MessageEvent) => {
+      if (error) {
+        this.setState({
+          error,
+          uploaded: false,
+          uploading: false
+        });
+      } else {
+        this.clearErrors();
+        this.setState({
+          filePreview,
+          uploaded: true,
+          uploading: false
+        });
+      }
+    },
+    700
+  );
 
   protected onChangeFile = (chosenFile?: File, error?: string): void => {
     if (error) {

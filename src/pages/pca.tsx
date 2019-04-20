@@ -6,7 +6,8 @@ import {
   WithStyles
 } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import * as React from "react";
+import React from "react";
+import debounce from "lodash/debounce";
 import { RouteComponentProps, withRouter } from "react-router";
 import compose from "recompose/compose";
 import {
@@ -143,49 +144,29 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
     this.pcaWorker.removeEventListener("message", this.onPCAWorkerMsg, false);
   }
 
-  protected onUploadWorkerMsg = ({
-    data: { error, filePreview }
-  }: MessageEvent) => {
-    if (error) {
-      this.setState({
-        error,
-        uploaded: false,
-        uploading: false
-      });
-    } else {
-      this.setState({
-        error,
-        filePreview,
-        uploaded: true,
-        uploading: false
-      });
-    }
-  };
+  protected onUploadWorkerMsg = debounce(
+    ({ data: { error, filePreview } }: MessageEvent) => {
+      if (error) {
+        this.setState({
+          error,
+          uploaded: false,
+          uploading: false
+        });
+      } else {
+        this.setState({
+          error,
+          filePreview,
+          uploaded: true,
+          uploading: false
+        });
+      }
+    },
+    700
+  );
 
-  protected onPCAWorkerMsg = ({
-    data: {
-      error,
-      dataset,
-      explainedVariance,
-      cumulativeVariance,
-      adjustedDataset,
-      loadings,
-      predictions,
-      eigenvalues,
-      components,
-      importantComponents
-    }
-  }: MessageEvent) => {
-    if (error) {
-      this.setState({
-        error,
-        uploaded: false,
-        uploading: false,
-        calculated: false,
-        calculating: false
-      });
-    } else {
-      this.setState({
+  protected onPCAWorkerMsg = debounce(
+    ({
+      data: {
         error,
         dataset,
         explainedVariance,
@@ -195,12 +176,36 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
         predictions,
         eigenvalues,
         components,
-        importantComponents,
-        calculated: true,
-        calculating: false
-      });
-    }
-  };
+        importantComponents
+      }
+    }: MessageEvent) => {
+      if (error) {
+        this.setState({
+          error,
+          uploaded: false,
+          uploading: false,
+          calculated: false,
+          calculating: false
+        });
+      } else {
+        this.setState({
+          error,
+          dataset,
+          explainedVariance,
+          cumulativeVariance,
+          adjustedDataset,
+          loadings,
+          predictions,
+          eigenvalues,
+          components,
+          importantComponents,
+          calculated: true,
+          calculating: false
+        });
+      }
+    },
+    700
+  );
 
   protected onFileChange = (file?: File, error?: string) => {
     this.setState({

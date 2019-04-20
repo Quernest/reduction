@@ -54,7 +54,9 @@ export const HomePage = () => {
           <Grid item={true} xs={12} md={6}>
             <div className={classes.iconTitleWrap}>
               <MultilineChartIcon color="primary" className={classes.icon} />
-              <Typography variant="h6">Principal Component Analysis</Typography>
+              <Typography component="h3" variant="h5">
+                Principal Component Analysis
+              </Typography>
             </div>
             <Typography variant="body1" paragraph={true}>
               Principal component analysis (PCA) is a statistical procedure that
@@ -70,7 +72,9 @@ export const HomePage = () => {
           <Grid item={true} xs={12} md={6}>
             <div className={classes.iconTitleWrap}>
               <DashboardIcon color="primary" className={classes.icon} />
-              <Typography variant="h6">Self-Organizing Maps</Typography>
+              <Typography component="h3" variant="h5">
+                Self-Organizing Maps
+              </Typography>
             </div>
             <Typography variant="body1" paragraph={true}>
               A self-organizing map (SOM) or self-organizing feature map (SOFM)
