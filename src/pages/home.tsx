@@ -30,7 +30,7 @@ const useStyles = makeStyles(({ spacing, breakpoints }: Theme) => ({
   iconTitleWrap: {
     display: "flex",
     alignItems: "center",
-    marginBottom: spacing.unit * 3
+    marginBottom: spacing.unit * 1.75
   }
 }));
 
@@ -42,7 +42,9 @@ export const HomePage = () => {
       <div className={classes.wrap}>
         <Grid container={true} alignItems="flex-start" spacing={24}>
           <Grid item={true} xs={12}>
-            <Typography variant="h1">What is "reduction" ?</Typography>
+            <Typography variant="h1" gutterBottom={true}>
+              What is "reduction" ?
+            </Typography>
             <Typography variant="body1" paragraph={true}>
               In statistics, machine learning, and information theory,
               dimensionality reduction or dimension reduction is the process of
@@ -54,9 +56,7 @@ export const HomePage = () => {
           <Grid item={true} xs={12} md={6}>
             <div className={classes.iconTitleWrap}>
               <MultilineChartIcon color="primary" className={classes.icon} />
-              <Typography component="h3" variant="h5">
-                Principal Component Analysis
-              </Typography>
+              <Typography variant="h2">Principal Component Analysis</Typography>
             </div>
             <Typography variant="body1" paragraph={true}>
               Principal component analysis (PCA) is a statistical procedure that
@@ -72,9 +72,7 @@ export const HomePage = () => {
           <Grid item={true} xs={12} md={6}>
             <div className={classes.iconTitleWrap}>
               <DashboardIcon color="primary" className={classes.icon} />
-              <Typography component="h3" variant="h5">
-                Self-Organizing Maps
-              </Typography>
+              <Typography variant="h2">Self-Organizing Maps</Typography>
             </div>
             <Typography variant="body1" paragraph={true}>
               A self-organizing map (SOM) or self-organizing feature map (SOFM)

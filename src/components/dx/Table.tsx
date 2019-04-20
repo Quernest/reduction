@@ -38,10 +38,7 @@ const useStyles = makeStyles(({ breakpoints }: Theme) => ({
     flexGrow: 1
   },
   title: {
-    marginRight: "auto",
-    [breakpoints.down("sm")]: {
-      fontSize: 16
-    }
+    marginRight: "auto"
   }
 }));
 
@@ -124,7 +121,7 @@ export const Table: React.FC<ITableProps> = ({
                 {({}) => (
                   <div className={classes.toolbarContent}>
                     {title && (
-                      <Typography className={classes.title} variant="h6">
+                      <Typography className={classes.title} variant="body1">
                         {title}
                       </Typography>
                     )}

@@ -39,7 +39,9 @@ export const DocsPage = () => {
   return (
     <div className={classes.root}>
       <div className={classes.wrap}>
-        <Typography variant="h1">Documentation</Typography>
+        <Typography variant="h1" gutterBottom={true}>
+          Documentation
+        </Typography>
         <Divider className={classes.divider} />
         <blockquote className={classes.blockquote}>
           <Typography variant="body1" className={classes.blockquoteText}>
@@ -47,7 +49,9 @@ export const DocsPage = () => {
           </Typography>
         </blockquote>
         <Divider className={classes.divider} />
-        <Typography variant="h2">Dataset</Typography>
+        <Typography variant="h2" gutterBottom={true}>
+          Dataset
+        </Typography>
         <Typography variant="body1" paragraph={true}>
           This application uses{" "}
           <Link href="https://en.wikipedia.org/wiki/Comma-separated_values">

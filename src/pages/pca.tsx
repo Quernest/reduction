@@ -291,7 +291,9 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
     return (
       <div className={classes.root}>
         <div className={classes.wrap}>
-          <Typography variant="h1">Principal Component Analysis</Typography>
+          <Typography variant="h1" gutterBottom={true}>
+            Principal Component Analysis
+          </Typography>
           {!uploaded && !calculated && (
             <>
               <Typography variant="body1" paragraph={true}>

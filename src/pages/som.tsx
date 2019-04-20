@@ -321,7 +321,9 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
     return (
       <div className={classes.root}>
         <div className={classes.wrap}>
-          <Typography variant="h1">Self-Organizing Maps</Typography>
+          <Typography variant="h1" gutterBottom={true}>
+            Self-Organizing Maps
+          </Typography>
           {uploaded && (
             <SOMControls
               options={options}

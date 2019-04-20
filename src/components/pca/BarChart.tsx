@@ -17,10 +17,7 @@ const styles = ({ palette, spacing, typography, breakpoints }: Theme) =>
       width: "100%"
     },
     title: {
-      marginTop: spacing.unit * 2,
-      [breakpoints.down("sm")]: {
-        fontSize: 16
-      }
+      marginTop: spacing.unit * 2
     },
     svgContainer: {
       position: "relative",
@@ -271,7 +268,11 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
     return (
       <div className={classes.root}>
         {title && (
-          <Typography className={classes.title} variant="h6">
+          <Typography
+            variant="h2"
+            gutterBottom={true}
+            className={classes.title}
+          >
             {title}
           </Typography>
         )}

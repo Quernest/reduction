@@ -32,10 +32,7 @@ const styles = ({ typography, spacing, breakpoints }: Theme) =>
       marginBottom: spacing.unit * 3
     },
     title: {
-      marginTop: spacing.unit * 2,
-      [breakpoints.down("sm")]: {
-        fontSize: 16
-      }
+      marginTop: spacing.unit * 2
     },
     container: {
       position: "relative"
@@ -518,7 +515,11 @@ class HexagonalGridBase extends React.Component<
     return (
       <div className={classes.root}>
         {title && (
-          <Typography variant="h6" className={classes.title}>
+          <Typography
+            variant="h2"
+            gutterBottom={true}
+            className={classes.title}
+          >
             {title}
           </Typography>
         )}
