@@ -16,7 +16,6 @@ import {
   withStyles
 } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
 import MenuIcon from "@material-ui/icons/Menu";
 import React from "react";
 import { Link } from "react-router-dom";
@@ -26,12 +25,6 @@ import { IRoute } from "src/router";
 
 const styles = ({ breakpoints }: Theme) =>
   createStyles({
-    root: {
-      flexGrow: 1
-    },
-    grow: {
-      flexGrow: 1
-    },
     wrap: {
       width: "100%",
       maxWidth: breakpoints.values.lg,
@@ -39,11 +32,13 @@ const styles = ({ breakpoints }: Theme) =>
       marginRight: "auto"
     },
     menuButton: {
-      marginLeft: -12,
-      marginRight: 20
+      marginLeft: -12
     },
     list: {
       width: 250
+    },
+    right: {
+      marginLeft: "auto"
     }
   });
 
@@ -120,7 +115,7 @@ class HeaderBase extends React.Component<IHeaderBaseProps, IHeaderBaseState> {
     });
 
     return (
-      <div className={classes.root}>
+      <React.Fragment>
         <AppBar position="static">
           <Toolbar>
             <div className={classes.wrap}>
@@ -135,14 +130,9 @@ class HeaderBase extends React.Component<IHeaderBaseProps, IHeaderBaseState> {
                     <MenuIcon />
                   </IconButton>
                 </Hidden>
-                <Typography
-                  variant="h6"
-                  color="inherit"
-                  className={classes.grow}
-                >
-                  Reduction
-                </Typography>
-                <Hidden smDown={true}>{links}</Hidden>
+                <Hidden smDown={true}>
+                  <div className={classes.right}>{links}</div>
+                </Hidden>
               </Grid>
             </div>
           </Toolbar>
@@ -162,7 +152,7 @@ class HeaderBase extends React.Component<IHeaderBaseProps, IHeaderBaseState> {
             </div>
           </Drawer>
         </Hidden>
-      </div>
+      </React.Fragment>
     );
   }
 }
