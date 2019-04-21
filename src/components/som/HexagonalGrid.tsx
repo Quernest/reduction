@@ -272,12 +272,6 @@ class HexagonalGridBase extends Component<
     });
   }
 
-  /**
-   * draw positions of observations
-   * @param d short diagonal of the hexagon
-   * @param positions result from the SOM mapping process, array of arrays with x and y positions
-   * @param observations array of observations
-   */
   public drawPositions(
     positions: number[][],
     observations: string[],
