@@ -1,7 +1,7 @@
 import { createStyles, Theme, withStyles, WithStyles } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
-import { max, mean, range } from "d3-array";
+import { mean, range } from "d3-array";
 import {
   forceCollide,
   forceSimulation,
@@ -22,10 +22,11 @@ import forEach from "lodash/forEach";
 import isUndefined from "lodash/isUndefined";
 import map from "lodash/map";
 import reduce from "lodash/reduce";
-import React from "react";
-import { IHexagonalGridDimensions, IHexagonParameters } from "../../models";
+import React, { Component } from "react";
+import { IHexagonalGridDimensions } from "../../models";
+import { HexagonDimensions } from ".";
 
-const styles = ({ typography, spacing, breakpoints }: Theme) =>
+const styles = ({ typography, spacing }: Theme) =>
   createStyles({
     root: {
       flexGrow: 1,
@@ -85,77 +86,66 @@ interface IHexagonalGridProps extends WithStyles {
 interface IHexagonalGridState {
   width: number;
   height: number;
-  hexagonParameters: IHexagonParameters;
+  hexagonDimensions: HexagonDimensions;
 }
 
-class HexagonalGridBase extends React.Component<
+class HexagonalGridBase extends Component<
   IHexagonalGridProps,
   IHexagonalGridState
 > {
-  /**
-   * react reference object with lower canvas layer element
-   */
   protected lowerCanvasReference = React.createRef<HTMLCanvasElement>();
-
-  /**
-   * react reference object with upper canvas layer element
-   */
   protected upperCanvasReference = React.createRef<HTMLCanvasElement>();
-
-  /**
-   * lower canvas selection
-   */
   protected lowerCanvas: Selection<HTMLCanvasElement, {}, null, undefined>;
-
-  /**
-   * upper canvas selection
-   */
   protected upperCanvas: Selection<HTMLCanvasElement, {}, null, undefined>;
-
-  /**
-   * 2d context of lower canvas
-   */
   protected lowerCtx: CanvasRenderingContext2D;
-
-  /**
-   * 2d context of upper canvas
-   */
   protected upperCtx: CanvasRenderingContext2D;
-
-  /**
-   * physics simulation
-   */
   protected simulation: Simulation<IPosition, undefined>;
-
-  /**
-   * tooltip container
-   */
   protected tooltip: Selection<HTMLDivElement, {}, HTMLElement, any>;
 
-  /**
-   * react component state
-   */
-  public readonly state = {
+  public readonly state: IHexagonalGridState = {
     width: 1280,
     height: 560,
-    hexagonParameters: {
-      r: 0,
-      R: 0,
-      d: 0,
-      D: 0,
-      a: 0
+    get hexagonDimensions() {
+      return new HexagonDimensions(this.width, this.height, 0, 0);
     }
   };
 
   public componentDidMount() {
-    const { positions, observations, types } = this.props;
-    const { columns, rows } = this.props.dimensions;
-    const { r, R, d, D } = this.computeHexagonParameters();
+    const { width, height } = this.state;
+    const {
+      positions,
+      observations,
+      types,
+      dimensions: { columns, rows }
+    } = this.props;
+
+    const hexagonDimensions = new HexagonDimensions(
+      width,
+      height,
+      columns,
+      rows
+    );
+
+    const bestWidth =
+      Math.round(
+        columns * hexagonDimensions.shortDiagonal +
+          hexagonDimensions.incircleRadius / 2 +
+          hexagonDimensions.circumcircleRadius / 2
+      ) + hexagonDimensions.shortDiagonal;
+
+    const bestHeight =
+      Math.round(
+        rows *
+          (hexagonDimensions.longDiagonal -
+            hexagonDimensions.circumcircleRadius / 2) +
+          hexagonDimensions.incircleRadius / 2
+      ) + hexagonDimensions.shortDiagonal;
 
     this.setState(
       {
-        width: Math.round(columns * d + r / 2 + R / 2) + d,
-        height: Math.round(rows * (D - R / 2) + r / 2) + d
+        hexagonDimensions,
+        width: bestWidth,
+        height: bestHeight
       },
       () => {
         this.initLowerCanvas(this.lowerCanvasReference);
@@ -170,10 +160,7 @@ class HexagonalGridBase extends React.Component<
     );
   }
 
-  public componentDidUpdate(
-    prevProps: IHexagonalGridProps,
-    prevState: IHexagonalGridState
-  ) {
+  public componentDidUpdate(prevProps: IHexagonalGridProps) {
     if (prevProps.currentFactorIdx !== this.props.currentFactorIdx) {
       this.clearCtxRect(this.lowerCtx);
       this.drawHexagons();
@@ -191,9 +178,6 @@ class HexagonalGridBase extends React.Component<
     }
   }
 
-  /**
-   * initialize lower canvas and it's context
-   */
   public initLowerCanvas({ current }: React.RefObject<HTMLCanvasElement>) {
     if (current) {
       this.lowerCanvas = select(current);
@@ -205,9 +189,6 @@ class HexagonalGridBase extends React.Component<
     }
   }
 
-  /**
-   * initialize upper canvas and it's context
-   */
   public initUpperCanvas({ current }: React.RefObject<HTMLCanvasElement>) {
     if (current) {
       this.upperCanvas = select(current);
@@ -217,39 +198,6 @@ class HexagonalGridBase extends React.Component<
         this.upperCtx = node.getContext("2d") as CanvasRenderingContext2D;
       }
     }
-  }
-
-  /**
-   * computes hexagon parameters as radius, diagonal, edge etc...
-   */
-  public computeHexagonParameters(): IHexagonParameters {
-    const { width, height } = this.state;
-    const { rows, columns } = this.props.dimensions;
-    const r = max([
-      width / (Math.sqrt(3) * columns + 3),
-      height / ((rows + 3) * 1.5)
-    ]) as number;
-    const d = r * 2;
-    const D = 2 * (d / Math.sqrt(3));
-    const R = D / 2;
-    const a = R;
-
-    const hexagonParameters: IHexagonParameters = {
-      r,
-      R,
-      d,
-      D,
-      a
-    };
-
-    this.setState({
-      hexagonParameters: {
-        ...this.state.hexagonParameters,
-        ...hexagonParameters
-      }
-    });
-
-    return hexagonParameters;
   }
 
   public createTooltip() {
@@ -278,11 +226,11 @@ class HexagonalGridBase extends React.Component<
    * @param value - scaled value
    */
   public scaleGrid(value: number) {
-    const { d } = this.state.hexagonParameters;
+    const { hexagonDimensions } = this.state;
 
     return scaleLinear()
       .domain([0, 1])
-      .range([0, d])(value);
+      .range([0, hexagonDimensions.shortDiagonal])(value);
   }
 
   /**
@@ -290,11 +238,14 @@ class HexagonalGridBase extends React.Component<
    * @param [x, y] is a pos of neuron
    */
   public getHexagonPoints([x, y]: [number, number]) {
-    const { R } = this.state.hexagonParameters;
+    const { hexagonDimensions } = this.state;
 
     return range(-Math.PI / 2, 2 * Math.PI, (2 * Math.PI) / 6).map<
       [number, number]
-    >((a: number) => [x + Math.cos(a) * R, y + Math.sin(a) * R]);
+    >((a: number) => [
+      x + Math.cos(a) * hexagonDimensions.circumcircleRadius,
+      y + Math.sin(a) * hexagonDimensions.circumcircleRadius
+    ]);
   }
 
   /**
@@ -349,7 +300,7 @@ class HexagonalGridBase extends React.Component<
     observations: string[],
     types?: string[]
   ) {
-    const { d } = this.state.hexagonParameters;
+    const { hexagonDimensions } = this.state;
 
     const input = map<number[], IPosition>(positions, ([x, y], index) => ({
       index,
@@ -359,27 +310,20 @@ class HexagonalGridBase extends React.Component<
       type: types ? types[index] : undefined
     }));
 
-    /**
-     * mean of each position
-     */
     const means = map(positions, pos => mean(pos));
-
-    /**
-     * max value of means array
-     */
     const maxMean = reduce(
       means,
       (a, b) => (!isUndefined(b) ? Math.max(a, b) : 0),
       0
     );
 
+    // classify by type (add type to input and pass as param)
+    const scaleColor = scaleBand();
+
     /**
      * positions represented in the interval from 0 to 1
      */
     const posInterval = map(means, x => (!isUndefined(x) ? x / maxMean : 0));
-
-    // classify by type (add type to input and pass as param)
-    const scaleColor = scaleBand();
 
     if (types) {
       scaleColor.domain(types).range([0, 1]);
@@ -396,16 +340,13 @@ class HexagonalGridBase extends React.Component<
       return this.scaleGrid(y as number);
     };
 
-    /**
-     * radius of circle
-     */
-    const r: number = d / 5;
+    const circleRadius: number = hexagonDimensions.shortDiagonal / 5;
 
     // force simulation and draw positions (circles)
     this.simulation = forceSimulation(input)
       .force("x", forceX(getX))
       .force("y", forceY(getY))
-      .force("collide", forceCollide(r))
+      .force("collide", forceCollide(circleRadius))
       .on("tick", () => {
         this.clearCtxRect(this.upperCtx);
 
@@ -418,7 +359,7 @@ class HexagonalGridBase extends React.Component<
           this.upperCtx.fillStyle = type
             ? getColor(type)
             : interpolateSpectral(posInterval[i]);
-          this.upperCtx.arc(x, y, r, 0, 2 * Math.PI);
+          this.upperCtx.arc(x, y, circleRadius, 0, 2 * Math.PI);
           this.upperCtx.strokeStyle = "#8395a7";
           this.upperCtx.stroke();
           this.upperCtx.fill();
@@ -436,48 +377,22 @@ class HexagonalGridBase extends React.Component<
       const offset = 10;
 
       this.upperCanvas.on("mousemove", () => {
-        /**
-         * size of the canvas element and its position relative to the viewport
-         */
         const canvasRect = canvas.getBoundingClientRect();
-
-        /**
-         * size of the tooltip div element and its position relative to the viewport
-         */
         const tooltipRect = tooltip.getBoundingClientRect();
-
-        /**
-         * x scaling coefficient
-         */
         const scaleX = canvas.width / canvasRect.width;
-
-        /**
-         * y scaling coefficient
-         */
         const scaleY = canvas.height / canvasRect.height;
-
-        /**
-         * cursor position in canvas (multiplied by scaleY)
-         */
         const x = (event.clientX - canvasRect.left) * scaleX;
-
-        /**
-         * cursor position in canvas (multiplied by scaleY)
-         */
         const y = (event.clientY - canvasRect.top) * scaleY;
 
         /**
          * closest node to the position ⟨x,y⟩ with the given search radius.
          */
-        const node = this.simulation.find(x, y, r);
+        const node = this.simulation.find(x, y, circleRadius);
 
-        // if node is not undefined and has name
         if (node && node.name) {
           const { name, type } = node;
 
           const tooltipText = type ? `${name}, type: ${type}` : name;
-
-          // add text
           this.tooltip.text(tooltipText);
 
           // because tooltip initializes with width = 0
