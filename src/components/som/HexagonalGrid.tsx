@@ -1,7 +1,7 @@
 import { createStyles, Theme, withStyles, WithStyles } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
-import { mean, range } from "d3-array";
+import { mean } from "d3-array";
 import {
   forceCollide,
   forceSimulation,
@@ -24,7 +24,7 @@ import map from "lodash/map";
 import reduce from "lodash/reduce";
 import React, { Component } from "react";
 import { IHexagonalGridDimensions } from "../../models";
-import { HexagonDimensions } from ".";
+import { Hexagon } from ".";
 
 const styles = ({ typography, spacing }: Theme) =>
   createStyles({
@@ -86,7 +86,7 @@ interface IHexagonalGridProps extends WithStyles {
 interface IHexagonalGridState {
   width: number;
   height: number;
-  hexagonDimensions: HexagonDimensions;
+  hexagon: Hexagon;
 }
 
 class HexagonalGridBase extends Component<
@@ -105,59 +105,13 @@ class HexagonalGridBase extends Component<
   public readonly state: IHexagonalGridState = {
     width: 1280,
     height: 560,
-    get hexagonDimensions() {
-      return new HexagonDimensions(this.width, this.height, 0, 0);
+    get hexagon() {
+      return new Hexagon(this.width, this.height, 0, 0);
     }
   };
 
   public componentDidMount() {
-    const { width, height } = this.state;
-    const {
-      positions,
-      observations,
-      types,
-      dimensions: { columns, rows }
-    } = this.props;
-
-    const hexagonDimensions = new HexagonDimensions(
-      width,
-      height,
-      columns,
-      rows
-    );
-
-    const bestWidth =
-      Math.round(
-        columns * hexagonDimensions.shortDiagonal +
-          hexagonDimensions.incircleRadius / 2 +
-          hexagonDimensions.circumcircleRadius / 2
-      ) + hexagonDimensions.shortDiagonal;
-
-    const bestHeight =
-      Math.round(
-        rows *
-          (hexagonDimensions.longDiagonal -
-            hexagonDimensions.circumcircleRadius / 2) +
-          hexagonDimensions.incircleRadius / 2
-      ) + hexagonDimensions.shortDiagonal;
-
-    this.setState(
-      {
-        hexagonDimensions,
-        width: bestWidth,
-        height: bestHeight
-      },
-      () => {
-        this.initLowerCanvas(this.lowerCanvasReference);
-        this.drawHexagons();
-
-        if (!isUndefined(positions) && !isUndefined(observations)) {
-          this.createTooltip();
-          this.initUpperCanvas(this.upperCanvasReference);
-          this.drawPositions(positions, observations, types);
-        }
-      }
-    );
+    this.init();
   }
 
   public componentDidUpdate(prevProps: IHexagonalGridProps) {
@@ -172,10 +126,47 @@ class HexagonalGridBase extends Component<
     this.removeTooltip();
   }
 
-  public stopSimulation() {
-    if (this.simulation) {
-      this.simulation.stop();
-    }
+  public init() {
+    const { width, height } = this.state;
+    const {
+      positions,
+      observations,
+      types,
+      dimensions: { columns, rows }
+    } = this.props;
+
+    const hexagon = new Hexagon(width, height, columns, rows);
+
+    const bestWidth =
+      Math.round(
+        columns * hexagon.shortDiagonal +
+          hexagon.incircleRadius / 2 +
+          hexagon.circumcircleRadius / 2
+      ) + hexagon.shortDiagonal;
+
+    const bestHeight =
+      Math.round(
+        rows * (hexagon.longDiagonal - hexagon.circumcircleRadius / 2) +
+          hexagon.incircleRadius / 2
+      ) + hexagon.shortDiagonal;
+
+    this.setState(
+      {
+        hexagon,
+        width: bestWidth,
+        height: bestHeight
+      },
+      () => {
+        this.initLowerCanvas(this.lowerCanvasReference);
+        this.drawHexagons();
+
+        if (!isUndefined(positions) && !isUndefined(observations)) {
+          this.createTooltip();
+          this.initUpperCanvas(this.upperCanvasReference);
+          this.drawPositions(positions, observations, types);
+        }
+      }
+    );
   }
 
   public initLowerCanvas({ current }: React.RefObject<HTMLCanvasElement>) {
@@ -208,6 +199,12 @@ class HexagonalGridBase extends Component<
       .attr("class", classes.tooltip);
   }
 
+  public stopSimulation() {
+    if (this.simulation) {
+      this.simulation.stop();
+    }
+  }
+
   public removeTooltip() {
     if (this.tooltip) {
       this.tooltip.remove();
@@ -226,26 +223,11 @@ class HexagonalGridBase extends Component<
    * @param value - scaled value
    */
   public scaleGrid(value: number) {
-    const { hexagonDimensions } = this.state;
+    const { hexagon } = this.state;
 
     return scaleLinear()
       .domain([0, 1])
-      .range([0, hexagonDimensions.shortDiagonal])(value);
-  }
-
-  /**
-   * generates points of an hexagon
-   * @param [x, y] is a pos of neuron
-   */
-  public getHexagonPoints([x, y]: [number, number]) {
-    const { hexagonDimensions } = this.state;
-
-    return range(-Math.PI / 2, 2 * Math.PI, (2 * Math.PI) / 6).map<
-      [number, number]
-    >((a: number) => [
-      x + Math.cos(a) * hexagonDimensions.circumcircleRadius,
-      y + Math.sin(a) * hexagonDimensions.circumcircleRadius
-    ]);
+      .range([0, hexagon.shortDiagonal])(value);
   }
 
   /**
@@ -253,12 +235,13 @@ class HexagonalGridBase extends Component<
    */
   public drawHexagons() {
     const { currentFactorIdx, neurons, heatmap, umatrix } = this.props;
+    const { hexagon } = this.state;
 
     const generatePathLine = ([x, y]: [number, number]) => {
       const sX = this.scaleGrid(x);
       const sY = this.scaleGrid(y);
 
-      const points = this.getHexagonPoints([sX, sY]);
+      const points = hexagon.getPoints([sX, sY], hexagon.circumcircleRadius);
 
       return line()(points);
     };
@@ -300,7 +283,7 @@ class HexagonalGridBase extends Component<
     observations: string[],
     types?: string[]
   ) {
-    const { hexagonDimensions } = this.state;
+    const { hexagon } = this.state;
 
     const input = map<number[], IPosition>(positions, ([x, y], index) => ({
       index,
@@ -340,7 +323,7 @@ class HexagonalGridBase extends Component<
       return this.scaleGrid(y as number);
     };
 
-    const circleRadius: number = hexagonDimensions.shortDiagonal / 5;
+    const circleRadius: number = hexagon.shortDiagonal / 5;
 
     // force simulation and draw positions (circles)
     this.simulation = forceSimulation(input)
@@ -443,6 +426,7 @@ class HexagonalGridBase extends Component<
           style={{ paddingBottom: `${(height / width) * 100}%` }}
         >
           <canvas
+            id="lowerCanvas"
             width={width}
             height={height}
             className={classes.canvas}
@@ -450,6 +434,7 @@ class HexagonalGridBase extends Component<
           />
           {positions && (
             <canvas
+              id="upperCanvas"
               width={width}
               height={height}
               className={classes.canvas}

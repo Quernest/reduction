@@ -1,4 +1,6 @@
-export class HexagonDimensions {
+import { range } from "d3-array";
+
+export class Hexagon {
   public incircleRadius: number = 0;
   public circumcircleRadius: number = 0;
   public shortDiagonal: number = 0;
@@ -14,6 +16,15 @@ export class HexagonDimensions {
     this.shortDiagonal = this.getShortDiagonal(this.incircleRadius);
     this.longDiagonal = this.getLongDiagonal(this.shortDiagonal);
     this.circumcircleRadius = this.getCircumcircleRadius(this.longDiagonal);
+  }
+
+  public getPoints([x, y]: [number, number], circumcircleRadius: number) {
+    return range(-Math.PI / 2, 2 * Math.PI, (2 * Math.PI) / 6).map<
+      [number, number]
+    >((a: number) => [
+      x + Math.cos(a) * circumcircleRadius,
+      y + Math.sin(a) * circumcircleRadius
+    ]);
   }
 
   private getIncircleRadius(
