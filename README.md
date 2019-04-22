@@ -5,6 +5,6 @@
 ## The following algorithms are available:
 
 - Principal Component Analysis (PCA)
-- Kohonen Self-organizing map (SOM)
+- Kohonen self-organizing maps (SOM)
 
 ## [Link](https://quernest.github.io/reduction)
