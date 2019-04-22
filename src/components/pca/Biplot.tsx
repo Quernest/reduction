@@ -5,27 +5,15 @@ import * as d3 from "d3";
 import React from "react";
 import compose from "recompose/compose";
 import { IChartState, Points, Vectors } from "../../models";
+import { SVG } from "../SVG";
 
-const styles = ({ spacing, typography, breakpoints }: Theme) =>
+const styles = ({ spacing, typography }: Theme) =>
   createStyles({
     root: {
       width: "100%"
     },
     title: {
       marginTop: spacing.unit * 2
-    },
-    svgContainer: {
-      position: "relative",
-      height: 0,
-      width: "100%",
-      padding: 0 // reset
-    },
-    svg: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%"
     },
     axis: {
       fontSize: typography.fontSize,
@@ -98,9 +86,6 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
     }
   };
 
-  /**
-   * main svg element
-   */
   protected svg: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
   /**
@@ -119,23 +104,13 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
    */
   protected view: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
-  /**
-   * x linear scale
-   */
-  protected x: d3.ScaleLinear<number, number>;
+  protected xScale: d3.ScaleLinear<number, number>;
+  protected yScale: d3.ScaleLinear<number, number>;
 
-  /**
-   * y linear scale
-   */
-  protected y: d3.ScaleLinear<number, number>;
-
-  // axes
   protected axisTop: d3.Axis<number | { valueOf(): number }>;
   protected axisBottom: d3.Axis<number | { valueOf(): number }>;
   protected axisLeft: d3.Axis<number | { valueOf(): number }>;
   protected axisRight: d3.Axis<number | { valueOf(): number }>;
-
-  // axes g (group) elements
   protected gAxisTop: d3.Selection<d3.BaseType, any, HTMLElement, any>;
   protected gAxisBottom: d3.Selection<d3.BaseType, any, HTMLElement, any>;
   protected gAxisLeft: d3.Selection<d3.BaseType, any, HTMLElement, any>;
@@ -176,36 +151,31 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
   private onGetXScaleValue = (value: number): number => {
     const { k } = this.state.transform;
 
-    return this.x(value * k);
+    return this.xScale(value * k);
   };
 
   private onGetYScaleValue = (value: number): number => {
     const { k } = this.state.transform;
 
-    return this.y(value * k);
+    return this.yScale(value * k);
   };
 
   protected onZoom = () => {
     const { classes } = this.props;
     const { transform } = d3.event;
 
-    const newX = transform.rescaleX(this.x);
-    const newY = transform.rescaleY(this.y);
+    const newX = transform.rescaleX(this.xScale);
+    const newY = transform.rescaleY(this.yScale);
 
     this.setState({
       transform
     });
 
-    // update view
     this.view.attr("transform", transform);
-
-    // update axes
     this.gAxisTop.call(this.axisTop.scale(newX));
     this.gAxisBottom.call(this.axisBottom.scale(newX));
     this.gAxisLeft.call(this.axisLeft.scale(newY));
     this.gAxisRight.call(this.axisRight.scale(newY));
-
-    // remove created elements
     this.view.selectAll(`line.${classes.vector}`).remove();
     this.view.selectAll(`text.${classes.factor}`).remove();
     this.view.selectAll(`circle.${classes.point}`).remove();
@@ -215,7 +185,7 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
   };
 
   public selectSVGElement() {
-    const { fullWidth, fullHeight, margin } = this.state;
+    const { margin } = this.state;
 
     this.zoom = d3
       .zoom()
@@ -224,8 +194,6 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
 
     this.svg = d3
       .select("#biplot")
-      .attr("viewBox", `0 0 ${fullWidth} ${fullHeight}`)
-      .attr("preserveAspectRatio", "xMinYMin meet")
       .call(this.zoom)
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
@@ -268,18 +236,18 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
     const xMax = d3.max(xPoints) || 0;
     const yMax = d3.max(yPoints) || 0;
 
-    this.x = d3
+    this.xScale = d3
       .scaleLinear()
       .domain([-xMax, xMax])
       .rangeRound([0, width]);
-    this.y = d3
+    this.yScale = d3
       .scaleLinear()
       .domain([yMax, -yMax])
       .rangeRound([0, height]);
-    this.axisLeft = d3.axisLeft(this.y);
-    this.axisTop = d3.axisTop(this.x);
-    this.axisRight = d3.axisRight(this.y);
-    this.axisBottom = d3.axisBottom(this.x);
+    this.axisLeft = d3.axisLeft(this.yScale);
+    this.axisTop = d3.axisTop(this.xScale);
+    this.axisRight = d3.axisRight(this.yScale);
+    this.axisBottom = d3.axisBottom(this.xScale);
     this.gAxisLeft = this.svg
       .append("g")
       .attr("class", classes.axis)
@@ -424,12 +392,7 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
             Use mouse scroll to zoom the biplot
           </Typography>
         </Hidden>
-        <div
-          className={classes.svgContainer}
-          style={{ paddingBottom: `${(fullHeight / fullWidth) * 100}%` }}
-        >
-          <svg className={classes.svg} id="biplot" />
-        </div>
+        <SVG id="biplot" width={fullWidth} height={fullHeight} />
       </div>
     );
   }

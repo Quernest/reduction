@@ -34,7 +34,7 @@ export const FactorSelector: React.FC<IFactorSelectorProps> = ({
   }
 
   return (
-    <>
+    <React.Fragment>
       <FormControl fullWidth={true} className={classes.formControl}>
         <InputLabel htmlFor="factor">factor</InputLabel>
         <Select
@@ -54,6 +54,6 @@ export const FactorSelector: React.FC<IFactorSelectorProps> = ({
             ))}
         </Select>
       </FormControl>
-    </>
+    </React.Fragment>
   );
 };

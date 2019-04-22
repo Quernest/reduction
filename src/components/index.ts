@@ -4,3 +4,4 @@ export * from "./Header";
 export * from "./dx";
 export * from "./pca";
 export * from "./som";
+export * from "./SVG";

@@ -400,7 +400,7 @@ class HexagonalGridBase extends Component<
     }
   }
 
-  public render(): JSX.Element {
+  public render() {
     const { classes, title, positions } = this.props;
     const { width, height } = this.state;
 

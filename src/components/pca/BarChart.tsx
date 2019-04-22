@@ -10,27 +10,15 @@ import round from "lodash/round";
 import React from "react";
 import compose from "recompose/compose";
 import { IBarData, IChartState } from "../../models";
+import { SVG } from "../";
 
-const styles = ({ palette, spacing, typography, breakpoints }: Theme) =>
+const styles = ({ palette, spacing, typography }: Theme) =>
   createStyles({
     root: {
       width: "100%"
     },
     title: {
       marginTop: spacing.unit * 2
-    },
-    svgContainer: {
-      position: "relative",
-      height: 0,
-      width: "100%",
-      padding: 0 // reset
-    },
-    svg: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%"
     },
     axis: {
       fontSize: typography.fontSize,
@@ -72,20 +60,9 @@ interface IBarChartProps extends WithStyles<typeof styles> {
 }
 
 class BarChartBase extends React.Component<IBarChartProps, IChartState> {
-  /**
-   * main svg element
-   */
   protected svg: d3.Selection<d3.BaseType, any, HTMLElement, any>;
-
-  /**
-   * x axis
-   */
-  protected x: d3.ScaleBand<string>;
-
-  /**
-   * y axis
-   */
-  protected y: d3.ScaleLinear<number, number>;
+  protected xScale: d3.ScaleBand<string>;
+  protected yScale: d3.ScaleLinear<number, number>;
 
   public readonly state = {
     margin: {
@@ -105,11 +82,11 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
   };
 
   private onScaleName = ({ name }: IBarData): number => {
-    return this.x(name) || 0;
+    return this.xScale(name) || 0;
   };
 
   private onScaleValue = ({ value }: IBarData): number => {
-    return this.y(value) || 0;
+    return this.yScale(value) || 0;
   };
 
   public componentDidMount() {
@@ -119,14 +96,10 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
   }
 
   public selectSVGElement() {
-    const { margin, fullWidth, fullHeight } = this.state;
+    const { margin } = this.state;
 
     this.svg = d3
       .select("#bar")
-      .attr("width", "100%")
-      .attr("height", "100%")
-      .attr("viewBox", `0 0 ${fullWidth} ${fullHeight}`)
-      .attr("preserveAspectRatio", "xMinYMin meet")
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
   }
@@ -135,12 +108,12 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
     const { classes, xAxisLabel, yAxisLabel, data } = this.props;
     const { width, height, margin } = this.state;
 
-    this.x = d3
+    this.xScale = d3
       .scaleBand()
       .range([0, width])
       .padding(0.25)
       .domain(data.map(d => d.name));
-    this.y = d3
+    this.yScale = d3
       .scaleLinear()
       .range([height, 0])
       .domain([0, d3.max(data, d => d.value) || 0]);
@@ -148,11 +121,11 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
       .append("g")
       .attr("class", classes.axis)
       .attr("transform", `translate(0, ${height})`)
-      .call(d3.axisBottom(this.x));
+      .call(d3.axisBottom(this.xScale));
     this.svg
       .append("g")
       .attr("class", classes.axis)
-      .call(d3.axisLeft(this.y));
+      .call(d3.axisLeft(this.yScale));
     this.svg
       .append("text")
       .text(yAxisLabel || "Variances")
@@ -183,7 +156,7 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
       .append("rect")
       .attr("class", classes.bar)
       .attr("x", this.onScaleName)
-      .attr("width", this.x.bandwidth())
+      .attr("width", this.xScale.bandwidth())
       .attr("y", this.onScaleValue)
       .attr("height", d => height - this.onScaleValue(d));
 
@@ -191,7 +164,7 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
       .line<IBarData>()
       .x(d => {
         const x = this.onScaleName(d);
-        const bandWidth = this.x.bandwidth();
+        const bandWidth = this.xScale.bandwidth();
 
         if (x && bandWidth) {
           return x + bandWidth / 2;
@@ -205,9 +178,9 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
     this.svg
       .append("line")
       .attr("x1", 0)
-      .attr("y1", this.y(1))
+      .attr("y1", this.yScale(1))
       .attr("x2", width)
-      .attr("y2", this.y(1))
+      .attr("y2", this.yScale(1))
       .attr("stroke-width", 2)
       .attr("stroke", "red");
 
@@ -226,7 +199,7 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
       .attr("r", 4)
       .attr("cx", d => {
         const x = this.onScaleName(d);
-        const bandWidth = this.x.bandwidth();
+        const bandWidth = this.xScale.bandwidth();
 
         if (x && bandWidth) {
           return x + bandWidth / 2;
@@ -236,10 +209,6 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
       })
       .attr("cy", this.onScaleValue);
 
-    /**
-     * create the text labels at the top of each bar
-     * the label is current component eigenvalue
-     */
     this.svg
       .selectAll(classes.label)
       .data(data)
@@ -249,7 +218,7 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
       .attr("class", classes.label)
       .attr("x", d => {
         const x = this.onScaleName(d);
-        const bandWidth = this.x.bandwidth();
+        const bandWidth = this.xScale.bandwidth();
 
         if (x && bandWidth) {
           return x + bandWidth / 2;
@@ -276,12 +245,7 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
             {title}
           </Typography>
         )}
-        <div
-          className={classes.svgContainer}
-          style={{ paddingBottom: `${(fullHeight / fullWidth) * 100}%` }}
-        >
-          <svg className={classes.svg} id="bar" />
-        </div>
+        <SVG id="bar" width={fullWidth} height={fullHeight} />
       </div>
     );
   }
