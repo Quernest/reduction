@@ -23,7 +23,7 @@ const config: ParseConfig = {
         throw new Error("column names or rows are empty");
       }
 
-      ctx.postMessage({ filePreview: { columns, rows } });
+      ctx.postMessage({ parsedFile: { columns, rows } });
     } catch (error) {
       ctx.postMessage({ error: error.message });
     }

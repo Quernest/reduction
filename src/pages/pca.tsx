@@ -21,7 +21,7 @@ import {
 import {
   IDataset,
   IDatasetRequiredColumnsIndexes,
-  IFilePreview
+  IParsedFile
 } from "../models";
 import PCAWorker from "worker-loader!../workers/pca.worker";
 import UploadWorker from "worker-loader!../workers/upload.worker";
@@ -52,7 +52,7 @@ interface IPCAPageProps
 
 interface IPCAPageState {
   file?: File;
-  filePreview: IFilePreview;
+  parsedFile: IParsedFile;
   dataset: IDataset;
   datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
   selectedComponents: {
@@ -80,7 +80,7 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
 
   public readonly state: IPCAPageState = {
     file: undefined,
-    filePreview: {
+    parsedFile: {
       rows: [],
       columns: []
     },
@@ -145,7 +145,7 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
   }
 
   protected onUploadWorkerMsg = debounce(
-    ({ data: { error, filePreview } }: MessageEvent) => {
+    ({ data: { error, parsedFile } }: MessageEvent) => {
       if (error) {
         this.setState({
           error,
@@ -155,7 +155,7 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
       } else {
         this.setState({
           error,
-          filePreview,
+          parsedFile,
           uploaded: true,
           uploading: false
         });
@@ -235,7 +235,7 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
   };
 
   protected onCalculate = () => {
-    const { datasetRequiredColumnsIdxs, filePreview } = this.state;
+    const { datasetRequiredColumnsIdxs, parsedFile } = this.state;
 
     this.setState({
       calculated: false,
@@ -244,7 +244,7 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
 
     this.pcaWorker.postMessage({
       datasetRequiredColumnsIdxs,
-      filePreview
+      parsedFile
     });
   };
 
@@ -269,7 +269,7 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
     const { classes } = this.props;
     const {
       file,
-      filePreview,
+      parsedFile,
       dataset,
       adjustedDataset,
       datasetRequiredColumnsIdxs,
@@ -313,7 +313,7 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
           {uploaded && !calculated && (
             <CalculateControls
               datasetRequiredColumnsIdxs={datasetRequiredColumnsIdxs}
-              filePreview={filePreview}
+              parsedFile={parsedFile}
               onCalculate={this.onCalculate}
               onChangeDatasetRequiredColumns={
                 this.onChangeDatasetRequiredColumns

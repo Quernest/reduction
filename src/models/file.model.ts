@@ -1,4 +1,4 @@
-export interface IFilePreview {
+export interface IParsedFile {
   rows: any[][];
   columns: any[];
 }

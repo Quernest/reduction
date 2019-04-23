@@ -11,7 +11,7 @@ import {
   generateColumns,
   generateRows
 } from "../../components";
-import { IDatasetRequiredColumnsIndexes, IFilePreview } from "../../models";
+import { IDatasetRequiredColumnsIndexes, IParsedFile } from "../../models";
 
 const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
   root: {
@@ -35,7 +35,7 @@ const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
 
 interface ICalculateControlsProps {
   calculating?: boolean;
-  filePreview: IFilePreview;
+  parsedFile: IParsedFile;
   datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
   onCalculate: () => void;
   onChangeDatasetRequiredColumns: (
@@ -45,7 +45,7 @@ interface ICalculateControlsProps {
 
 export const CalculateControls: React.FC<ICalculateControlsProps> = ({
   calculating,
-  filePreview,
+  parsedFile,
   onChangeDatasetRequiredColumns,
   datasetRequiredColumnsIdxs,
   onCalculate
@@ -53,11 +53,11 @@ export const CalculateControls: React.FC<ICalculateControlsProps> = ({
   const classes = useStyles();
 
   const DatasetTable = React.useMemo(() => {
-    const columns = generateColumns(filePreview.columns);
-    const rows = generateRows(filePreview.rows, filePreview.columns);
+    const columns = generateColumns(parsedFile.columns);
+    const rows = generateRows(parsedFile.rows, parsedFile.columns);
 
     return <Table title="Dataset preview" rows={rows} columns={columns} />;
-  }, [filePreview]);
+  }, [parsedFile]);
 
   return (
     <div className={classes.root}>
@@ -83,8 +83,8 @@ export const CalculateControls: React.FC<ICalculateControlsProps> = ({
         </Grid>
         <Grid item={true} xs={12}>
           <DatasetControls
-            rows={filePreview.rows}
-            columns={filePreview.columns}
+            rows={parsedFile.rows}
+            columns={parsedFile.columns}
             onChange={onChangeDatasetRequiredColumns}
             datasetRequiredColumnsIdxs={datasetRequiredColumnsIdxs}
           />

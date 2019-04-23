@@ -2,17 +2,17 @@ import { generateGrid, Kohonen } from "@seracio/kohonen";
 import unzip from "lodash/unzip";
 import {
   IDatasetRequiredColumnsIndexes,
-  IFilePreview,
+  IParsedFile,
   IHexagonalGridDimensions,
-  ISOMOptions
+  ISOMOptions,
+  Dataset
 } from "src/models";
-import { DatasetService } from "../services";
 
 const ctx: Worker = self as any;
 
 interface IEventData {
   datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
-  filePreview: IFilePreview;
+  parsedFile: IParsedFile;
   dimensions: IHexagonalGridDimensions;
   options: ISOMOptions;
 }
@@ -22,7 +22,7 @@ ctx.addEventListener(
   (event: MessageEvent) => {
     const {
       datasetRequiredColumnsIdxs,
-      filePreview,
+      parsedFile,
       dimensions,
       options
     }: IEventData = event.data;
@@ -35,10 +35,7 @@ ctx.addEventListener(
     } = options;
 
     try {
-      const dataset = new DatasetService(
-        filePreview,
-        datasetRequiredColumnsIdxs
-      ).generate();
+      const dataset = new Dataset(parsedFile, datasetRequiredColumnsIdxs);
 
       const k = new Kohonen({
         neurons: generateGrid(dimensions.columns, dimensions.rows),

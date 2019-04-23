@@ -5,7 +5,8 @@
     "member-ordering": [false],
     "object-literal-sort-keys": [false],
     "no-unused-expression": [true],
-    "ordered-imports": [false]
+    "ordered-imports": [false],
+    "jsx-no-lambda": [false]
   },
   "linterOptions": {
     "exclude": [

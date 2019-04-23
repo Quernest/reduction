@@ -1,30 +1,29 @@
 import forEach from "lodash/forEach";
 import map from "lodash/map";
 import unzip from "lodash/unzip";
-import { IDatasetRequiredColumnsIndexes, IFilePreview } from "../models";
+import {
+  IDatasetRequiredColumnsIndexes,
+  IParsedFile,
+  Dataset
+} from "../models";
 // @ts-ignore
 import PCA from "ml-pca";
 import Matrix from "ml-matrix";
-import { DatasetService } from "../services";
 
 const ctx: Worker = self as any;
 
 interface IEventData {
   datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
-  filePreview: IFilePreview;
+  parsedFile: IParsedFile;
 }
 
 ctx.addEventListener(
   "message",
   (event: MessageEvent) => {
-    const { datasetRequiredColumnsIdxs, filePreview }: IEventData = event.data;
+    const { datasetRequiredColumnsIdxs, parsedFile }: IEventData = event.data;
 
     try {
-      const dataset = new DatasetService(
-        filePreview,
-        datasetRequiredColumnsIdxs
-      ).generate();
-
+      const dataset = new Dataset(parsedFile, datasetRequiredColumnsIdxs);
       const unzippedDataset = unzip(dataset.values);
       const PCAOptions = { scale: true, center: true };
       const pca = new PCA(unzippedDataset, PCAOptions);

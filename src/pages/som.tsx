@@ -26,7 +26,7 @@ import {
 import {
   IDataset,
   IDatasetRequiredColumnsIndexes,
-  IFilePreview,
+  IParsedFile,
   IHexagonalGridDimensions,
   ISOMOptions
 } from "../models";
@@ -70,7 +70,7 @@ interface ISOMPageProps
 
 interface ISOMPageState {
   file?: File;
-  filePreview: IFilePreview;
+  parsedFile: IParsedFile;
   datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes;
   dataset: IDataset;
   uploading: boolean;
@@ -94,7 +94,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
 
   public readonly state: ISOMPageState = {
     file: undefined,
-    filePreview: {
+    parsedFile: {
       rows: [],
       columns: []
     },
@@ -167,12 +167,12 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
     newDimensions: IHexagonalGridDimensions,
     newOptions: ISOMOptions
   ) => {
-    const { filePreview, datasetRequiredColumnsIdxs } = this.state;
+    const { parsedFile, datasetRequiredColumnsIdxs } = this.state;
 
     this.setState({ dimensions: newDimensions, options: newOptions });
     this.startCalculating(
       datasetRequiredColumnsIdxs,
-      filePreview,
+      parsedFile,
       newDimensions,
       newOptions
     );
@@ -216,7 +216,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
   );
 
   protected onUploadWorkerMsg = debounce(
-    ({ data: { error, filePreview } }: MessageEvent) => {
+    ({ data: { error, parsedFile } }: MessageEvent) => {
       if (error) {
         this.setState({
           error,
@@ -226,7 +226,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
       } else {
         this.clearErrors();
         this.setState({
-          filePreview,
+          parsedFile,
           uploaded: true,
           uploading: false
         });
@@ -280,14 +280,14 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
 
   public startCalculating(
     datasetRequiredColumnsIdxs: IDatasetRequiredColumnsIndexes,
-    filePreview: IFilePreview,
+    parsedFile: IParsedFile,
     dimensions: IHexagonalGridDimensions,
     options: ISOMOptions
   ) {
     this.setState({ calculated: false, calculating: true });
     this.somWorker.postMessage({
       datasetRequiredColumnsIdxs,
-      filePreview,
+      parsedFile,
       dimensions,
       options
     });
@@ -307,7 +307,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
       positions,
       dataset: { observations, types, factors },
       datasetRequiredColumnsIdxs,
-      filePreview,
+      parsedFile,
       currentFactorIdx,
       quantizationError,
       topographicError,
@@ -315,8 +315,8 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
       file
     } = this.state;
 
-    const previewColumns = generateColumns(filePreview.columns);
-    const previewRows = generateRows(filePreview.rows, filePreview.columns);
+    const previewColumns = generateColumns(parsedFile.columns);
+    const previewRows = generateRows(parsedFile.rows, parsedFile.columns);
 
     return (
       <div className={classes.root}>
@@ -338,8 +338,8 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
           {uploaded && !calculated && !calculating && (
             <>
               <DatasetControls
-                rows={filePreview.rows}
-                columns={filePreview.columns}
+                rows={parsedFile.rows}
+                columns={parsedFile.columns}
                 onChange={this.onChangeDatasetRequiredColumns}
                 datasetRequiredColumnsIdxs={datasetRequiredColumnsIdxs}
               />
