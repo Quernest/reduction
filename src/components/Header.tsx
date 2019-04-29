@@ -12,19 +12,13 @@ import ListItemText from "@material-ui/core/ListItemText";
 import { Theme } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
 import MenuIcon from "@material-ui/icons/Menu";
+import { makeStyles } from "@material-ui/styles";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import { IRoute } from "../router";
-import { makeStyles } from "@material-ui/styles";
 
 const useStyles = makeStyles(({ breakpoints }: Theme) => ({
-  wrap: {
-    width: "100%",
-    maxWidth: breakpoints.values.lg,
-    marginLeft: "auto",
-    marginRight: "auto"
-  },
   menuButton: {
     marginLeft: -12
   },
@@ -94,23 +88,21 @@ export const HeaderBase: React.FC<IHeaderProps> = ({ routes, location }) => {
     <React.Fragment>
       <AppBar position="static">
         <Toolbar>
-          <div className={classes.wrap}>
-            <Grid container={true} alignItems="center">
-              <Hidden mdUp={true}>
-                <IconButton
-                  onClick={() => toggleDrawer(true)}
-                  className={classes.menuButton}
-                  color="inherit"
-                  aria-label="Menu"
-                >
-                  <MenuIcon />
-                </IconButton>
-              </Hidden>
-              <Hidden smDown={true}>
-                <div className={classes.right}>{links}</div>
-              </Hidden>
-            </Grid>
-          </div>
+          <Grid container={true} alignItems="center">
+            <Hidden mdUp={true}>
+              <IconButton
+                onClick={() => toggleDrawer(true)}
+                className={classes.menuButton}
+                color="inherit"
+                aria-label="Menu"
+              >
+                <MenuIcon />
+              </IconButton>
+            </Hidden>
+            <Hidden smDown={true}>
+              <div className={classes.right}>{links}</div>
+            </Hidden>
+          </Grid>
         </Toolbar>
       </AppBar>
       <Hidden mdUp={true}>

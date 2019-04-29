@@ -1,9 +1,10 @@
 import Divider from "@material-ui/core/Divider";
+import Button from "@material-ui/core/Button";
 import Link from "@material-ui/core/Link";
 import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
-import * as React from "react";
+import React from "react";
 
 const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   root: {
@@ -29,6 +30,9 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   },
   blockquoteText: {
     marginTop: spacing.unit * 2,
+    marginBottom: spacing.unit * 2
+  },
+  downloadBtn: {
     marginBottom: spacing.unit * 2
   }
 }));
@@ -92,11 +96,18 @@ export const DocsPage = () => {
         </ul>
         <Typography variant="body1" paragraph={true}>
           To review an example of valid CSV data, download the following ZIP
-          file:{" "}
-          <Link href="https://gist.github.com/Quernest/d8b8d8be49c6acbbe00ea8cd0f2f16c2/archive/99c522cf29f2a2c764e6c814de8165c07c8a0975.zip">
-            Sample CSV data
-          </Link>
-          . The ZIP file contains 3 datasets. Two of them (wines) describes five
+          file:
+        </Typography>
+        <Button
+          className={classes.downloadBtn}
+          color="primary"
+          href="https://gist.github.com/Quernest/d8b8d8be49c6acbbe00ea8cd0f2f16c2/archive/99c522cf29f2a2c764e6c814de8165c07c8a0975.zip"
+          variant="outlined"
+        >
+          download
+        </Button>
+        <Typography variant="body2" paragraph={true}>
+          The ZIP file contains 3 datasets. Two of them (wines) describes five
           wines described by the average ratings of a set of experts on their
           hedonic dimension, how much the wine goes with dessert, and how much
           the wine goes with meat. Each wine is also described by its price, its
