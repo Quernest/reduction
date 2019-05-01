@@ -97,7 +97,7 @@ export class Dataset implements IDataset {
         }
       });
 
-      if (!isUndefined(typesIdx) && i === typesIdx && this.types) {
+      if (!isUndefined(typesIdx) && i === typesIdx) {
         this.types = row;
       }
 

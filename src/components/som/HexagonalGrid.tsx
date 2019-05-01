@@ -307,7 +307,7 @@ class HexagonalGridBase extends Component<
     }
 
     const getColor = (type: string) =>
-      interpolateSpectral(scaleColor(type) as number);
+      interpolateSpectral(scaleColor(type.trim()) || 0);
 
     const getX = ({ x }: IPosition) => {
       return this.scaleGrid(x as number);
