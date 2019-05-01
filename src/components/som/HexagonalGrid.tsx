@@ -12,9 +12,10 @@ import {
 } from "d3-force";
 import { scaleBand, scaleLinear } from "d3-scale";
 import {
-  interpolateBlues,
+  interpolateRdYlBu,
   interpolateGreys,
-  interpolateSpectral
+  // interpolateSpectral,
+  interpolateRainbow
 } from "d3-scale-chromatic";
 import { event, select, Selection } from "d3-selection";
 import { line } from "d3-shape";
@@ -258,7 +259,7 @@ class HexagonalGridBase extends Component<
       this.lowerCtx.beginPath();
 
       if (v && heatmap && !isUndefined(currentFactorIdx)) {
-        this.lowerCtx.fillStyle = interpolateBlues(v[currentFactorIdx]);
+        this.lowerCtx.fillStyle = interpolateRdYlBu(1 - v[currentFactorIdx]);
       } else if (umatrix) {
         this.lowerCtx.fillStyle = interpolateGreys(umatrix[i]);
       } else {
@@ -307,7 +308,7 @@ class HexagonalGridBase extends Component<
     }
 
     const getColor = (type: string) =>
-      interpolateSpectral(scaleColor(type.trim()) || 0);
+      interpolateRainbow(scaleColor(type.trim()) || 0);
 
     const getX = ({ x }: IPosition) => {
       return this.scaleGrid(x as number);
@@ -335,7 +336,7 @@ class HexagonalGridBase extends Component<
           this.upperCtx.beginPath();
           this.upperCtx.fillStyle = type
             ? getColor(type)
-            : interpolateSpectral(posInterval[i]);
+            : interpolateRainbow(posInterval[i]);
           this.upperCtx.arc(x, y, circleRadius, 0, 2 * Math.PI);
           this.upperCtx.strokeStyle = "#8395a7";
           this.upperCtx.stroke();
