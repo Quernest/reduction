@@ -12,10 +12,9 @@ import {
 } from "d3-force";
 import { scaleBand, scaleLinear } from "d3-scale";
 import {
-  interpolateRdYlBu,
   interpolateGreys,
-  // interpolateSpectral,
-  interpolateRainbow
+  interpolateRainbow,
+  interpolateSpectral
 } from "d3-scale-chromatic";
 import { event, select, Selection } from "d3-selection";
 import { line } from "d3-shape";
@@ -259,7 +258,7 @@ class HexagonalGridBase extends Component<
       this.lowerCtx.beginPath();
 
       if (v && heatmap && !isUndefined(currentFactorIdx)) {
-        this.lowerCtx.fillStyle = interpolateRdYlBu(1 - v[currentFactorIdx]);
+        this.lowerCtx.fillStyle = interpolateSpectral(1 - v[currentFactorIdx]);
       } else if (umatrix) {
         this.lowerCtx.fillStyle = interpolateGreys(umatrix[i]);
       } else {
@@ -279,7 +278,7 @@ class HexagonalGridBase extends Component<
     types?: string[]
   ) {
     const { hexagon } = this.state;
-
+    const scaleColor = scaleBand();
     const input = map<number[], IPosition>(positions, ([x, y], index) => ({
       index,
       x,
@@ -288,23 +287,20 @@ class HexagonalGridBase extends Component<
       type: types ? types[index] : undefined
     }));
 
-    const means = map(positions, pos => mean(pos));
-    const maxMean = reduce(
-      means,
-      (a, b) => (!isUndefined(b) ? Math.max(a, b) : 0),
-      0
-    );
-
-    // classify by type (add type to input and pass as param)
-    const scaleColor = scaleBand();
-
-    /**
-     * positions represented in the interval from 0 to 1
-     */
-    const posInterval = map(means, x => (!isUndefined(x) ? x / maxMean : 0));
+    let means: Array<number | undefined> = [];
+    let maxMean: number = 0;
+    let posInterval: number[] = [];
 
     if (types) {
       scaleColor.domain(types).range([0, 1]);
+    } else {
+      means = map(positions, pos => mean(pos));
+      maxMean = reduce(
+        means,
+        (a, b) => (!isUndefined(b) ? Math.max(a, b) : 0),
+        0
+      );
+      posInterval = map(means, x => (!isUndefined(x) ? x / maxMean : 0));
     }
 
     const getColor = (type: string) =>
@@ -328,7 +324,7 @@ class HexagonalGridBase extends Component<
       .on("tick", () => {
         this.clearCtxRect(this.upperCtx);
 
-        input.forEach(({ x, y, type }: IPosition, i) => {
+        forEach(input, ({ x, y, type }: IPosition, i) => {
           if (!x || !y) {
             return;
           }
@@ -338,7 +334,7 @@ class HexagonalGridBase extends Component<
             ? getColor(type)
             : interpolateRainbow(posInterval[i]);
           this.upperCtx.arc(x, y, circleRadius, 0, 2 * Math.PI);
-          this.upperCtx.strokeStyle = "#8395a7";
+          this.upperCtx.strokeStyle = "#eee";
           this.upperCtx.stroke();
           this.upperCtx.fill();
           this.upperCtx.closePath();
