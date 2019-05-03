@@ -71,7 +71,7 @@ export class Dataset implements IDataset {
     );
 
     forEach(rows, (row, i) => {
-      if (this.requiredVariablesCount + this.minFactorsCount > row.length) {
+      if (this.minObservationsCount > row.length) {
         throw new Error(
           `the number of observations must be equal to or more than ${
             this.minObservationsCount
