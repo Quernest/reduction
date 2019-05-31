@@ -10,6 +10,7 @@ import React from "react";
 import debounce from "lodash/debounce";
 import { RouteComponentProps, withRouter } from "react-router";
 import compose from "recompose/compose";
+import { withTranslation, WithTranslation } from 'react-i18next';
 import {
   ErrorMessage,
   UploadControls,
@@ -48,7 +49,7 @@ const styles = (theme: Theme) =>
 
 interface IPCAPageProps
   extends WithStyles<typeof styles>,
-  RouteComponentProps { }
+  RouteComponentProps, WithTranslation { }
 
 interface IPCAPageState {
   file?: File;
@@ -266,7 +267,7 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
   };
 
   public render() {
-    const { classes } = this.props;
+    const { classes, t } = this.props;
     const {
       file,
       parsedFile,
@@ -292,13 +293,12 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
       <div className={classes.root}>
         <div className={classes.wrap}>
           <Typography variant="h1" gutterBottom={true}>
-            Principal Component Analysis
+            {t('pages.pca.title')}
           </Typography>
           {!uploaded && !calculated && (
             <>
               <Typography variant="body1" paragraph={true}>
-                Process two-dimensional data arrays using principal component
-                analysis.
+                {t('pages.pca.description')}
               </Typography>
               <Divider className={classes.divider} />
               <UploadControls
@@ -311,15 +311,20 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
             </>
           )}
           {uploaded && !calculated && (
-            <CalculateControls
-              datasetRequiredColumnsIdxs={datasetRequiredColumnsIdxs}
-              parsedFile={parsedFile}
-              onCalculate={this.onCalculate}
-              onChangeDatasetRequiredColumns={
-                this.onChangeDatasetRequiredColumns
-              }
-              calculating={calculating}
-            />
+            <>
+              <Typography variant="body1" paragraph={true}>
+                {t('pages.pca.messages.uploaded')}
+              </Typography>
+              <CalculateControls
+                datasetRequiredColumnsIdxs={datasetRequiredColumnsIdxs}
+                parsedFile={parsedFile}
+                onCalculate={this.onCalculate}
+                onChangeDatasetRequiredColumns={
+                  this.onChangeDatasetRequiredColumns
+                }
+                calculating={calculating}
+              />
+            </>
           )}
           {calculated && (
             <>
@@ -358,5 +363,6 @@ class PCAPageBase extends React.Component<IPCAPageProps, IPCAPageState> {
 
 export const PCAPage = compose<IPCAPageProps, any>(
   withRouter,
-  withStyles(styles)
+  withTranslation(),
+  withStyles(styles),
 )(PCAPageBase);

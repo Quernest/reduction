@@ -6,6 +6,7 @@ import DashboardIcon from "@material-ui/icons/Dashboard";
 import MultilineChartIcon from "@material-ui/icons/MultilineChart";
 import { makeStyles } from "@material-ui/styles";
 import React from "react";
+import { useTranslation } from 'react-i18next';
 import { redirectTo } from "src/utils";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -36,6 +37,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const HomePage = () => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   return (
     <div className={classes.root}>
@@ -43,47 +45,34 @@ export const HomePage = () => {
         <Grid container={true} alignItems="flex-start" spacing={2}>
           <Grid item={true} xs={12}>
             <Typography variant="h1" gutterBottom={true}>
-              What is "reduction" ?
+              {t('pages.home.title')}
             </Typography>
             <Typography variant="body1" paragraph={true}>
-              In statistics, machine learning, and information theory,
-              dimensionality reduction or dimension reduction is the process of
-              reducing the number of random variables under consideration by
-              obtaining a set of principal variables. It can be divided into
-              feature selection and feature extraction.
+              {t('pages.home.description')}
             </Typography>
           </Grid>
           <Grid item={true} xs={12} md={6}>
             <div className={classes.iconTitleWrap}>
               <MultilineChartIcon color="primary" className={classes.icon} />
-              <Typography variant="h2">Principal Component Analysis</Typography>
+              <Typography variant="h2">{t('pages.home.pca.title')}</Typography>
             </div>
             <Typography variant="body1" paragraph={true}>
-              Principal component analysis (PCA) is a statistical procedure that
-              uses an orthogonal transformation to convert a set of observations
-              of possibly correlated variables (entities each of which takes on
-              various numerical values) into a set of values of linearly
-              uncorrelated variables called principal components.
+              {t('pages.home.pca.description')}
             </Typography>
             <Button {...redirectTo("/pca")} color="primary" variant="contained">
-              Try it
+              {t('pages.home.pca.button')}
             </Button>
           </Grid>
           <Grid item={true} xs={12} md={6}>
             <div className={classes.iconTitleWrap}>
               <DashboardIcon color="primary" className={classes.icon} />
-              <Typography variant="h2">Self-Organizing Maps</Typography>
+              <Typography variant="h2">{t('pages.home.som.title')}</Typography>
             </div>
             <Typography variant="body1" paragraph={true}>
-              A self-organizing map (SOM) or self-organizing feature map (SOFM)
-              is a type of artificial neural network (ANN) that is trained using
-              unsupervised learning to produce a low-dimensional (typically
-              two-dimensional), discretized representation of the input space of
-              the training samples, called a map, and is therefore a method to
-              do dimensionality reduction.
+              {t('pages.home.som.description')}
             </Typography>
             <Button {...redirectTo("/som")} color="primary" variant="contained">
-              Try it
+              {t('pages.home.som.button')}
             </Button>
           </Grid>
         </Grid>

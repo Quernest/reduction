@@ -7,10 +7,32 @@ import filter from "lodash/filter";
 import { IParsedFile } from ".";
 
 export interface IDataset {
+  /**
+   * variables (also columns) in dataset table
+   */
   variables: string[];
+
+  /**
+   * variables without observations
+   * @todo new variable name
+   */
   factors: string[];
+
+  /**
+   * names of observations
+   * it may be index or code
+   */
   observations: string[];
+
+  /**
+   * only numeric values
+   */
   values: number[][];
+
+  /**
+   * names of types
+   * need for classification by type
+   */
   types?: string[];
 }
 
@@ -26,8 +48,19 @@ export class Dataset implements IDataset {
   public values: number[][] = [];
   public types?: string[];
 
+  /**
+   * required vars for factors
+   */
   private minFactorsCount: number = 2;
+
+  /**
+   * required vars for observations
+   */
   private minObservationsCount: number = 2;
+
+  /**
+   * getting required variables count
+   */
   private get requiredVariablesCount(): number {
     return isUndefined(this.options.typesIdx) ? 1 : 2;
   }
@@ -45,6 +78,9 @@ export class Dataset implements IDataset {
     this.handle();
   }
 
+  /**
+   * process for formating the dataset
+   */
   private handle() {
     const { columns, rows } = this.parsedFile;
     const { observationsIdx, typesIdx } = this.options;

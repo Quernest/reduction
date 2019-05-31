@@ -5,6 +5,8 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import { makeStyles } from "@material-ui/styles";
+import { useTranslation } from 'react-i18next';
+
 import React from "react";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -48,6 +50,7 @@ export const UploadControls: React.FC<IUploadControlsProps> = ({
 }) => {
   const classes = useStyles();
   const fileInput: React.RefObject<HTMLInputElement> = React.createRef();
+  const { t } = useTranslation();
 
   function onChoose(event: React.MouseEvent<HTMLElement, MouseEvent>) {
     const input = fileInput.current;
@@ -114,7 +117,7 @@ export const UploadControls: React.FC<IUploadControlsProps> = ({
             disabled={uploading}
             fullWidth={true}
           >
-            choose a file
+            {t('controls.upload.button.choose')}
           </Button>
         </Grid>
         <Grid item={true} xs={6} sm={4} md={3} lg={2}>
@@ -126,7 +129,7 @@ export const UploadControls: React.FC<IUploadControlsProps> = ({
               onClick={onUpload}
               fullWidth={true}
             >
-              Upload
+              {t('controls.upload.button.upload')}
               <CloudUploadIcon className={classes.rightIcon} />
             </Button>
             {uploading && (

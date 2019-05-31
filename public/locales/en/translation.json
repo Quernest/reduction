@@ -1,0 +1,47 @@
+{
+  "navigation": {
+    "/": "Home",
+    "/pca": "PCA",
+    "/som": "SOM",
+    "/docs": "Docs"
+  },
+  "pages": {
+    "home": {
+      "title": "What is reduction?",
+      "description": "In statistics, machine learning, and information theory, dimensionality reduction or dimension reduction is the process of reducing the number of random variables under consideration by obtaining a set of principal variables. It can be divided into feature selection and feature extraction.",
+      "pca": {
+        "title": "Principal Component Analysis",
+        "description": "A statistical procedure that uses an orthogonal transformation to convert a set of observations of possibly correlated variables (entities each of which takes on various numerical values) into a set of values of linearly uncorrelated variables called principal components.",
+        "button": "Try it"
+      },
+      "som": {
+        "title": "Self-Organizing Maps",
+        "description": "A type of artificial neural network (ANN) that is trained using unsupervised learning to produce a low-dimensional (typically two-dimensional), discretized representation of the input space of the training samples, called a map, and is therefore a method to do dimensionality reduction.",
+        "button": "Try it"
+      }
+    },
+    "pca": {
+      "title": "Principal Component Analysis",
+      "description": "Process two-dimensional data arrays using principal component analysis.",
+      "messages": {
+        "uploaded": "The dataset is uploaded. Press on the submit button."
+      }
+    },
+    "som": {
+      "title": "Self-Organizing Maps",
+      "description": "Process two-dimensional data arrays using self-organizing maps.",
+      "messages": {
+        "uploaded": "The dataset is uploaded. Press on the submit button."
+      }
+    }
+  },
+  "controls": {
+    "upload": {
+      "button": {
+        "choose": "choose a file",
+        "upload": "upload"
+      }
+    }
+  },
+  "changeLanguage": "Change language"
+}

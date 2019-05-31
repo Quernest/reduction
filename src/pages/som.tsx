@@ -12,6 +12,7 @@ import round from "lodash/round";
 import debounce from "lodash/debounce";
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
+import { withTranslation, WithTranslation } from 'react-i18next';
 import compose from "recompose/compose";
 import {
   DatasetControls,
@@ -66,7 +67,7 @@ const styles = (theme: Theme) =>
 
 interface ISOMPageProps
   extends WithStyles<typeof styles>,
-  RouteComponentProps { }
+  RouteComponentProps, WithTranslation { }
 
 interface ISOMPageState {
   file?: File;
@@ -294,7 +295,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
   }
 
   public render() {
-    const { classes } = this.props;
+    const { classes, t } = this.props;
     const {
       uploaded,
       uploading,
@@ -322,7 +323,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
       <div className={classes.root}>
         <div className={classes.wrap}>
           <Typography variant="h1" gutterBottom={true}>
-            Self-Organizing Maps
+            {t('pages.som.title')}
           </Typography>
           {uploaded && (
             <SOMControls
@@ -390,7 +391,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
           {!uploaded && !calculated && (
             <>
               <Typography variant="body1" paragraph={true}>
-                Process two-dimensional data arrays using self-organizing maps.
+                {t('pages.som.description')}
               </Typography>
               <Divider className={classes.divider} />
               <UploadControls
@@ -411,5 +412,6 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
 
 export const SOMPage = compose<ISOMPageProps, any>(
   withRouter,
+  withTranslation(),
   withStyles(styles)
 )(SOMPageBase);

@@ -3,22 +3,26 @@ import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
 import Drawer from "@material-ui/core/Drawer";
 import Grid from "@material-ui/core/Grid";
+import Typography from '@material-ui/core/Typography';
 import Hidden from "@material-ui/core/Hidden";
 import IconButton from "@material-ui/core/IconButton";
+import IconLanguage from '@material-ui/icons/Language';
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import { Theme } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
+import Tooltip from "@material-ui/core/Tooltip";
 import MenuIcon from "@material-ui/icons/Menu";
+import Popover from '@material-ui/core/Popover';
 import { makeStyles } from "@material-ui/styles";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import { IRoute } from "../router";
 
-const useStyles = makeStyles(({ breakpoints }: Theme) => ({
+const useStyles = makeStyles({
   menuButton: {
     marginLeft: -12
   },
@@ -28,7 +32,7 @@ const useStyles = makeStyles(({ breakpoints }: Theme) => ({
   right: {
     marginLeft: "auto"
   }
-}));
+});
 
 interface IHeaderProps extends RouteComponentProps {
   routes: IRoute[];
@@ -36,10 +40,28 @@ interface IHeaderProps extends RouteComponentProps {
 
 export const HeaderBase: React.FC<IHeaderProps> = ({ routes, location }) => {
   const classes = useStyles();
+  const { t, i18n } = useTranslation();
   const [isOpenDrawer, toggleDrawer] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 
-  const links = routes.map(({ path, title }, i) => {
-    if (path && title) {
+  function handleClick(event: any) {
+    setAnchorEl(event.currentTarget);
+  }
+
+  function handleClose() {
+    setAnchorEl(null);
+  }
+
+  function handleChangeLanguage(lng: string) {
+    i18n.changeLanguage(lng);
+    handleClose();
+  }
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'lng-popover' : undefined;
+
+  const links = routes.map(({ path }, i) => {
+    if (path) {
       return (
         <Button
           key={i}
@@ -51,7 +73,7 @@ export const HeaderBase: React.FC<IHeaderProps> = ({ routes, location }) => {
           variant="text"
           color="inherit"
         >
-          {title || ""}
+          {t(`navigation.${path}`) || ""}
         </Button>
       );
     }
@@ -59,8 +81,8 @@ export const HeaderBase: React.FC<IHeaderProps> = ({ routes, location }) => {
     return null;
   });
 
-  const drawerLinks = routes.map(({ path, title, icon }, i) => {
-    if (path && title && icon) {
+  const drawerLinks = routes.map(({ path, icon }, i) => {
+    if (path && icon) {
       const Icon = icon;
 
       return (
@@ -76,7 +98,7 @@ export const HeaderBase: React.FC<IHeaderProps> = ({ routes, location }) => {
           <ListItemIcon>
             <Icon color={path === location.pathname ? "primary" : "inherit"} />
           </ListItemIcon>
-          <ListItemText primary={title} />
+          <ListItemText primary={t(`navigation.${path}`)} />
         </ListItem>
       );
     }
@@ -102,6 +124,38 @@ export const HeaderBase: React.FC<IHeaderProps> = ({ routes, location }) => {
             <Hidden smDown={true}>
               <div className={classes.right}>{links}</div>
             </Hidden>
+            <Tooltip title={t('changeLanguage')}>
+              <IconButton color="inherit" aria-describedby={id} onClick={handleClick}>
+                <IconLanguage color="inherit" />
+              </IconButton>
+            </Tooltip>
+            <Popover
+              id={id}
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'center',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+              }}
+            >
+              <List component="nav" dense={true}>
+                <ListItem button={true} onClick={() => handleChangeLanguage('en')}>
+                  <ListItemText disableTypography={true}>
+                    <Typography component="span"><small>us</small> English</Typography>
+                  </ListItemText>
+                </ListItem>
+                <ListItem button={true} onClick={() => handleChangeLanguage('uk')}>
+                  <ListItemText disableTypography={true}>
+                    <Typography component="span"><small>uk</small> Українська</Typography>
+                  </ListItemText>
+                </ListItem>
+              </List>
+            </Popover>
           </Grid>
         </Toolbar>
       </AppBar>

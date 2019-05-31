@@ -2,7 +2,6 @@ import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
 import { Theme } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import React from "react";
 import {
@@ -61,9 +60,6 @@ export const CalculateControls: React.FC<ICalculateControlsProps> = ({
 
   return (
     <div className={classes.root}>
-      <Typography variant="body1" paragraph={true}>
-        The dataset is processed. Press on the calculate button
-      </Typography>
       <Grid container={true} alignItems="center" spacing={2}>
         <Grid item={true} xs={6} sm={4} md={3} lg={2}>
           <div className={classes.buttonWrapper}>

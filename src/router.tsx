@@ -11,7 +11,6 @@ import { RouteProps } from "react-router";
 import { NoMatch, PCAPage, HomePage, DocsPage, SOMPage } from "./pages";
 
 export interface IRoute extends RouteProps {
-  title?: string;
   icon?: React.ComponentType<SvgIconProps>;
 }
 
@@ -19,24 +18,20 @@ export const routes: IRoute[] = [
   {
     exact: true,
     path: "/",
-    title: "Home",
     component: HomePage,
     icon: HomeIcon
   },
   {
     path: "/pca",
-    title: "PCA",
     component: PCAPage,
     icon: MultilineChartIcon
   },
   {
-    title: "SOM",
     path: "/som",
     component: SOMPage,
     icon: DashboardIcon
   },
   {
-    title: "Docs",
     path: "/docs",
     component: DocsPage,
     icon: BookIcon
