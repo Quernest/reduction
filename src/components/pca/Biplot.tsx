@@ -7,26 +7,26 @@ import compose from "recompose/compose";
 import { IChartState, Points, Vectors } from "../../models";
 import { SVG } from "../SVG";
 
-const styles = ({ spacing, typography }: Theme) =>
+const styles = (theme: Theme) =>
   createStyles({
     root: {
       width: "100%"
     },
     title: {
-      marginTop: spacing.unit * 2
+      marginTop: theme.spacing(2)
     },
     axis: {
-      fontSize: typography.fontSize,
-      fontFamily: typography.fontFamily
+      fontSize: theme.typography.fontSize,
+      fontFamily: theme.typography.fontFamily
     },
     axisLabel: {
-      fontSize: typography.fontSize,
-      fontFamily: typography.fontFamily,
+      fontSize: theme.typography.fontSize,
+      fontFamily: theme.typography.fontFamily,
       textAnchor: "middle"
     },
     factor: {
-      fontSize: typography.fontSize,
-      fontFamily: typography.fontFamily,
+      fontSize: theme.typography.fontSize,
+      fontFamily: theme.typography.fontFamily,
       textAnchor: "middle"
     },
     vector: {
@@ -188,7 +188,7 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
     const { margin } = this.state;
 
     this.zoom = d3
-      .zoom()
+      .zoom<Element, {}>()
       .scaleExtent([1 / 2, 5])
       .on("zoom", this.onZoom);
 
@@ -350,9 +350,9 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
         const angle: number =
           (Math.atan2(
             this.onGetYScaleValue(y2Points[i]) -
-              this.onGetYScaleValue(y1Points[i]),
+            this.onGetYScaleValue(y1Points[i]),
             this.onGetXScaleValue(x2Points[i]) -
-              this.onGetXScaleValue(x1Points[i])
+            this.onGetXScaleValue(x1Points[i])
           ) *
             180) /
           Math.PI;

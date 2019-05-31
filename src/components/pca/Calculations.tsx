@@ -8,24 +8,24 @@ import React from "react";
 import { Table, generateColumns, generateRows } from "../";
 import { IDataset, IDatasetRequiredColumnsIndexes } from "../../models";
 
-const useStyles = makeStyles(({ spacing }: Theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     flexGrow: 1
   },
   tableTitle: {
-    marginBottom: spacing.unit
+    marginBottom: theme.spacing(1)
   },
   tableBox: {
     flexGrow: 1,
-    marginTop: spacing.unit * 2,
-    marginBottom: spacing.unit * 3
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(3)
   },
   tables: {
     flexGrow: 1
   },
   analysisInfo: {
-    marginTop: spacing.unit * 2,
-    marginBottom: spacing.unit * 2
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2)
   }
 }));
 

@@ -8,29 +8,29 @@ import { makeStyles } from "@material-ui/styles";
 import React from "react";
 import { redirectTo } from "src/utils";
 
-const useStyles = makeStyles(({ spacing, breakpoints }: Theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     flexGrow: 1,
-    padding: spacing.unit * 2,
-    [breakpoints.up("sm")]: {
-      padding: spacing.unit * 3
+    padding: theme.spacing(2),
+    [theme.breakpoints.up("sm")]: {
+      padding: theme.spacing(3)
     }
   },
   wrap: {
     width: "100%",
-    maxWidth: breakpoints.values.lg,
+    maxWidth: theme.breakpoints.values.lg,
     marginLeft: "auto",
     marginRight: "auto",
-    paddingBottom: spacing.unit * 3
+    paddingBottom: theme.spacing(3)
   },
   icon: {
     fontSize: 30,
-    marginRight: spacing.unit * 2
+    marginRight: theme.spacing(2)
   },
   iconTitleWrap: {
     display: "flex",
     alignItems: "center",
-    marginBottom: spacing.unit * 1.75
+    marginBottom: theme.spacing(1.75)
   }
 }));
 
@@ -40,7 +40,7 @@ export const HomePage = () => {
   return (
     <div className={classes.root}>
       <div className={classes.wrap}>
-        <Grid container={true} alignItems="flex-start" spacing={24}>
+        <Grid container={true} alignItems="flex-start" spacing={2}>
           <Grid item={true} xs={12}>
             <Typography variant="h1" gutterBottom={true}>
               What is "reduction" ?

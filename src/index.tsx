@@ -1,10 +1,3 @@
-/**
- * This is the main entry point of React application.
- * NOTE: bootstrap.ts file must be imported first
- */
-import "./bootstrap";
-import './index.css';
-
 import { ThemeProvider } from "@material-ui/styles";
 import React from "react";
 import ReactDOM from "react-dom";

@@ -52,8 +52,8 @@ export class Dataset implements IDataset {
     if (this.requiredVariablesCount + this.minFactorsCount > columns.length) {
       throw new Error(`
           the number of factors must be equal to or more than ${
-            this.minFactorsCount
-          }
+        this.minFactorsCount
+        }
           (taking into account the variable with observations and types if types are indicated)
         `);
     }
@@ -74,7 +74,7 @@ export class Dataset implements IDataset {
       if (this.minObservationsCount > row.length) {
         throw new Error(
           `the number of observations must be equal to or more than ${
-            this.minObservationsCount
+          this.minObservationsCount
           }`
         );
       }
@@ -83,14 +83,14 @@ export class Dataset implements IDataset {
         if (isNull(value)) {
           throw new Error(
             `value is required in the ${i + 1} row / ${j +
-              this.requiredVariablesCount} cell.`
+            this.requiredVariablesCount} cell.`
           );
         }
 
         if (i !== observationsIdx && i !== typesIdx && isString(value)) {
           throw new Error(
             `value in the ${i + 1} row / ${j +
-              this.requiredVariablesCount} cell is string. It must be number.
+            this.requiredVariablesCount} cell is string. It must be number.
                 If it is observation names or types select this columns
                 in selection menu.`
           );

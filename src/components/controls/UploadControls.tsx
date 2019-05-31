@@ -7,22 +7,22 @@ import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import { makeStyles } from "@material-ui/styles";
 import React from "react";
 
-const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     flexGrow: 1
   },
   rightIcon: {
-    marginLeft: spacing.unit
+    marginLeft: theme.spacing(1)
   },
   chip: {
-    marginTop: spacing.unit,
-    marginBottom: spacing.unit
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1)
   },
   buttonWrapper: {
     position: "relative"
   },
   buttonProgress: {
-    color: palette.primary.main,
+    color: theme.palette.primary.main,
     position: "absolute",
     top: "50%",
     left: "50%",
@@ -105,7 +105,7 @@ export const UploadControls: React.FC<IUploadControlsProps> = ({
         hidden={true}
         accept=".csv, .txt"
       />
-      <Grid container={true} alignItems="center" spacing={16}>
+      <Grid container={true} alignItems="center" spacing={2}>
         <Grid item={true} xs={6} sm={4} md={3} lg={2}>
           <Button
             variant="contained"

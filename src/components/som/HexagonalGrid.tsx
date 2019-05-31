@@ -26,14 +26,14 @@ import React, { Component } from "react";
 import { IHexagonalGridDimensions } from "../../models";
 import { Hexagon } from ".";
 
-const styles = ({ typography, spacing }: Theme) =>
+const styles = (theme: Theme) =>
   createStyles({
     root: {
       flexGrow: 1,
-      marginBottom: spacing.unit * 3
+      marginBottom: theme.spacing(3)
     },
     title: {
-      marginTop: spacing.unit * 2
+      marginTop: theme.spacing(2)
     },
     container: {
       position: "relative"
@@ -52,8 +52,8 @@ const styles = ({ typography, spacing }: Theme) =>
       position: "absolute",
       top: 0,
       left: 0,
-      fontSize: typography.fontSize,
-      fontFamily: typography.fontFamily,
+      fontSize: theme.typography.fontSize,
+      fontFamily: theme.typography.fontFamily,
       userSelect: "none",
       pointerEvents: "none",
       whiteSpace: "nowrap",
@@ -92,7 +92,7 @@ interface IHexagonalGridState {
 class HexagonalGridBase extends Component<
   IHexagonalGridProps,
   IHexagonalGridState
-> {
+  > {
   protected lowerCanvasReference = React.createRef<HTMLCanvasElement>();
   protected upperCanvasReference = React.createRef<HTMLCanvasElement>();
   protected lowerCanvas: Selection<HTMLCanvasElement, {}, null, undefined>;
@@ -140,14 +140,14 @@ class HexagonalGridBase extends Component<
     const bestWidth =
       Math.round(
         columns * hexagon.shortDiagonal +
-          hexagon.incircleRadius / 2 +
-          hexagon.circumcircleRadius / 2
+        hexagon.incircleRadius / 2 +
+        hexagon.circumcircleRadius / 2
       ) + hexagon.shortDiagonal;
 
     const bestHeight =
       Math.round(
         rows * (hexagon.longDiagonal - hexagon.circumcircleRadius / 2) +
-          hexagon.incircleRadius / 2
+        hexagon.incircleRadius / 2
       ) + hexagon.shortDiagonal;
 
     this.setState(
@@ -196,7 +196,7 @@ class HexagonalGridBase extends Component<
 
     this.tooltip = select("body")
       .append("div")
-      .attr("class", classes.tooltip);
+      .attr("class", classes.tooltip) as Selection<HTMLDivElement, {}, HTMLElement, any>;
   }
 
   public stopSimulation() {

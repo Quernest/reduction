@@ -33,18 +33,18 @@ import {
 import SOMWorker from "worker-loader!../workers/som.worker";
 import UploadWorker from "worker-loader!../workers/upload.worker";
 
-const styles = ({ spacing, breakpoints }: Theme) =>
+const styles = (theme: Theme) =>
   createStyles({
     root: {
       flexGrow: 1,
-      padding: spacing.unit * 2,
-      [breakpoints.up("sm")]: {
-        padding: spacing.unit * 3
+      padding: theme.spacing(2),
+      [theme.breakpoints.up("sm")]: {
+        padding: theme.spacing(3)
       }
     },
     wrap: {
       width: "100%",
-      maxWidth: breakpoints.values.lg,
+      maxWidth: theme.breakpoints.values.lg,
       marginLeft: "auto",
       marginRight: "auto"
     },
@@ -52,21 +52,21 @@ const styles = ({ spacing, breakpoints }: Theme) =>
       flexGrow: 1
     },
     divider: {
-      marginBottom: spacing.unit * 3
+      marginBottom: theme.spacing(3)
     },
     maps: {
-      marginTop: spacing.unit,
-      marginBottom: spacing.unit
+      marginTop: theme.spacing(1),
+      marginBottom: theme.spacing(1)
     },
     errors: {
-      marginTop: spacing.unit * 2,
-      marginBottom: spacing.unit * 2
+      marginTop: theme.spacing(2),
+      marginBottom: theme.spacing(2)
     }
   });
 
 interface ISOMPageProps
   extends WithStyles<typeof styles>,
-    RouteComponentProps {}
+  RouteComponentProps { }
 
 interface ISOMPageState {
   file?: File;

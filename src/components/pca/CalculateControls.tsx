@@ -13,18 +13,18 @@ import {
 } from "../../components";
 import { IDatasetRequiredColumnsIndexes, IParsedFile } from "../../models";
 
-const useStyles = makeStyles(({ spacing, palette }: Theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     flexGrow: 1
   },
   tableTitle: {
-    marginBottom: spacing.unit
+    marginBottom: theme.spacing(1)
   },
   buttonWrapper: {
     position: "relative"
   },
   buttonProgress: {
-    color: palette.primary.main,
+    color: theme.palette.primary.main,
     position: "absolute",
     top: "50%",
     left: "50%",
@@ -64,7 +64,7 @@ export const CalculateControls: React.FC<ICalculateControlsProps> = ({
       <Typography variant="body1" paragraph={true}>
         The dataset is processed. Press on the calculate button
       </Typography>
-      <Grid container={true} alignItems="center" spacing={16}>
+      <Grid container={true} alignItems="center" spacing={2}>
         <Grid item={true} xs={6} sm={4} md={3} lg={2}>
           <div className={classes.buttonWrapper}>
             <Button

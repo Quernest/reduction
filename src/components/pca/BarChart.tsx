@@ -12,28 +12,28 @@ import compose from "recompose/compose";
 import { IBarData, IChartState } from "../../models";
 import { SVG } from "../";
 
-const styles = ({ palette, spacing, typography }: Theme) =>
+const styles = (theme: Theme) =>
   createStyles({
     root: {
       width: "100%"
     },
     title: {
-      marginTop: spacing.unit * 2
+      marginTop: theme.spacing(2)
     },
     axis: {
-      fontSize: typography.fontSize,
-      fontFamily: typography.fontFamily
+      fontSize: theme.typography.fontSize,
+      fontFamily: theme.typography.fontFamily
     },
     axisLabel: {
-      fontSize: typography.fontSize,
-      fontFamily: typography.fontFamily
+      fontSize: theme.typography.fontSize,
+      fontFamily: theme.typography.fontFamily
     },
     bar: {
-      fill: palette.primary.main
+      fill: theme.palette.primary.main
     },
     barValue: {
-      fontSize: typography.fontSize,
-      fontFamily: typography.fontFamily
+      fontSize: theme.typography.fontSize,
+      fontFamily: theme.typography.fontFamily
     },
     line: {
       fill: "none",
@@ -47,8 +47,8 @@ const styles = ({ palette, spacing, typography }: Theme) =>
     },
     label: {
       textAnchor: "start",
-      fontSize: typography.fontSize,
-      fontFamily: typography.fontFamily
+      fontSize: theme.typography.fontSize,
+      fontFamily: theme.typography.fontFamily
     }
   });
 

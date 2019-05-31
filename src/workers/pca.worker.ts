@@ -6,9 +6,7 @@ import {
   IParsedFile,
   Dataset
 } from "../models";
-// @ts-ignore
-import PCA from "ml-pca";
-import Matrix from "ml-matrix";
+import { PCA } from "ml-pca";
 
 const ctx: Worker = self as any;
 
@@ -24,16 +22,53 @@ ctx.addEventListener(
 
     try {
       const dataset = new Dataset(parsedFile, datasetRequiredColumnsIdxs);
-      const unzippedDataset = unzip(dataset.values);
-      const PCAOptions = { scale: true, center: true };
-      const pca = new PCA(unzippedDataset, PCAOptions);
-      const explainedVariance: number[] = pca.getExplainedVariance();
-      const cumulativeVariance: number[] = pca.getCumulativeVariance();
-      const adjustedDataset: Matrix = pca._adjust(unzippedDataset, PCAOptions);
-      const loadings: Matrix = pca.getLoadings();
-      const predictions: Matrix = pca.predict(unzippedDataset);
-      const eigenvalues: number[] = pca.getEigenvalues();
+      const unzippedValues = unzip(dataset.values);
+
+      // creates new PCA (Principal Component Analysis) from the dataset
+      const pca = new PCA(unzippedValues, { scale: true, center: true });
+
+      // this is temporary solution of
+      // adjusting the dataset bacause
+      // pca._adjust() doesn't work
+      const adjustedDataset =
+        map(dataset.values, (xs, i) =>
+          // @ts-ignore
+          map(xs, x => (x - pca.means[i]) / pca.stdevs[i]))
+
+
+      /**
+       * proportion of variance for each component
+       */
+      const explainedVariance = pca.getExplainedVariance();
+
+      /**
+       * the cumulative proportion of variance
+       */
+      const cumulativeVariance = pca.getCumulativeVariance();
+
+      /**
+       * loadings matrix
+       */
+      const loadings = pca.getLoadings();
+
+      /**
+       * project the dataset into the PCA space
+       */
+      const predictions = pca.predict(unzippedValues);
+
+      /**
+       * eigenvalues (on the diagonal)
+       */
+      const eigenvalues = pca.getEigenvalues();
+
+      /**
+       * collection of component names
+       */
       const components = map(eigenvalues, (_, i) => `PC${++i}`);
+
+      /**
+       * components that have eigenvalues ​​above 1
+       */
       const importantComponents: string[] = [];
 
       forEach(eigenvalues, (eig, i) => {
@@ -44,14 +79,14 @@ ctx.addEventListener(
 
       ctx.postMessage({
         dataset,
+        adjustedDataset,
         explainedVariance,
         cumulativeVariance,
         loadings: loadings.to2DArray(),
         predictions: unzip(predictions.to2DArray()),
         eigenvalues,
         components,
-        importantComponents,
-        adjustedDataset: unzip(adjustedDataset.to2DArray())
+        importantComponents
       });
     } catch (error) {
       ctx.postMessage({ error: error.message });

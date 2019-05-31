@@ -11,10 +11,10 @@ import map from "lodash/map";
 import React from "react";
 import { IDatasetRequiredColumnsIndexes } from "../../models";
 
-const useStyles = makeStyles(({ spacing }: Theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    marginTop: spacing.unit * 2,
-    marginBottom: spacing.unit * 2
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2)
   },
   formControl: {
     minWidth: 100
@@ -52,7 +52,7 @@ export const DatasetControls: React.FC<IDatasetControlsProps> = ({
   return (
     <div className={classes.root}>
       <form autoComplete="off">
-        <Grid container={true} spacing={16}>
+        <Grid container={true} spacing={2}>
           <Grid item={true} xs={6} sm={4} md={3} lg={2}>
             <FormControl
               required={true}

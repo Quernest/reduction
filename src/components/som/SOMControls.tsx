@@ -146,10 +146,10 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
     return (
       <div className={classes.root}>
         <form autoComplete="off" onSubmit={this.onSubmit}>
-          <Grid container={true} spacing={24}>
+          <Grid container={true} spacing={5}>
             <Grid item={true} xs={12} sm={3}>
               <Typography variant="body1">Model</Typography>
-              <Grid container={true} spacing={16}>
+              <Grid container={true} spacing={2}>
                 <Grid item={true} xs={12} md={6}>
                   <Tooltip title="hexagons per column">
                     <FormControl fullWidth={true}>
@@ -212,7 +212,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
             </Grid>
             <Grid item={true} xs={12} sm={9}>
               <Typography variant="body1">Training</Typography>
-              <Grid container={true} spacing={16}>
+              <Grid container={true} spacing={2}>
                 <Grid item={true} xs={12} sm={4} md={2}>
                   <Tooltip title="maximum step (iteration) value">
                     <FormControl fullWidth={true}>
@@ -359,7 +359,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
                   </Tooltip>
                 </Grid>
                 <Grid item={true} xs={12} sm={4} md={2}>
-                  <Grid container={true} spacing={16}>
+                  <Grid container={true} spacing={2}>
                     <Grid item={true} xs={12}>
                       {!isEmpty(factors) && (
                         <FactorSelector
@@ -375,7 +375,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
               </Grid>
             </Grid>
             <Grid item={true} xs={12}>
-              <Grid container={true} alignItems="center" spacing={16}>
+              <Grid container={true} alignItems="center" spacing={2}>
                 <Grid item={true} xs={6} sm={4} md={2}>
                   <div className={classes.wrapper}>
                     <Button

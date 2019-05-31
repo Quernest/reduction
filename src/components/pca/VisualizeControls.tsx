@@ -13,20 +13,20 @@ import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
 import React from "react";
 
-const useStyles = makeStyles(({ spacing }: Theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     flexGrow: 1
   },
   button: {
-    marginTop: spacing.unit,
-    marginBottom: spacing.unit
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1)
   },
   formControl: {
-    marginRight: spacing.unit,
+    marginRight: theme.spacing(1),
     minWidth: 120
   },
   divider: {
-    marginBottom: spacing.unit * 2
+    marginBottom: theme.spacing(2)
   }
 }));
 
@@ -59,7 +59,7 @@ export const VisualizeControls: React.FC<IVisualizeControlsProps> = ({
   return (
     <div className={classes.root}>
       <form className={classes.root} autoComplete="off">
-        <Grid container={true} spacing={16}>
+        <Grid container={true} spacing={2}>
           <Grid item={true} xs={6} sm={4} md={3} lg={2}>
             <FormControl fullWidth={true} className={classes.formControl}>
               <InputLabel htmlFor="x">Axis X</InputLabel>

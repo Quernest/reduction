@@ -26,29 +26,29 @@ import {
 import PCAWorker from "worker-loader!../workers/pca.worker";
 import UploadWorker from "worker-loader!../workers/upload.worker";
 
-const styles = ({ spacing, breakpoints }: Theme) =>
+const styles = (theme: Theme) =>
   createStyles({
     root: {
       flexGrow: 1,
-      padding: spacing.unit * 2,
-      [breakpoints.up("sm")]: {
-        padding: spacing.unit * 3
+      padding: theme.spacing(2),
+      [theme.breakpoints.up("sm")]: {
+        padding: theme.spacing(3)
       }
     },
     wrap: {
       width: "100%",
-      maxWidth: breakpoints.values.lg,
+      maxWidth: theme.breakpoints.values.lg,
       marginLeft: "auto",
       marginRight: "auto"
     },
     divider: {
-      marginBottom: spacing.unit * 3
+      marginBottom: theme.spacing(3)
     }
   });
 
 interface IPCAPageProps
   extends WithStyles<typeof styles>,
-    RouteComponentProps {}
+  RouteComponentProps { }
 
 interface IPCAPageState {
   file?: File;

@@ -6,34 +6,34 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import React from "react";
 
-const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     flexGrow: 1,
-    padding: spacing.unit * 2,
-    [breakpoints.up("sm")]: {
-      padding: spacing.unit * 3
+    padding: theme.spacing(2),
+    [theme.breakpoints.up("sm")]: {
+      padding: theme.spacing(3)
     }
   },
   wrap: {
     width: "100%",
-    maxWidth: breakpoints.values.lg,
+    maxWidth: theme.breakpoints.values.lg,
     marginLeft: "auto",
     marginRight: "auto"
   },
   divider: {
-    marginBottom: spacing.unit * 3
+    marginBottom: theme.spacing(3)
   },
   blockquote: {
-    margin: `${spacing.unit * 3}px 0px`,
-    padding: `${spacing.unit / 2}px ${spacing.unit * 3}px`,
+    margin: theme.spacing(3, 0),
+    padding: theme.spacing(1 / 2, 3),
     borderLeft: "5px solid rgba(0, 0, 0, 0.38)"
   },
   blockquoteText: {
-    marginTop: spacing.unit * 2,
-    marginBottom: spacing.unit * 2
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2)
   },
   downloadBtn: {
-    marginBottom: spacing.unit * 2
+    marginBottom: theme.spacing(2)
   }
 }));
 
@@ -64,7 +64,7 @@ export const DocsPage = () => {
           format as default.
         </Typography>
         <Typography variant="body1" color="secondary" paragraph={true}>
-          <Typography inline={true} variant="button" color="secondary">
+          <Typography variant="button" color="secondary">
             important:
           </Typography>{" "}
           The data in the CSV file needs to be formatted according to specific
