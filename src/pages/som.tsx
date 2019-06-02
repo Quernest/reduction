@@ -345,7 +345,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
                 datasetRequiredColumnsIdxs={datasetRequiredColumnsIdxs}
               />
               <Table
-                title="Dataset preview"
+                title={t('dataset')}
                 rows={previewRows}
                 columns={previewColumns}
               />
@@ -354,23 +354,23 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
           {calculated && (
             <div className={classes.maps}>
               <div className={classes.errors}>
-                <Grid container={true} spacing={8}>
+                <Grid container={true} spacing={1}>
                   <Grid item={true} xs="auto">
                     <Typography variant="body2">
-                      Topographic error:{" "}
-                      <span>{round(topographicError, 6)}</span>
+                      {t('topographicError')}:{" "}
+                      <span>{round(topographicError, 6)};</span>
                     </Typography>
                   </Grid>
                   <Grid item={true} xs="auto">
                     <Typography variant="body2">
-                      Quantization error:{" "}
-                      <span>{round(quantizationError, 6)}</span>
+                      {t('quantizationError')}:{" "}
+                      <span>{round(quantizationError, 6)};</span>
                     </Typography>
                   </Grid>
                 </Grid>
               </div>
               <HexagonalGrid
-                title="Heatmap"
+                title={t('heatmap')}
                 neurons={neurons}
                 dimensions={dimensions}
                 heatmap={true}
@@ -381,7 +381,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
                 types={types}
               />
               <HexagonalGrid
-                title="U-matrix"
+                title={t('umatrix')}
                 neurons={neurons}
                 dimensions={dimensions}
                 umatrix={umatrix}

@@ -33,6 +33,23 @@
       "messages": {
         "uploaded": "The dataset is uploaded. Press on the submit button."
       }
+    },
+    "docs": {
+      "title": "Documentation",
+      "alert": "Documentation is incomplete and gradually updated",
+      "datasetTitle": "Dataset",
+      "datasetFormatPart1": "This application uses",
+      "datasetFormat": "Comma-Separated Values",
+      "datasetFormatPart2": "format as default.",
+      "important": "important",
+      "importantInfo": "The data in the CSV file needs to be formatted according to specific requirements",
+      "importantInfoPart1": "the number of factors must be equal to or more than 2 (taking into account the variable with observations and types if types are indicated)",
+      "importantInfoPart2": "the number of observations must be equal to or more than 2",
+      "importantInfoPart3": "all values ​​must be numeric, unless observations and types",
+      "importantInfoPart4": "empty values are not allowed",
+      "example": "To review an example of valid CSV data, download the following ZIP file",
+      "downloadButton": "download",
+      "aboutExample": "The ZIP file contains 3 datasets. Two of them (wines) describes five wines described by the average ratings of a set of experts on their hedonic dimension, how much the wine goes with dessert, and how much the wine goes with meat. Each wine is also described by its price, its sugar and alcohol content, and its acidity. Another describes gross state product from Lattin, Carroll, and Green (2003). Data are for 50 observations (U.S. states) and 13 categories (ag, mining, trade, etc.) for the gross state product expressed as shares."
     }
   },
   "controls": {
@@ -56,10 +73,21 @@
       "axisX": "Axis X",
       "axisY": "Axis Y",
       "swapAxes": "Swap axes"
+    },
+    "som": {
+      "train": "Train",
+      "training": "Training",
+      "model": "Model",
+      "hexagonsPerRow": "hexagons per row",
+      "hexagonsPerColumn": "hexagons per column",
+      "maxStep": "max step value (number of iterations)",
+      "minLearnCoef": "min learning coefficient",
+      "maxLearnCoef": "max learning coefficient",
+      "minNeighbor": "min neighborhood function value",
+      "maxNeighbor": "max neighborhood function value"
     }
   },
   "DXTable": {
-    "datasetTitle": "Dataset",
     "paggingPanel": {
       "rowsPerPage": "Rows per page",
       "info": "{from}-{to} of {count}"
@@ -79,6 +107,7 @@
     "xAxisLabel": "Number of PCs",
     "yAxisLabel": "Eigenvalue"
   },
+  "dataset": "Dataset",
   "analysis": "Analysis",
   "variable": "Variable",
   "predictions": "Linear combinations",
@@ -90,6 +119,12 @@
   "numberOfComponentsEqual": "Number of components equal to total number of variables: {{count}}",
   "explainVariationOfTheData": "Number of components which explain {{percentage}} variation of the data: {{count}}",
   "numberOfImportantComponents": "Number of components which have eigenvalue above 1 and explain {{percentage}} of variation: {{count}}",
+  "heatmap": "Heatmap",
+  "umatrix": "U-matrix",
+  "min": "min",
+  "max": "max",
+  "rows": "rows",
+  "columns": "columns",
   "changeLanguage": "Change language",
   "error": "Error",
   "errors": {

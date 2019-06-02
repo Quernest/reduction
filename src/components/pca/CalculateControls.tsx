@@ -57,7 +57,7 @@ export const CalculateControls: React.FC<ICalculateControlsProps> = ({
    * title outside for updating
    * if language is changed
    */
-  const datasetTableTitle = t('DXTable.datasetTitle');
+  const datasetTableTitle = t('dataset');
 
   const DatasetTable = React.useMemo(() => {
     const columns = generateColumns(parsedFile.columns);

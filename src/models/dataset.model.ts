@@ -86,12 +86,7 @@ export class Dataset implements IDataset {
     const { observationsIdx, typesIdx } = this.options;
 
     if (this.requiredVariablesCount + this.minFactorsCount > columns.length) {
-      throw new Error(`
-          the number of factors must be equal to or more than ${
-        this.minFactorsCount
-        }
-          (taking into account the variable with observations and types if types are indicated)
-        `);
+      throw new Error('importantInfoPart1');
     }
 
     forEach(columns, (column, i) => {
@@ -108,11 +103,7 @@ export class Dataset implements IDataset {
 
     forEach(rows, (row, i) => {
       if (this.minObservationsCount > row.length) {
-        throw new Error(
-          `the number of observations must be equal to or more than ${
-          this.minObservationsCount
-          }`
-        );
+        throw new Error('importantInfoPart2');
       }
 
       forEach(row, (value, j) => {

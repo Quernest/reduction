@@ -9,6 +9,8 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import isEmpty from "lodash/isEmpty";
 import React from "react";
+import compose from "recompose/compose";
+import { withTranslation, WithTranslation } from 'react-i18next';
 import { FactorSelector } from ".";
 import { IHexagonalGridDimensions, ISOMOptions } from "../../models";
 
@@ -45,7 +47,7 @@ const styles = ({ palette }: Theme) =>
     }
   });
 
-interface ISOMControlsProps extends WithStyles<typeof styles> {
+interface ISOMControlsProps extends WithStyles<typeof styles>, WithTranslation {
   options: ISOMOptions;
   dimensions: IHexagonalGridDimensions;
   onSubmit: (
@@ -140,7 +142,8 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
       },
       onChangeFactor,
       factors,
-      currentFactorIdx
+      currentFactorIdx,
+      t
     } = this.props;
 
     return (
@@ -148,10 +151,10 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
         <form autoComplete="off" onSubmit={this.onSubmit}>
           <Grid container={true} spacing={5}>
             <Grid item={true} xs={12} sm={3}>
-              <Typography variant="body1">Model</Typography>
+              <Typography variant="body1">{t('controls.som.model')}</Typography>
               <Grid container={true} spacing={2}>
                 <Grid item={true} xs={12} md={6}>
-                  <Tooltip title="hexagons per column">
+                  <Tooltip title={t('controls.som.hexagonsPerColumn')}>
                     <FormControl fullWidth={true}>
                       <InputLabel
                         required={true}
@@ -161,7 +164,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
                           focused: classes.cssFocused
                         }}
                       >
-                        columns
+                        {t('columns')}
                       </InputLabel>
                       <Input
                         id="columns"
@@ -180,7 +183,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
                   </Tooltip>
                 </Grid>
                 <Grid item={true} xs={12} md={6}>
-                  <Tooltip title="hexagons per row">
+                  <Tooltip title={t('controls.som.hexagonsPerRow')}>
                     <FormControl fullWidth={true}>
                       <InputLabel
                         htmlFor="rows"
@@ -190,7 +193,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
                           focused: classes.cssFocused
                         }}
                       >
-                        rows
+                        {t('rows')}
                       </InputLabel>
                       <Input
                         id="rows"
@@ -211,10 +214,10 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
               </Grid>
             </Grid>
             <Grid item={true} xs={12} sm={9}>
-              <Typography variant="body1">Training</Typography>
+              <Typography variant="body1">{t('controls.som.training')}</Typography>
               <Grid container={true} spacing={2}>
                 <Grid item={true} xs={12} sm={4} md={2}>
-                  <Tooltip title="maximum step (iteration) value">
+                  <Tooltip title={t('controls.som.maxStep')}>
                     <FormControl fullWidth={true}>
                       <InputLabel
                         htmlFor="steps"
@@ -224,7 +227,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
                           focused: classes.cssFocused
                         }}
                       >
-                        &lambda; max
+                        &lambda; {t('max')}
                       </InputLabel>
                       <Input
                         id="steps"
@@ -243,7 +246,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
                   </Tooltip>
                 </Grid>
                 <Grid item={true} xs={6} sm={4} md={2}>
-                  <Tooltip title="minimum learning coefficient">
+                  <Tooltip title={t('controls.som.minLearnCoef')}>
                     <FormControl fullWidth={true}>
                       <InputLabel
                         htmlFor="minLearningCoeff"
@@ -253,7 +256,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
                           focused: classes.cssFocused
                         }}
                       >
-                        &alpha; min
+                        &alpha; {t('min')}
                       </InputLabel>
                       <Input
                         id="minLearningCoeff"
@@ -272,7 +275,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
                   </Tooltip>
                 </Grid>
                 <Grid item={true} xs={6} sm={4} md={2}>
-                  <Tooltip title="maximum learning coefficient">
+                  <Tooltip title={t('controls.som.maxLearnCoef')}>
                     <FormControl fullWidth={true}>
                       <InputLabel
                         htmlFor="maxLearningCoefficient"
@@ -282,7 +285,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
                           focused: classes.cssFocused
                         }}
                       >
-                        &alpha; max
+                        &alpha; {t('max')}
                       </InputLabel>
                       <Input
                         id="maxLearningCoefficient"
@@ -301,7 +304,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
                   </Tooltip>
                 </Grid>
                 <Grid item={true} xs={6} sm={4} md={2}>
-                  <Tooltip title="minimum neighbor value">
+                  <Tooltip title={t('controls.som.minNeighbor')}>
                     <FormControl fullWidth={true}>
                       <InputLabel
                         htmlFor="minNeighborhood"
@@ -311,7 +314,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
                           focused: classes.cssFocused
                         }}
                       >
-                        &theta; min
+                        &theta; {t('min')}
                       </InputLabel>
                       <Input
                         id="minNeighborhood"
@@ -330,7 +333,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
                   </Tooltip>
                 </Grid>
                 <Grid item={true} xs={6} sm={4} md={2}>
-                  <Tooltip title="maximum neighbor value">
+                  <Tooltip title={t('controls.som.maxNeighbor')}>
                     <FormControl fullWidth={true}>
                       <InputLabel
                         htmlFor="maxNeighborhood"
@@ -340,7 +343,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
                           focused: classes.cssFocused
                         }}
                       >
-                        &theta; max
+                        &theta; {t('max')}
                       </InputLabel>
                       <Input
                         id="maxNeighborhood"
@@ -385,7 +388,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
                       fullWidth={true}
                       type="submit"
                     >
-                      Submit
+                      {t('controls.som.train')}
                     </Button>
                     {loading && (
                       <CircularProgress
@@ -404,4 +407,7 @@ class SOMControlsBase extends React.Component<ISOMControlsProps> {
   }
 }
 
-export const SOMControls = withStyles(styles)(SOMControlsBase);
+export const SOMControls = compose<ISOMControlsProps, any>(
+  withTranslation(),
+  withStyles(styles),
+)(SOMControlsBase);

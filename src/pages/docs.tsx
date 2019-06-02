@@ -5,6 +5,7 @@ import { Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import React from "react";
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -39,64 +40,61 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const DocsPage = () => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   return (
     <div className={classes.root}>
       <div className={classes.wrap}>
         <Typography variant="h1" gutterBottom={true}>
-          Documentation
+          {t('pages.docs.title')}
         </Typography>
         <Divider className={classes.divider} />
         <blockquote className={classes.blockquote}>
           <Typography variant="body1" className={classes.blockquoteText}>
-            Documentation is incomplete and gradually updated
+            {t('pages.docs.alert')}
           </Typography>
         </blockquote>
         <Divider className={classes.divider} />
         <Typography variant="h2" gutterBottom={true}>
-          Dataset
+          {t('pages.docs.datasetTitle')}
         </Typography>
         <Typography variant="body1" paragraph={true}>
-          This application uses{" "}
+          {t('pages.docs.datasetFormatPart1')}{" "}
           <Link href="https://en.wikipedia.org/wiki/Comma-separated_values">
-            Comma-Separated Values
+            {t('pages.docs.datasetFormat')}
           </Link>{" "}
-          format as default.
+          {t('pages.docs.datasetFormatPart2')}
         </Typography>
         <Typography variant="body1" color="secondary" paragraph={true}>
           <Typography variant="button" color="secondary">
-            important:
+            {t('pages.docs.important')}!
           </Typography>{" "}
-          The data in the CSV file needs to be formatted according to specific
-          requirements
+          {t('pages.docs.importantInfo')}:
         </Typography>
         <ul>
           <li>
-            <Typography variant="body2" gutterBottom={true}>
-              the number of factors must be equal to or more than 2 (taking into
-              account the variable with observations and types if types are
-              indicated)
+            <Typography variant="body1" gutterBottom={true}>
+              {t('pages.docs.importantInfoPart1')}
             </Typography>
           </li>
           <li>
-            <Typography variant="body2" gutterBottom={true}>
-              the number of observations must be equal to or more than 2
+            <Typography variant="body1" gutterBottom={true}>
+              {t('pages.docs.importantInfoPart2')}
             </Typography>
           </li>
           <li>
-            <Typography variant="body2" gutterBottom={true}>
-              all values ​​must be numeric, unless observations and types
+            <Typography variant="body1" gutterBottom={true}>
+              {t('pages.docs.importantInfoPart3')}
             </Typography>
           </li>
           <li>
-            <Typography variant="body2" gutterBottom={true}>
-              empty values are not allowed
+            <Typography variant="body1" gutterBottom={true}>
+              {t('pages.docs.importantInfoPart4')}
             </Typography>
           </li>
         </ul>
         <Typography variant="body1" paragraph={true}>
-          To review an example of valid CSV data, download the following ZIP
-          file:
+          {t('pages.docs.example')}:
         </Typography>
         <Button
           className={classes.downloadBtn}
@@ -104,17 +102,10 @@ export const DocsPage = () => {
           href="https://gist.github.com/Quernest/d8b8d8be49c6acbbe00ea8cd0f2f16c2/archive/99c522cf29f2a2c764e6c814de8165c07c8a0975.zip"
           variant="outlined"
         >
-          download
+          {t('pages.docs.downloadButton')}
         </Button>
-        <Typography variant="body2" paragraph={true}>
-          The ZIP file contains 3 datasets. Two of them (wines) describes five
-          wines described by the average ratings of a set of experts on their
-          hedonic dimension, how much the wine goes with dessert, and how much
-          the wine goes with meat. Each wine is also described by its price, its
-          sugar and alcohol content, and its acidity. Another describes gross
-          state product from Lattin, Carroll, and Green (2003). Data are for 50
-          observations (U.S. states) and 13 categories (ag, mining, trade, etc.)
-          for the gross state product expressed as shares.
+        <Typography variant="body1" paragraph={true}>
+          {t('pages.docs.aboutExample')}
         </Typography>
       </div>
     </div>

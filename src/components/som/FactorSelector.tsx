@@ -5,6 +5,7 @@ import Select from "@material-ui/core/Select";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
 import React from "react";
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles({
   formControl: {
@@ -26,6 +27,7 @@ export const FactorSelector: React.FC<IFactorSelectorProps> = ({
   disabled
 }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
     const idx: number = Number(event.target.value);
@@ -36,7 +38,7 @@ export const FactorSelector: React.FC<IFactorSelectorProps> = ({
   return (
     <React.Fragment>
       <FormControl fullWidth={true} className={classes.formControl}>
-        <InputLabel htmlFor="factor">factor</InputLabel>
+        <InputLabel htmlFor="factor">{t('variable')}</InputLabel>
         <Select
           fullWidth={true}
           disabled={disabled}
