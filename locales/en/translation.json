@@ -1,0 +1,139 @@
+{
+  "navigation": {
+    "/": "Home",
+    "/pca": "PCA",
+    "/som": "SOM",
+    "/docs": "Docs"
+  },
+  "pages": {
+    "home": {
+      "title": "What is reduction?",
+      "description": "In statistics, machine learning, and information theory, dimensionality reduction or dimension reduction is the process of reducing the number of random variables under consideration by obtaining a set of principal variables. It can be divided into feature selection and feature extraction.",
+      "pca": {
+        "title": "Principal Component Analysis",
+        "description": "A statistical procedure that uses an orthogonal transformation to convert a set of observations of possibly correlated variables (entities each of which takes on various numerical values) into a set of values of linearly uncorrelated variables called principal components.",
+        "button": "Try it"
+      },
+      "som": {
+        "title": "Self-Organizing Maps",
+        "description": "A type of artificial neural network (ANN) that is trained using unsupervised learning to produce a low-dimensional (typically two-dimensional), discretized representation of the input space of the training samples, called a map, and is therefore a method to do dimensionality reduction.",
+        "button": "Try it"
+      }
+    },
+    "pca": {
+      "title": "Principal Component Analysis",
+      "description": "Process two-dimensional data arrays using principal component analysis.",
+      "messages": {
+        "uploaded": "The dataset is uploaded. Press on the submit button."
+      }
+    },
+    "som": {
+      "title": "Self-Organizing Maps",
+      "description": "Process two-dimensional data arrays using self-organizing maps.",
+      "messages": {
+        "uploaded": "The dataset is uploaded. Press on the submit button."
+      }
+    },
+    "docs": {
+      "title": "Documentation",
+      "alert": "Documentation is incomplete and gradually updated",
+      "datasetTitle": "Dataset",
+      "datasetFormatPart1": "This application uses",
+      "datasetFormat": "Comma-Separated Values",
+      "datasetFormatPart2": "format as default.",
+      "important": "important",
+      "importantInfo": "The data in the CSV file needs to be formatted according to specific requirements",
+      "importantInfoPart1": "the number of factors must be equal to or more than 2 (taking into account the variable with observations and types if types are indicated)",
+      "importantInfoPart2": "the number of observations must be equal to or more than 2",
+      "importantInfoPart3": "all values ​​must be numeric, unless observations and types",
+      "importantInfoPart4": "empty values are not allowed",
+      "example": "To review an example of valid CSV data, download the following ZIP file",
+      "downloadButton": "download",
+      "aboutExample": "The ZIP file contains 3 datasets. Two of them (wines) describes five wines described by the average ratings of a set of experts on their hedonic dimension, how much the wine goes with dessert, and how much the wine goes with meat. Each wine is also described by its price, its sugar and alcohol content, and its acidity. Another describes gross state product from Lattin, Carroll, and Green (2003). Data are for 50 observations (U.S. states) and 13 categories (ag, mining, trade, etc.) for the gross state product expressed as shares."
+    }
+  },
+  "controls": {
+    "upload": {
+      "button": {
+        "choose": "choose a file",
+        "upload": "upload"
+      }
+    },
+    "dataset": {
+      "observations": "Observations",
+      "types": "Types",
+      "requiredHelperText": "Required",
+      "optionalHelperText": "Optional",
+      "noneHelperText": "None"
+    },
+    "calculate": {
+      "button": "Analyze"
+    },
+    "visualize": {
+      "axisX": "Axis X",
+      "axisY": "Axis Y",
+      "swapAxes": "Swap axes"
+    },
+    "som": {
+      "train": "Train",
+      "training": "Training",
+      "model": "Model",
+      "hexagonsPerRow": "hexagons per row",
+      "hexagonsPerColumn": "hexagons per column",
+      "maxStep": "max step value (number of iterations)",
+      "minLearnCoef": "min learning coefficient",
+      "maxLearnCoef": "max learning coefficient",
+      "minNeighbor": "min neighborhood function value",
+      "maxNeighbor": "max neighborhood function value"
+    }
+  },
+  "DXTable": {
+    "paggingPanel": {
+      "rowsPerPage": "Rows per page",
+      "info": "{from}-{to} of {count}"
+    },
+    "columnChooser": {
+      "showColumnChooser": "Show column chooser"
+    },
+    "onlyImportantComponents": "Show only important components",
+    "showValuesInInterval": "Show values in interval (absolute)"
+  },
+  "biplot": {
+    "title": "Biplot of principal component scores",
+    "info": "Use the computer mouse or the touch screen to zoom or translate the biplot."
+  },
+  "bar": {
+    "title": "Scree plot of eigenvalues",
+    "xAxisLabel": "Number of PCs",
+    "yAxisLabel": "Eigenvalue"
+  },
+  "dataset": "Dataset",
+  "analysis": "Analysis",
+  "variable": "Variable",
+  "predictions": "Linear combinations",
+  "factorLoadings": "Factor loadings",
+  "component": "Component",
+  "eigenvalue": "Eigenvalue",
+  "explainedVariance": "Explained variance",
+  "cumulativeVariance": "Cumulative variance",
+  "numberOfComponentsEqual": "Number of components equal to total number of variables: {{count}}",
+  "explainVariationOfTheData": "Number of components which explain {{percentage}} variation of the data: {{count}}",
+  "numberOfImportantComponents": "Number of components which have eigenvalue above 1 and explain {{percentage}} of variation: {{count}}",
+  "heatmap": "Heatmap",
+  "umatrix": "U-matrix",
+  "min": "min",
+  "max": "max",
+  "rows": "rows",
+  "columns": "columns",
+  "changeLanguage": "Change language",
+  "error": "Error",
+  "errors": {
+    "invalidFile": "selected file has invalid format.",
+    "noFile": "the file is uploaded incorrectly",
+    "isInvalidDatasetValue": "the dataset is invalid. All values ​​must be numeric (unless observations and types). Also, empty values are not allowed.",
+    "theDatasetIsEmpty": "the dataset is empty",
+    "columnsOrRowsAreEmpty": "column names or rows are empty"
+  },
+  "topographicError": "Topographic error",
+  "quantizationError": "Quantization error"
+}
