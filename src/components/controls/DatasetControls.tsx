@@ -7,6 +7,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { makeStyles } from "@material-ui/styles";
 import isUndefined from "lodash/isUndefined";
+import { useTranslation } from 'react-i18next';
 import map from "lodash/map";
 import React from "react";
 import { IDatasetRequiredColumnsIndexes } from "../../models";
@@ -39,6 +40,7 @@ export const DatasetControls: React.FC<IDatasetControlsProps> = ({
   disabled
 }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
     const { name, value } = event.target;
@@ -59,7 +61,7 @@ export const DatasetControls: React.FC<IDatasetControlsProps> = ({
               fullWidth={true}
               className={classes.formControl}
             >
-              <InputLabel htmlFor="observationsIdx">Observations</InputLabel>
+              <InputLabel htmlFor="observationsIdx">{t('controls.dataset.observations')}</InputLabel>
               <Select
                 fullWidth={true}
                 disabled={disabled}
@@ -82,12 +84,12 @@ export const DatasetControls: React.FC<IDatasetControlsProps> = ({
                       )
                   )}
               </Select>
-              <FormHelperText>Required</FormHelperText>
+              <FormHelperText>{t('controls.dataset.requiredHelperText')}</FormHelperText>
             </FormControl>
           </Grid>
           <Grid item={true} xs={6} sm={4} md={3} lg={2}>
             <FormControl fullWidth={true} className={classes.formControl}>
-              <InputLabel htmlFor="typesIdx">Types</InputLabel>
+              <InputLabel htmlFor="typesIdx">{t('controls.dataset.types')}</InputLabel>
               <Select
                 fullWidth={true}
                 disabled={disabled}
@@ -103,7 +105,7 @@ export const DatasetControls: React.FC<IDatasetControlsProps> = ({
                 }}
               >
                 <MenuItem value="">
-                  <em>None</em>
+                  <em>{t('controls.dataset.noneHelperText')}</em>
                 </MenuItem>
                 {columns &&
                   map(
@@ -116,7 +118,7 @@ export const DatasetControls: React.FC<IDatasetControlsProps> = ({
                       )
                   )}
               </Select>
-              <FormHelperText>Optional</FormHelperText>
+              <FormHelperText>{t('controls.dataset.optionalHelperText')}</FormHelperText>
             </FormControl>
           </Grid>
         </Grid>

@@ -17,3 +17,5 @@ export const opposite = (value: any[] | number): any[] | number => {
 export const isLongNumber = (n: number, max: number) => {
   return String(n).replace(".", "").length > max;
 };
+
+export const toPercentage = (n: number) => n * 100;

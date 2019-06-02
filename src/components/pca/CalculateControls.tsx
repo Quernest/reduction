@@ -3,6 +3,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
 import { Theme } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/styles";
+import { useTranslation } from 'react-i18next';
 import React from "react";
 import {
   DatasetControls,
@@ -50,13 +51,20 @@ export const CalculateControls: React.FC<ICalculateControlsProps> = ({
   onCalculate
 }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
+
+  /**
+   * title outside for updating
+   * if language is changed
+   */
+  const datasetTableTitle = t('DXTable.datasetTitle');
 
   const DatasetTable = React.useMemo(() => {
     const columns = generateColumns(parsedFile.columns);
     const rows = generateRows(parsedFile.rows, parsedFile.columns);
 
-    return <Table title="Dataset preview" rows={rows} columns={columns} />;
-  }, [parsedFile]);
+    return <Table title={datasetTableTitle} rows={rows} columns={columns} />;
+  }, [parsedFile, datasetTableTitle]);
 
   return (
     <div className={classes.root}>
@@ -70,7 +78,7 @@ export const CalculateControls: React.FC<ICalculateControlsProps> = ({
               onClick={onCalculate}
               fullWidth={true}
             >
-              Calculate
+              {t('controls.calculate.button')}
             </Button>
             {calculating && (
               <CircularProgress size={24} className={classes.buttonProgress} />

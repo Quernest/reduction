@@ -5,6 +5,7 @@ import ClearIcon from "@material-ui/icons/Clear";
 import LinearScaleIcon from "@material-ui/icons/LinearScale";
 import { makeStyles } from "@material-ui/styles";
 import React from "react";
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles({
   input: {
@@ -28,6 +29,7 @@ export const IntervalInput: React.FC<IIntervalInputProps> = ({
   isOpen
 }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   if (isOpen) {
     return (
@@ -54,7 +56,7 @@ export const IntervalInput: React.FC<IIntervalInputProps> = ({
 
   return (
     <Tooltip
-      title="Show values in absolute interval"
+      title={t('DXTable.showValuesInInterval')}
       placeholder="bottom"
       enterDelay={300}
     >

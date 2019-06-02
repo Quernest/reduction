@@ -1,4 +1,3 @@
-import Hidden from "@material-ui/core/Hidden";
 import { createStyles, Theme, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
@@ -6,6 +5,7 @@ import React from "react";
 import compose from "recompose/compose";
 import { IChartState, Points, Vectors } from "../../models";
 import { SVG } from "../SVG";
+import { withTranslation, WithTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -39,7 +39,7 @@ const styles = (theme: Theme) =>
     }
   });
 
-interface IBiplotProps {
+interface IBiplotProps extends WithTranslation {
   theme: Theme;
   title?: string;
   points: Points;
@@ -373,7 +373,7 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
   };
 
   public render() {
-    const { classes, title } = this.props;
+    const { classes, title, t } = this.props;
     const { fullWidth, fullHeight } = this.state;
 
     return (
@@ -387,11 +387,9 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
             {title}
           </Typography>
         )}
-        <Hidden smDown={true}>
-          <Typography variant="body2" color="textSecondary">
-            Use mouse scroll to zoom the biplot
-          </Typography>
-        </Hidden>
+        <Typography variant="body2" color="textSecondary">
+          {t('biplot.info')}
+        </Typography>
         <SVG id="biplot" width={fullWidth} height={fullHeight} />
       </div>
     );
@@ -399,5 +397,6 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
 }
 
 export const Biplot = compose<IBiplotProps, any>(
+  withTranslation(),
   withStyles(styles, { withTheme: true })
 )(BiplotBase);

@@ -5,6 +5,7 @@ import React from "react";
 import { IBarData, Vectors, Points } from "../../models";
 import { getColumn } from "../../utils";
 import { BarChart, Biplot } from ".";
+import { useTranslation } from 'react-i18next';
 
 interface IChartsProps {
   factors: string[];
@@ -30,7 +31,9 @@ export const Charts: React.FC<IChartsProps> = ({
   selectedComponents: { x, y }
 }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
+  const biplotTitle = t('biplot.title');
   const memoizedBiplot = React.useMemo(() => {
     const x2s = getColumn<number>(loadings, x);
     const y2s = getColumn<number>(loadings, y);
@@ -41,7 +44,7 @@ export const Charts: React.FC<IChartsProps> = ({
 
     return (
       <Biplot
-        title="Biplot of principal component scores"
+        title={biplotTitle}
         eigenvectors={vectors}
         factors={factors}
         xAxisLabel={components[x]}
@@ -49,8 +52,11 @@ export const Charts: React.FC<IChartsProps> = ({
         points={points}
       />
     );
-  }, [adjustedDataset, loadings, x, y, components, factors]);
+  }, [biplotTitle, adjustedDataset, loadings, x, y, components, factors]);
 
+  const barTitle = t('bar.title');
+  const barXAxisLabel = t('bar.xAxisLabel');
+  const barYAxisLabel = t('bar.yAxisLabel');
   const memoizedBar = React.useMemo(() => {
     const data = zipWith<string, number, IBarData>(
       components,
@@ -63,13 +69,13 @@ export const Charts: React.FC<IChartsProps> = ({
 
     return (
       <BarChart
-        title="Scree plot of eigenvalues"
+        title={barTitle}
         data={data}
-        xAxisLabel="Components"
-        yAxisLabel="Variances"
+        xAxisLabel={barXAxisLabel}
+        yAxisLabel={barYAxisLabel}
       />
     );
-  }, [eigenvalues, components]);
+  }, [barTitle, barXAxisLabel, barYAxisLabel, eigenvalues, components]);
 
   return (
     <div className={classes.root}>

@@ -41,7 +41,59 @@
         "choose": "choose a file",
         "upload": "upload"
       }
+    },
+    "dataset": {
+      "observations": "Observations",
+      "types": "Types",
+      "requiredHelperText": "Required",
+      "optionalHelperText": "Optional",
+      "noneHelperText": "None"
+    },
+    "calculate": {
+      "button": "Analyze"
+    },
+    "visualize": {
+      "axisX": "Axis X",
+      "axisY": "Axis Y",
+      "swapAxes": "Swap axes"
     }
   },
-  "changeLanguage": "Change language"
+  "DXTable": {
+    "datasetTitle": "Dataset",
+    "paggingPanel": {
+      "rowsPerPage": "Rows per page",
+      "info": "{from}-{to} of {count}"
+    },
+    "columnChooser": {
+      "showColumnChooser": "Show column chooser"
+    },
+    "onlyImportantComponents": "Show only important components",
+    "showValuesInInterval": "Show values in interval (absolute)"
+  },
+  "biplot": {
+    "title": "Biplot of principal component scores",
+    "info": "Use the computer mouse or the touch screen to zoom or translate the biplot."
+  },
+  "bar": {
+    "title": "Scree plot of eigenvalues",
+    "xAxisLabel": "Number of PCs",
+    "yAxisLabel": "Eigenvalue"
+  },
+  "analysis": "Analysis",
+  "variable": "Variable",
+  "predictions": "Linear combinations",
+  "factorLoadings": "Factor loadings",
+  "component": "Component",
+  "eigenvalue": "Eigenvalue",
+  "explainedVariance": "Explained variance",
+  "cumulativeVariance": "Cumulative variance",
+  "numberOfComponentsEqual": "Number of components equal to total number of variables: {{count}}",
+  "explainVariationOfTheData": "Number of components which explain {{percentage}} variation of the data: {{count}}",
+  "numberOfImportantComponents": "Number of components which have eigenvalue above 1 and explain {{percentage}} of variation: {{count}}",
+  "changeLanguage": "Change language",
+  "error": "Error",
+  "errors": {
+    "invalidFile": "selected file has invalid format.",
+    "noFile": "the file is uploaded incorrectly"
+  }
 }

@@ -14,7 +14,6 @@ import {
   TableHeaderRow,
   Toolbar
 } from "@devexpress/dx-react-grid-material-ui";
-import { Theme } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
@@ -27,8 +26,9 @@ import zipObject from "lodash/zipObject";
 import React from "react";
 import { isLongNumber } from "../../utils";
 import { Cell, FilterComponentsButton, IntervalInput } from ".";
+import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(({ breakpoints }: Theme) => ({
+const useStyles = makeStyles({
   root: {
     flexGrow: 1
   },
@@ -40,7 +40,7 @@ const useStyles = makeStyles(({ breakpoints }: Theme) => ({
   title: {
     marginRight: "auto"
   }
-}));
+});
 
 interface ITableProps {
   rows: Row[];
@@ -58,6 +58,7 @@ export const Table: React.FC<ITableProps> = ({
   intervalFilter
 }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
   const [hiddenColumnNames, setHiddenColumnNames] = React.useState<string[]>(
     []
   );
@@ -86,11 +87,11 @@ export const Table: React.FC<ITableProps> = ({
     setInterval(Number(value));
   }
 
-  function onOpenIntervalInput(event: React.MouseEvent<HTMLElement>) {
+  function onOpenIntervalInput() {
     toggleIntervalInput(true);
   }
 
-  function onCloseIntervalInput(event: React.MouseEvent<HTMLElement>) {
+  function onCloseIntervalInput() {
     toggleIntervalInput(false);
   }
 
@@ -106,8 +107,8 @@ export const Table: React.FC<ITableProps> = ({
           <IntegratedPaging />
           <DXTable
             {...intervalFilter &&
-              interval &&
-              isOpenIntervalInput && { cellComponent: CellWrapper }}
+            interval &&
+            isOpenIntervalInput && { cellComponent: CellWrapper }}
           />
           <TableHeaderRow />
           <TableColumnVisibility
@@ -118,7 +119,7 @@ export const Table: React.FC<ITableProps> = ({
           <Plugin name="toolbar">
             <Template name="toolbarContent">
               <TemplateConnector>
-                {({}) => (
+                {({ }) => (
                   <div className={classes.toolbarContent}>
                     {title && (
                       <Typography className={classes.title} variant="body1">
@@ -142,8 +143,18 @@ export const Table: React.FC<ITableProps> = ({
               </TemplateConnector>
             </Template>
           </Plugin>
-          <ColumnChooser />
-          <PagingPanel pageSizes={[5, 10, 15]} />
+          <ColumnChooser
+            messages={{
+              showColumnChooser: t('DXTable.columnChooser.showColumnChooser')
+            }}
+          />
+          <PagingPanel
+            pageSizes={[5, 10, 15]}
+            messages={{
+              rowsPerPage: t('DXTable.paggingPanel.rowsPerPage'),
+              info: t('DXTable.paggingPanel.info')
+            }}
+          />
         </Grid>
       </Paper>
     </div>

@@ -63,6 +63,8 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
   protected svg: d3.Selection<d3.BaseType, any, HTMLElement, any>;
   protected xScale: d3.ScaleBand<string>;
   protected yScale: d3.ScaleLinear<number, number>;
+  protected gAxisBottom: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+  protected gAxisLeft: d3.Selection<d3.BaseType, any, HTMLElement, any>;
 
   public readonly state = {
     margin: {
@@ -95,6 +97,15 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
     this.drawBars();
   }
 
+  public componentDidUpdate(nextProps: IBarChartProps) {
+    if (this.props.xAxisLabel !== nextProps.xAxisLabel || this.props.yAxisLabel !== nextProps.yAxisLabel) {
+      this.svg.select(`text#axis-x-label`).remove();
+      this.svg.select(`text#axis-y-label`).remove();
+
+      this.drawAxesLabels();
+    }
+  }
+
   public selectSVGElement() {
     const { margin } = this.state;
 
@@ -105,8 +116,8 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
   }
 
   public drawAxes() {
-    const { classes, xAxisLabel, yAxisLabel, data } = this.props;
-    const { width, height, margin } = this.state;
+    const { classes, data } = this.props;
+    const { width, height } = this.state;
 
     this.xScale = d3
       .scaleBand()
@@ -117,30 +128,40 @@ class BarChartBase extends React.Component<IBarChartProps, IChartState> {
       .scaleLinear()
       .range([height, 0])
       .domain([0, d3.max(data, d => d.value) || 0]);
-    this.svg
+    this.gAxisBottom = this.svg
       .append("g")
       .attr("class", classes.axis)
       .attr("transform", `translate(0, ${height})`)
       .call(d3.axisBottom(this.xScale));
-    this.svg
+    this.gAxisLeft = this.svg
       .append("g")
       .attr("class", classes.axis)
       .call(d3.axisLeft(this.yScale));
+
+    this.drawAxesLabels();
+  }
+
+  private drawAxesLabels(): void {
+    const { classes, xAxisLabel, yAxisLabel } = this.props;
+    const { width, height, margin } = this.state;
+
     this.svg
       .append("text")
-      .text(yAxisLabel || "Variances")
+      .text(yAxisLabel || "Eigenvalue")
       .attr("transform", "rotate(-90)")
       .attr("x", 0 - height / 2)
       .attr("y", 0 - margin.left)
       .attr("dy", "1em")
+      .attr("id", "axis-x-label")
       .attr("class", classes.axisLabel)
       .style("text-anchor", "middle");
     this.svg
       .append("text")
-      .text(xAxisLabel || "Components")
+      .text(xAxisLabel || "Number of PCs")
       .attr("x", width / 2)
       .attr("y", height + margin.bottom)
       .attr("dy", "-0.5em")
+      .attr("id", "axis-y-label")
       .attr("class", classes.axisLabel)
       .style("text-anchor", "middle");
   }

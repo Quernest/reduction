@@ -12,6 +12,7 @@ import ThreeSixtyIcon from "@material-ui/icons/ThreeSixty";
 import { makeStyles } from "@material-ui/styles";
 import map from "lodash/map";
 import React from "react";
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -45,6 +46,7 @@ export const VisualizeControls: React.FC<IVisualizeControlsProps> = ({
   onChange
 }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
     const { name, value } = event.target;
@@ -62,7 +64,7 @@ export const VisualizeControls: React.FC<IVisualizeControlsProps> = ({
         <Grid container={true} spacing={2}>
           <Grid item={true} xs={6} sm={4} md={3} lg={2}>
             <FormControl fullWidth={true} className={classes.formControl}>
-              <InputLabel htmlFor="x">Axis X</InputLabel>
+              <InputLabel htmlFor="x">{t('controls.visualize.axisX')}</InputLabel>
               <Select
                 value={selectedComponents.x}
                 onChange={handleChange}
@@ -86,7 +88,7 @@ export const VisualizeControls: React.FC<IVisualizeControlsProps> = ({
           </Grid>
           <Grid item={true} xs={6} sm={4} md={3} lg={2}>
             <FormControl fullWidth={true} className={classes.formControl}>
-              <InputLabel htmlFor="y">Axis Y</InputLabel>
+              <InputLabel htmlFor="y">{t('controls.visualize.axisY')}</InputLabel>
               <Select
                 value={selectedComponents.y}
                 onChange={handleChange}
@@ -112,7 +114,7 @@ export const VisualizeControls: React.FC<IVisualizeControlsProps> = ({
             <Hidden smUp={true}>
               <Divider />
             </Hidden>
-            <Tooltip title="Swap axes">
+            <Tooltip title={t('controls.visualize.swapAxes')}>
               <IconButton
                 aria-label="Swap"
                 onClick={onSwap}

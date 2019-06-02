@@ -38,7 +38,59 @@
         "choose": "вибрати файл",
         "upload": "завантажити"
       }
+    },
+    "dataset": {
+      "observations": "Спостереження",
+      "types": "Типи",
+      "requiredHelperText": "Обов'язкове поле",
+      "optionalHelperText": "Необов'язкове поле",
+      "noneHelperText": "Немає"
+    },
+    "calculate": {
+      "button": "Аналізувати"
+    },
+    "visualize": {
+      "axisX": "Ось X",
+      "axisY": "Ось Y",
+      "swapAxes": "Змінити осі"
     }
   },
-  "changeLanguage": "Змінити мову"
+  "DXTable": {
+    "datasetTitle": "Набір даних",
+    "paggingPanel": {
+      "rowsPerPage": "Рядків на сторінці",
+      "info": "{from}-{to} з {count}"
+    },
+    "columnChooser": {
+      "showColumnChooser": "Показати вибір стовпців"
+    },
+    "onlyImportantComponents": "Показати тільки значущі компоненти",
+    "showValuesInInterval": "Показати значення в інтервалі (абсолютне значення)"
+  },
+  "biplot": {
+    "title": "Графік значень головних компонент",
+    "info": "Для зміщення і масштабування осей графіку використовуйте комп'ютерну мишу або сенсорний дисплей."
+  },
+  "bar": {
+    "title": "Діаграма кам'янистого осипу власних значень",
+    "xAxisLabel": "Номер головної компоненти",
+    "yAxisLabel": "Власне значення"
+  },
+  "analysis": "Аналіз",
+  "variable": "Показник",
+  "predictions": "Лінійні комбінації",
+  "factorLoadings": "Факторні навантаження",
+  "component": "Компонента",
+  "eigenvalue": "Власне значення",
+  "explainedVariance": "Внесок",
+  "cumulativeVariance": "Сумарна дисперсія",
+  "numberOfComponentsEqual": "Кількість компонент дорівнює загальної кількості змінних: {{count}}",
+  "explainVariationOfTheData": "Кількість компонент, що описують {{percentage}} варіації даних: {{count}}",
+  "numberOfImportantComponents": "Кількість компонент, що мають власне значення більш ніж 1 і описують {{percentage}} варіації: {{count}}",
+  "changeLanguage": "Змінити мову",
+  "error": "Помилка",
+  "errors": {
+    "invalidFile": "вибраний файл має неправильний формат.",
+    "noFile": "файл завантажений некоректно."
+  }
 }

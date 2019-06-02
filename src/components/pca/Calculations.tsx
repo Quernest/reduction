@@ -3,10 +3,13 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import filter from "lodash/filter";
 import includes from "lodash/includes";
+import map from 'lodash/map';
 import round from "lodash/round";
 import React from "react";
 import { Table, generateColumns, generateRows } from "../";
 import { IDataset, IDatasetRequiredColumnsIndexes } from "../../models";
+import { useTranslation } from 'react-i18next';
+import { toPercentage } from 'src/utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -53,73 +56,69 @@ export const Calculations: React.FC<ICalculationsProps> = ({
   datasetRequiredColumnsIdxs: { observationsIdx }
 }) => {
   const classes = useStyles();
+  const { t } = useTranslation();
+
+  const analysisTableColumnNames = [
+    t('component'),
+    t('eigenvalue'),
+    `${t('explainedVariance')}, %`,
+    `${t('cumulativeVariance')}, %`
+  ];
 
   const AnalysisTable = React.useMemo(() => {
-    const columnNames = [
-      "Component",
-      "Eigenvalue",
-      "Explained variance",
-      "Cumulative variance"
-    ];
-
-    const columns = generateColumns(columnNames);
+    const columns = generateColumns(analysisTableColumnNames);
 
     const rows = generateRows(
-      [components, eigenvalues, explainedVariance, cumulativeVariance],
-      columnNames
+      [components, eigenvalues, map(explainedVariance, toPercentage), map(cumulativeVariance, toPercentage)],
+      analysisTableColumnNames
     );
 
     return (
       <div className={classes.tableBox}>
-        <Table title="Analysis" rows={rows} columns={columns} />
+        <Table title={t('analysis')} rows={rows} columns={columns} />
         <div className={classes.analysisInfo}>
           <Typography variant="body1" gutterBottom={true}>
-            Number of components equal to total number of variables:{" "}
-            <strong>{factors.length}</strong>
+            {t('numberOfComponentsEqual', { count: factors.length })}
           </Typography>
           <Typography variant="body1" gutterBottom={true}>
-            All <strong>{factors.length}</strong> components explain{" "}
-            <strong>
-              {round(cumulativeVariance[cumulativeVariance.length - 1] * 100)}%
-            </strong>{" "}
-            variation of the data
+            {t('explainVariationOfTheData', {
+              count: factors.length,
+              percentage: `${round(toPercentage(cumulativeVariance[cumulativeVariance.length - 1]))}%`
+            })}
           </Typography>
           <Typography variant="body1" gutterBottom={true}>
-            <strong>{importantComponents.length}</strong> component
-            {importantComponents.length > 1 ? "s" : ""} have eigenvalue
-            {importantComponents.length > 1 ? "s" : ""} above 1 and explain{" "}
-            <strong>
-              {round(cumulativeVariance[importantComponents.length - 1] * 100)}%
-            </strong>{" "}
-            of variation.
+            {t('numberOfImportantComponents', {
+              count: importantComponents.length,
+              percentage: `${round(toPercentage(cumulativeVariance[importantComponents.length - 1]))}%`
+            })}
           </Typography>
         </div>
       </div>
     );
   }, [
-    eigenvalues,
-    explainedVariance,
-    cumulativeVariance,
-    importantComponents,
-    factors
-  ]);
+      analysisTableColumnNames,
+      eigenvalues,
+      explainedVariance,
+      cumulativeVariance,
+      importantComponents,
+      factors
+    ]);
 
+  const loadingsTableTitle = t('factorLoadings');
+  const factor = t('variable');
   const LoadingsTable = React.useMemo(() => {
-    const columnNames = ["Loadings", ...components];
+    const columnNames = [factor, ...components];
     const columns = generateColumns(columnNames);
-
     const rows = generateRows([factors, ...loadings], columnNames);
-
     const importantComponentNames = filter(components, component =>
       includes(importantComponents, component)
     );
-
-    const importantComponentsList = ["Loadings", ...importantComponentNames];
+    const importantComponentsList = [factor, ...importantComponentNames];
 
     return (
       <div className={classes.tableBox}>
         <Table
-          title="Loadings (i.e., Q matrix)"
+          title={loadingsTableTitle}
           importantComponentsList={importantComponentsList}
           rows={rows}
           columns={columns}
@@ -127,8 +126,9 @@ export const Calculations: React.FC<ICalculationsProps> = ({
         />
       </div>
     );
-  }, [loadings, factors, importantComponents]);
+  }, [loadingsTableTitle, factor, loadings, factors, importantComponents]);
 
+  const predictionsTableTitle = t('predictions');
   const PredictionsTable = React.useMemo(() => {
     const columnNames = [variables[observationsIdx], ...components];
     const columns = generateColumns(columnNames);
@@ -146,14 +146,14 @@ export const Calculations: React.FC<ICalculationsProps> = ({
     return (
       <div className={classes.tableBox}>
         <Table
-          title="Predicted principal components"
+          title={predictionsTableTitle}
           rows={rows}
           columns={columns}
           importantComponentsList={importantComponentsList}
         />
       </div>
     );
-  }, [observations, variables, predictions, importantComponents]);
+  }, [predictionsTableTitle, observations, variables, predictions, importantComponents]);
 
   return (
     <div className={classes.root}>

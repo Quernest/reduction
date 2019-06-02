@@ -83,13 +83,13 @@ export const UploadControls: React.FC<IUploadControlsProps> = ({
         if (exts.indexOf(ext) < 0) {
           onChange(
             undefined,
-            `invalid file selected, valid files are of [${exts.toString()}] types.`
+            "errors.invalidFile"
           );
         } else {
           onChange(chosenFile);
         }
       } else {
-        onChange(undefined, "getting file error");
+        onChange(undefined, "errors.noFile");
       }
 
       // reset input
