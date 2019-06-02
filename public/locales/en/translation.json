@@ -129,6 +129,11 @@
   "error": "Error",
   "errors": {
     "invalidFile": "selected file has invalid format.",
-    "noFile": "the file is uploaded incorrectly"
-  }
+    "noFile": "the file is uploaded incorrectly",
+    "isInvalidDatasetValue": "the dataset is invalid. All values ​​must be numeric (unless observations and types). Also, empty values are not allowed.",
+    "theDatasetIsEmpty": "the dataset is empty",
+    "columnsOrRowsAreEmpty": "column names or rows are empty"
+  },
+  "topographicError": "Topographic error",
+  "quantizationError": "Quantization error"
 }

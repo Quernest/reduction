@@ -86,12 +86,12 @@ export class Dataset implements IDataset {
     const { observationsIdx, typesIdx } = this.options;
 
     if (this.requiredVariablesCount + this.minFactorsCount > columns.length) {
-      throw new Error('importantInfoPart1');
+      throw new Error('pages.docs.importantInfoPart1');
     }
 
     forEach(columns, (column, i) => {
       if (isNull(column)) {
-        throw new Error(`variable is required in the ${i + 1} cell.`);
+        throw new Error(`errors.isInvalidDatasetValue`);
       }
     });
 
@@ -103,24 +103,16 @@ export class Dataset implements IDataset {
 
     forEach(rows, (row, i) => {
       if (this.minObservationsCount > row.length) {
-        throw new Error('importantInfoPart2');
+        throw new Error('pages.docs.importantInfoPart2');
       }
 
       forEach(row, (value, j) => {
         if (isNull(value)) {
-          throw new Error(
-            `value is required in the ${i + 1} row / ${j +
-            this.requiredVariablesCount} cell.`
-          );
+          throw new Error('errors.isInvalidDatasetValue');
         }
 
         if (i !== observationsIdx && i !== typesIdx && isString(value)) {
-          throw new Error(
-            `value in the ${i + 1} row / ${j +
-            this.requiredVariablesCount} cell is string. It must be number.
-                If it is observation names or types select this columns
-                in selection menu.`
-          );
+          throw new Error('errors.isInvalidDatasetValue');
         }
       });
 

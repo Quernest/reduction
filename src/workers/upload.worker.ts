@@ -13,14 +13,14 @@ const config: ParseConfig = {
   complete: ({ data }) => {
     try {
       if (isEmpty(data)) {
-        throw new Error("the dataset is empty");
+        throw new Error("errors.theDatasetIsEmpty");
       }
 
       const columns = head<any[]>(data);
       const rows = unzip<any>(tail(data));
 
       if (!columns || columns.length === 0 || !rows || rows.length === 0) {
-        throw new Error("column names or rows are empty");
+        throw new Error("errors.columnsOrRowsAreEmpty");
       }
 
       ctx.postMessage({ parsedFile: { columns, rows } });
