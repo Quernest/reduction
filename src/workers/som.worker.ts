@@ -36,10 +36,12 @@ ctx.addEventListener(
 
     try {
       const dataset = new Dataset(parsedFile, datasetRequiredColumnsIdxs);
+      const neurons = generateGrid(dimensions.columns, dimensions.rows);
+      const data = unzip(dataset.values);
 
       const k = new Kohonen({
-        neurons: generateGrid(dimensions.columns, dimensions.rows),
-        data: unzip(dataset.values),
+        neurons,
+        data,
         maxStep,
         minLearningCoef,
         maxLearningCoef,
@@ -47,11 +49,9 @@ ctx.addEventListener(
         maxNeighborhood
       });
 
-      k.training();
-
       ctx.postMessage({
         dataset,
-        positions: k.mapping(),
+        positions: k.mapping(data),
         umatrix: k.umatrix(),
         neurons: k.neurons,
         topographicError: k.topographicError(),
