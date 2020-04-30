@@ -25,7 +25,7 @@ ctx.addEventListener(
       const unzippedValues = unzip(dataset.values);
 
       // creates new PCA (Principal Component Analysis) from the dataset
-      const pca = new PCA(unzippedValues, { scale: true, center: true });
+      const pca = new PCA(unzippedValues, { scale: true, center: true, ignoreZeroVariance: true });
 
       // this is temporary solution of
       // adjusting the dataset bacause
