@@ -1,6 +1,16 @@
 import { createStyles, Theme, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import * as d3 from "d3";
+import {
+  forceCollide,
+  forceSimulation,
+  Simulation,
+  SimulationNodeDatum,
+  forceX,
+  forceY,
+  forceCenter,
+  forceManyBody
+} from "d3-force";
 import React from "react";
 import compose from "recompose/compose";
 import { IChartState, Points, Vectors } from "../../models";
@@ -115,6 +125,7 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
   protected gAxisBottom: d3.Selection<d3.BaseType, any, HTMLElement, any>;
   protected gAxisLeft: d3.Selection<d3.BaseType, any, HTMLElement, any>;
   protected gAxisRight: d3.Selection<d3.BaseType, any, HTMLElement, any>;
+  protected simulation: Simulation<SimulationNodeDatum, undefined>;
 
   public componentDidMount() {
     this.selectSVGElement();
@@ -148,6 +159,10 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
     }
   }
 
+  public componentWillUnmount() {
+    this.stopSimulation();
+  }
+
   private onGetXScaleValue = (value: number): number => {
     const { k } = this.state.transform;
 
@@ -159,6 +174,8 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
 
     return this.yScale(value * k);
   };
+
+  private timeout: NodeJS.Timeout;
 
   protected onZoom = () => {
     const { classes } = this.props;
@@ -179,9 +196,13 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
     this.view.selectAll(`line.${classes.vector}`).remove();
     this.view.selectAll(`text.${classes.factor}`).remove();
     this.view.selectAll(`circle.${classes.point}`).remove();
-
-    this.drawPoints();
     this.drawVectors();
+
+    clearTimeout(this.timeout);
+
+    this.timeout = setTimeout(() => {
+      this.drawPoints();
+    }, 500);
   };
 
   public selectSVGElement() {
@@ -224,6 +245,12 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
       .append("rect")
       .attr("width", width)
       .attr("height", height);
+  }
+
+  public stopSimulation() {
+    if (this.simulation) {
+      this.simulation.stop();
+    }
   }
 
   public drawAxes = () => {
@@ -303,16 +330,41 @@ class BiplotBase extends React.Component<IBiplotProps, IBiplotState> {
       classes,
       points: [xPoints, yPoints]
     } = this.props;
+    this.stopSimulation();
 
-    this.view
+    const nodes: SimulationNodeDatum[] = [];
+
+    xPoints.forEach((x, i) => {
+      const y = yPoints[i];
+
+      nodes.push({
+        x: this.onGetXScaleValue(x),
+        y: this.onGetYScaleValue(y),
+        index: i
+      });
+    });
+
+    const node = this.view
       .selectAll(`circle.${classes.point}`)
-      .data(xPoints)
+      .data(nodes)
       .enter()
       .append("circle")
       .attr("class", classes.point)
-      .attr("cx", (_, i) => this.onGetXScaleValue(xPoints[i]))
-      .attr("cy", (_, i) => this.onGetYScaleValue(yPoints[i]))
-      .attr("r", 4);
+      .attr("r", 4)
+
+    this.simulation = forceSimulation(nodes)
+      .force('x', forceX((d: SimulationNodeDatum): number => d.x as number))
+      .force('y', forceY((d: SimulationNodeDatum): number => d.y as number))
+      .force("center", forceCenter(this.state.width / 2, this.state.height / 2))
+      .force("collision", forceCollide(4))
+      .force("charge", forceManyBody().strength(0.25))
+      .on("tick", () => {
+        node
+          .attr("cx", (d: SimulationNodeDatum): number => d.x as number)
+          .attr("cy", (d: SimulationNodeDatum): number => d.y as number)
+      })
+      .alphaTarget(0)
+      .alphaDecay(0.05);
   };
 
   /**
