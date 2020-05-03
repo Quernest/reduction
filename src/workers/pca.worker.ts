@@ -1,5 +1,6 @@
 import forEach from "lodash/forEach";
 import map from "lodash/map";
+import filter from 'lodash/filter';
 import unzip from "lodash/unzip";
 import {
   IDatasetRequiredColumnsIndexes,
@@ -27,14 +28,13 @@ ctx.addEventListener(
       // creates new PCA (Principal Component Analysis) from the dataset
       const pca = new PCA(unzippedValues, { scale: true, center: true, ignoreZeroVariance: true });
 
-      // this is temporary solution of
-      // adjusting the dataset bacause
-      // pca._adjust() doesn't work
-      const adjustedDataset =
-        map(dataset.values, (xs, i) =>
+      // @ts-ignore
+      const adjustedDataset: number[][] = filter(dataset.values, (xs, i) => pca.excludedFeatures.indexOf(i) === -1)
+        // @ts-ignore
+        .map((xs, i) => {
           // @ts-ignore
-          map(xs, x => (x - pca.means[i]) / pca.stdevs[i]))
-
+          return map(xs, x => (x - pca.means[i]) / pca.stdevs[i])
+        });
 
       /**
        * proportion of variance for each component
