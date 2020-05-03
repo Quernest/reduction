@@ -29,6 +29,9 @@ ctx.addEventListener(
       const pca = new PCA(unzippedValues, { scale: true, center: true, ignoreZeroVariance: true });
 
       // @ts-ignore
+      dataset.factors = filter(dataset.factors, (xs, i) => pca.excludedFeatures.indexOf(i) === -1);
+
+      // @ts-ignore
       const adjustedDataset: number[][] = filter(dataset.values, (xs, i) => pca.excludedFeatures.indexOf(i) === -1)
         // @ts-ignore
         .map((xs, i) => {
