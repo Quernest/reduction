@@ -1,5 +1,5 @@
 import Divider from "@material-ui/core/Divider";
-import Grid from "@material-ui/core/Grid";
+// import Grid from "@material-ui/core/Grid";
 import {
   createStyles,
   Theme,
@@ -8,7 +8,7 @@ import {
 } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { Neuron } from "@seracio/kohonen/dist/types";
-import round from "lodash/round";
+// import round from "lodash/round";
 import debounce from "lodash/debounce";
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
@@ -310,8 +310,6 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
       datasetRequiredColumnsIdxs,
       parsedFile,
       currentFactorIdx,
-      quantizationError,
-      topographicError,
       error,
       file
     } = this.state;
@@ -353,7 +351,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
           )}
           {calculated && (
             <div className={classes.maps}>
-              <div className={classes.errors}>
+              {/* <div className={classes.errors}>
                 <Grid container={true} spacing={1}>
                   <Grid item={true} xs="auto">
                     <Typography variant="body2">
@@ -368,7 +366,7 @@ class SOMPageBase extends React.Component<ISOMPageProps, ISOMPageState> {
                     </Typography>
                   </Grid>
                 </Grid>
-              </div>
+              </div> */}
               <HexagonalGrid
                 title={t('heatmap')}
                 neurons={neurons}
