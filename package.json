@@ -23,7 +23,7 @@
     "d3-selection-multi": "^1.0.1",
     "i18next": "^17.3.0",
     "i18next-browser-languagedetector": "^4.0.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "ml-matrix": "^6.2.0",
     "ml-pca": "^4.0.1",
     "papaparse": "^5.0.1",
